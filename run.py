@@ -170,8 +170,8 @@ def highlight_next_build():
 
 # change_accounts_fast(daen)
 
-print(is_image_old("status", 20))
+# print(is_image_old("status", 20))
 
-# run()
+run()
 goto(pycharm)
 
