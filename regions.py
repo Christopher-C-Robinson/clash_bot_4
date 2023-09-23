@@ -161,3 +161,5 @@ def merge_regions(string, min_increase=None):
 # merge_regions("donate2")
 
 # db_delete()
+
+# db_create_table()

@@ -113,7 +113,7 @@ class Number():
 
 resource_numbers = Number(name="resource_numbers", directory="numbers/resources", confidence=0.89)
 available_resource_set = Number(name="available_resource", directory="numbers/available_resources", confidence=0.85)
-cost_numbers = Number(name="cost_numbers", directory="numbers_cost", confidence=0.85)
+cost_numbers = Number(name="cost_numbers", directory="numbers/cost", confidence=0.85)
 tower_count = Number(name="tower_count", directory="numbers/tower_count", confidence=0.85)
 build_time = Number(name="build_time", directory="numbers/time", confidence=0.89)
 research_time = Number(name="research_time", directory="numbers/research", confidence=0.85)

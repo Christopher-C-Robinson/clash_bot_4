@@ -1,5 +1,22 @@
 from datetime import datetime, timedelta
 from number_sets import *
+from pathlib import Path
+
+def time_to_army_ready():
+    time = army_time()
+    print("Time to army ready:", time)
+    return time
+
+def available_resources():
+    wait_cv2("end_battle")
+    time.sleep(1)
+
+    screen = get_screenshot(AVAILABLE_GOLD)
+    gold = available_resource_set.read_screen(screen, return_number=True, show_image=False)
+    print("Available resources (gold):", gold)
+
+    return [gold, 0, 0]
+
 
 def text_to_time(string):
     print(f"text_to_time:{string}")

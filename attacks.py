@@ -9,22 +9,22 @@ barb5 = (i_barb_b, 5, 6)
 barb_bulk = (i_barb, 5, 13)
 machine = (i_machine, 2, 1)
 chopper = (i_chopper, 2, 1)
-bomb3 = (i_bomber, 3, 1)
-bomb4 = (i_bomber, 4, 1)
-bomb5 = (i_bomber, 5, 1)
-cannon2 = (i_cannon, 2, 1)
-cannon3 = (i_cannon, 3, 1)
-cannon4 = (i_cannon, 4, 1)
-cannon5 = (i_cannon, 5, 1)
-giant4 = (i_giant, 4, 1)
-pekka1 = (i_pekka, 1, 1)
+# bomb3 = (i_bomber, 3, 1)
+# bomb4 = (i_bomber, 4, 1)
+# bomb5 = (i_bomber, 5, 1)
+# cannon2 = (i_cannon, 2, 1)
+# cannon3 = (i_cannon, 3, 1)
+# cannon4 = (i_cannon, 4, 1)
+# cannon5 = (i_cannon, 5, 1)
+# giant4 = (i_giant, 4, 1)
+# pekka1 = (i_pekka, 1, 1)
 
 troops4 = [machine, chopper, barb5]
-troops3 = [barb5, machine, bomb3, barb5, barb5, cannon5, barb5, barb5, barb5, cannon4, barb5, barb5, ]
-troops2 = [barb5, machine, bomb5, barb5, barb5, cannon5, barb5, barb5, barb5, cannon4, barb5, barb5, barb5, ]
-troops1 = [barb5, bomb5, giant4, barb5, pekka1, barb5, cannon3, machine, cannon3, barb5]
+# troops3 = [barb5, machine, bomb3, barb5, barb5, cannon5, barb5, barb5, barb5, cannon4, barb5, barb5, ]
+# troops2 = [barb5, machine, bomb5, barb5, barb5, cannon5, barb5, barb5, barb5, cannon4, barb5, barb5, barb5, ]
+# troops1 = [barb5, bomb5, giant4, barb5, pekka1, barb5, cannon3, machine, cannon3, barb5]
 
-TROOPS_B = ["Fail", troops1, troops2, troops3]
+# TROOPS_B = ["Fail", troops1, troops2, troops3]
 
 # === ATTACKS ===
 war1 = ["edrag",] * 2 + ["dragon"] * 12 + ["freeze"] * 11

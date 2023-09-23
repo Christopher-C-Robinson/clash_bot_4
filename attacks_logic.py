@@ -2,7 +2,7 @@ from account import *
 from lose_trophies import *
 from donate import *
 from people import *
-from yolo import *
+# from yolo import *
 
 def return_account(number):
     return next((x for x in accounts if x.number == number), None)
@@ -93,7 +93,8 @@ def get_war_elixir():
 
 def check_all_troops_used(a, b):
     print("Check all troops used")
-    for x in [i_barb, i_bomber, i_giant, i_pekka, i_cannon, i_machine]:
+    for x in [i_barb,i_machine]:
+    # for x in [i_barb, i_bomber, i_giant, i_pekka, i_cannon, i_machine]:
         place_b(x, a, b, 5, 1)
     return
 
@@ -357,12 +358,12 @@ def launch_attack(account, data, image):
         dp2 = None
 
     print("Launch attack: bombing")
-    if data['bomb']: bomb(data['bomb_target'], image)
-    if data['bomb_target2'] is not None: bomb(data['bomb_target2'], image)
+    # if data['bomb']: bomb(data['bomb_target'], image)
+    # if data['bomb_target2'] is not None: bomb(data['bomb_target2'], image)
     troop_pause = data['troop_pause']
 
-    if account.th < 9:
-        place_clan()
+    # if account.th < 9:
+    #     place_clan()
     print("Launch attack: initial troops")
     print("Attack - initial troops 6:", objects_to_str(data['initial_troops']))
 
@@ -376,16 +377,16 @@ def launch_attack(account, data, image):
                 place(troop, n, dp, troop_pause=troop_pause)
             else:
                 place_line(troop, n, dp, dp2)
-        try:
-            damage = read_text(DAMAGE, WHITE,True)
-        except:
-            damage = 0
-        try:
-            if int(damage) > 60:
-                standard_pace = False
-        except:
-            pass
-        print("launch_attack Damage:", damage)
+        # try:
+        #     damage = read_text(DAMAGE, WHITE,True)
+        # except:
+        #     damage = 0
+        # try:
+        #     if int(damage) > 60:
+        #         standard_pace = False
+        # except:
+        #     pass
+        # print("launch_attack Damage:", damage)
         if standard_pace: time.sleep(3)
     if standard_pace: time.sleep(10)
 
@@ -412,20 +413,20 @@ def place(troop, count_total, dp=[400,400], troop_pause=0):
             time.sleep(troop_pause)
             time.sleep(pause_dur)
             prop_troops = int(count / count_total * 100)
-            damage = read_text(DAMAGE, WHITE, True)
-            if damage > 100: damage = 0
+            # damage = read_text(DAMAGE, WHITE, True)
+            # if damage > 100: damage = 0
             # print("Place:", prop_troops, damage)
-            if damage + 30 > prop_troops and damage > 30:
-                pause_dur += 0.1
-                pause_dur = min (1.5, pause_dur)
-            if damage + 20 > prop_troops and damage > 50:
-                reduction = int((1 - prop_troops/damage) * count_total)
-                count += reduction * 2
+            # if damage + 30 > prop_troops and damage > 30:
+            #     pause_dur += 0.1
+            #     pause_dur = min (1.5, pause_dur)
+            # if damage + 20 > prop_troops and damage > 50:
+            #     reduction = int((1 - prop_troops/damage) * count_total)
+            #     count += reduction * 2
             count += 1
 
-def place_clan():
-    i_clan_army.click()
-    pag.click(STANDARD_DP)
+# def place_clan():
+#     i_clan_army.click()
+#     pag.click(STANDARD_DP)
 
 def place_line(troop, count_total, dp1, dp2, troop_pause=0):
     if troop in TROOP_ATTACK_EXT: troop = troop + "_attack"
@@ -470,42 +471,42 @@ def kill_tower(rect, yolo_code):
     show(screen, label="kill tower")
 
     killed, count = False, 0
-    while not killed and count < 5:
-        screen = get_screenshot(region=enlarged_rect, colour=1)
-        results = find_targets([yolo_code], screen, enlarged_rect[0], enlarged_rect[1])
-        if len(results) == 0:
-            killed = True
-        else:
-            pag.click(rect)
-        if lightening.i_attack.colour() < 600:
-            return
-        count += 1
+    # while not killed and count < 5:
+    #     screen = get_screenshot(region=enlarged_rect, colour=1)
+    #     results = find_targets([yolo_code], screen, enlarged_rect[0], enlarged_rect[1])
+    #     if len(results) == 0:
+    #         killed = True
+    #     else:
+    #         pag.click(rect)
+    #     if lightening.i_attack.colour() < 600:
+    #         return
+    #     count += 1
 
 
-def bomb(tower_to_bomb, image):
-    if tower_to_bomb not in [air_defence]:
-        print("Only bombing air defence atm")
-        return
-    if not lightening.i_attack.find(fast=False, show_image=False):
-        print("No spells at all")
-        return
-    if lightening.i_attack.colour() < 600:
-        print("No spells left")
-        return
+# def bomb(tower_to_bomb, image):
+#     if tower_to_bomb not in [air_defence]:
+#         print("Only bombing air defence atm")
+#         return
+#     if not lightening.i_attack.find(fast=False, show_image=False):
+#         print("No spells at all")
+#         return
+#     if lightening.i_attack.colour() < 600:
+#         print("No spells left")
+#         return
+#
+#     WAR_ZONE = (600, 0, 800, 700)
 
-    WAR_ZONE = (600, 0, 800, 700)
-
-    screen = get_screenshot(region=WAR_ZONE, colour=1)
-    results = find_targets([tower_to_bomb.yolo_code], screen, WAR_ZONE[0], WAR_ZONE[1])
+    # screen = get_screenshot(region=WAR_ZONE, colour=1)
+    # results = find_targets([tower_to_bomb.yolo_code], screen, WAR_ZONE[0], WAR_ZONE[1])
     # results = find_targets([tower_to_bomb.yolo_code], image, 0, 0)
-    if len(results) > 0:
-        lightening.i_attack.click()
-        for result in results:
-            kill_tower(result, tower_to_bomb.yolo_code)
-            if lightening.i_attack.colour() < 600:
-                print("No spells left")
-                return
-    for _ in range(3): pag.scroll(300)
+    # if len(results) > 0:
+    #     lightening.i_attack.click()
+    #     for result in results:
+    #         kill_tower(result, tower_to_bomb.yolo_code)
+    #         if lightening.i_attack.colour() < 600:
+    #             print("No spells left")
+    #             return
+    # for _ in range(3): pag.scroll(300)
 
 
 def bomb_old(tower_to_bomb):
@@ -566,38 +567,38 @@ def bomb_old_2(tower_to_bomb):
 
 
 
-def share_latest_attack():
-    print("Share latest attack")
-    goto(main)
-    i_mail.click()
-    time.sleep(0.5)
-    if not i_attack_log.find():
-        print(i_attack_log.find_detail())
-        print("Couldn't find attack log tab")
-        i_red_cross.click()
-        return
-    i_attack_log.click()
-    rects = i_share_replay.find_many(show_image=False)
-    rects = sorted(rects, key=lambda x: x[1])
-    if len(rects) > 0:
-        rect = rects[0]
-        time.sleep(0.25)
-        region = (rect[0] + 180, rect[1] + 20, 150, 80)
-        screen = get_screenshot(region)
-        result = i_3_stars_2.find_screen(screen)
-        print("3 Stars:", result)
-        if not result:
-            i_red_cross.click()
-            return
-
-        click_rect(rects[0])
-        time.sleep(0.3)
-        i_share_replay_message.click()
-        pag.write("Bot attack")
-
-        i_share_replay_send.click()
-    time.sleep(0.7)
-    i_red_cross.click()
+# def share_latest_attack():
+#     print("Share latest attack")
+#     goto(main)
+#     i_mail.click()
+#     time.sleep(0.5)
+#     if not i_attack_log.find():
+#         print(i_attack_log.find_detail())
+#         print("Couldn't find attack log tab")
+#         i_red_cross.click()
+#         return
+#     i_attack_log.click()
+#     rects = i_share_replay.find_many(show_image=False)
+#     rects = sorted(rects, key=lambda x: x[1])
+#     if len(rects) > 0:
+#         rect = rects[0]
+#         time.sleep(0.25)
+#         region = (rect[0] + 180, rect[1] + 20, 150, 80)
+#         screen = get_screenshot(region)
+#         result = i_3_stars_2.find_screen(screen)
+#         print("3 Stars:", result)
+#         if not result:
+#             i_red_cross.click()
+#             return
+#
+#         click_rect(rects[0])
+#         time.sleep(0.3)
+#         i_share_replay_message.click()
+#         pag.write("Bot attack")
+#
+#         i_share_replay_send.click()
+#     time.sleep(0.7)
+#     i_red_cross.click()
 
 # def log(var, account, no):
 #     time = datetime.now().strftime('%d %b %I:%M%p')

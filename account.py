@@ -84,9 +84,9 @@ class Account:
         self.army_troops_b = data['army_troops_b']
         icon = data['icon']
         self.icon = Image(icon, f"images/accounts/{icon}.png", threshold=0.84)
-        self.icon_b = Image(icon, f"images/accounts/{icon}_b.png", threshold=0.84)
-        icon2 = data['icon2']
-        self.icon2 = Image(icon2, f"images/accounts/{icon2}.png", threshold=0.84)
+        # self.icon_b = Image(icon, f"images/accounts/{icon}_b.png", threshold=0.84)
+        # icon2 = data['icon2']
+        self.icon2 = Image(icon + "_2", f"images/accounts/{icon}_2.png", threshold=0.84)
         self.troops_to_build = None
         self.attacking = data['attacking']
         self.attacking_b = data['attacking_b']
@@ -441,8 +441,8 @@ def set_current_account():
             max_result = result
     print("Current account:", current_account.name)
 
-def update_images(account):
-    if not is_old(account, 10): return
+def update_images(account, create=False):
+    if not create and not is_old(account, 10): return
     change_accounts_fast(account)
     goto(main)
     pag.click(BOTTOM_LEFT)
@@ -605,7 +605,6 @@ account_data_1 = {
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "bad_daz",
-    'icon2': "bad_daz2",
     'needs_walls': False,
     'attacking': True,
     'build_sets': old_th_h,
@@ -637,7 +636,6 @@ account_data_2 = {
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "daz",
-    'icon2': "daz2",
     'needs_walls': False,
     'attacking': True,
     'build_sets': old_th_h,
@@ -671,47 +669,45 @@ account_data_3 = {
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "bob",
-    'icon2': "bob2",
     'build_sets': old_th_h,
     'researching': True,
     'attacking_b': False,
 }
 
-account_data_4 = {
-    'name': "Jon Snow",
-    'number': 4,
-    'th': 11,
-    'has_siege': False,
-    'requires_siege': True,
-    'building': True,
-    'needs_walls': False,
-    'attacking': True,
-    'building_b': False,
-    'total_gold': 10000000,
-    'total_elixir': 22000,
-    'total_dark': 160000,
-    'army_troops': BARBS_52,
-    'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 7,
-    # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
-    'war_troops': [dragon] * 26 + [lightening] * 22,
-    'cwl_troops': [dragon] * 13 + [lightening] * 14,
-    'clan_troops_war': [bloon] + [edrag] + [lightening],
-    'war_donations': [dragon] * 20 + [lightening] * 14,
-    'siege_troops': [],
-    'donations_from': 1,
-    'games_troops': GIANT200_GAMES,
-    'army_troops_b': troops4,
-    'required_currency': "gold",
-    'icon': "jon_snow",
-    'icon2': "jon_snow2",
-    'build_sets': old_th_h,
-    'researching': False,
-    'attacking_b': False,
-}
+# account_data_4 = {
+#     'name': "Jon Snow",
+#     'number': 4,
+#     'th': 11,
+#     'has_siege': False,
+#     'requires_siege': True,
+#     'building': True,
+#     'needs_walls': False,
+#     'attacking': True,
+#     'building_b': False,
+#     'total_gold': 10000000,
+#     'total_elixir': 22000,
+#     'total_dark': 160000,
+#     'army_troops': BARBS_52,
+#     'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 7,
+#     # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
+#     'war_troops': [dragon] * 26 + [lightening] * 22,
+#     'cwl_troops': [dragon] * 13 + [lightening] * 14,
+#     'clan_troops_war': [bloon] + [edrag] + [lightening],
+#     'war_donations': [dragon] * 20 + [lightening] * 14,
+#     'siege_troops': [],
+#     'donations_from': 1,
+#     'games_troops': GIANT200_GAMES,
+#     'army_troops_b': troops4,
+#     'required_currency': "gold",
+#     'icon': "jon",
+#     'build_sets': old_th_h,
+#     'researching': False,
+#     'attacking_b': False,
+# }
 
-account_data_5 = {
+account_data_4 = {
     'name': "Crusher",
-    'number': 5,
+    'number': 4,
     'th': 11,
     'has_siege': False,
     'requires_siege': True,
@@ -734,15 +730,14 @@ account_data_5 = {
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "crusher",
-    'icon2': "crusher2",
     'build_sets': old_th_h,
     'researching': False,
     'attacking_b': False,
 }
 
-account_data_6 = {
+account_data_5 = {
     'name': "Daenerys",
-    'number': 6,
+    'number': 5,
     'th': 11,
     'has_siege': False,
     'requires_siege': True,
@@ -765,7 +760,6 @@ account_data_6 = {
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "daenerys",
-    'icon2': "daenerys2",
     'build_sets': old_th_h,
     'researching': False,
     'attacking_b': True,
@@ -773,7 +767,7 @@ account_data_6 = {
 
 
 
-for data in [account_data_1, account_data_2, account_data_3, account_data_4, account_data_5, account_data_6]:
+for data in [account_data_1, account_data_2, account_data_3, account_data_4, account_data_5]:
     Account(data)
 
 def return_account(number):
@@ -784,14 +778,14 @@ account_2 = next((x for x in accounts if x.number == 2), None)
 account_3 = next((x for x in accounts if x.number == 3), None)
 account_4 = next((x for x in accounts if x.number == 4), None)
 account_5 = next((x for x in accounts if x.number == 5), None)
-account_6 = next((x for x in accounts if x.number == 6), None)
+# account_6 = next((x for x in accounts if x.number == 6), None)
 
 bad_daz = account_1
 daz = account_2
 bob = account_3
 jon = account_4
-micah = account_5
-daen = account_6
+micah = account_4
+daen = account_5
 
 war_participants = [bad_daz, daz, bob, jon, daen]
 

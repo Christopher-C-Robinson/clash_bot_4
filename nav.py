@@ -2,6 +2,7 @@ import psutil
 
 from towers_load import *
 from images import *
+from number_sets import *
 
 ICONS = (300, 1012, 1200, 62)
 TOP_LEFT = (0,0,300,100)
@@ -427,7 +428,7 @@ builder = Loc(name="builder", identifier=i_master_builder, accessible=True)
 builder.add_identifier(i_otto)
 
 overlays = []
-for overlay in [i_another_device, i_ad_cross, i_ad_back, i_reload, i_reload_2, i_reload_game, i_ad_cross, i_try_again, i_return_home, i_pre_app, i_okay, i_okay2, i_okay3, i_okay4, i_okay5,
+for overlay in [i_another_device, i_ad_cross, i_ad_back, i_reload, i_reload_game, i_ad_cross, i_try_again, i_return_home, i_pre_app, i_okay, i_okay2, i_okay3, i_okay4, i_okay5,
                 i_next2, i_return_home_2, i_return_home_3, i_red_cross, i_red_cross_2, i_red_cross_3, i_close_app, i_return_home_b]:
     new_overlay = Loc(name=overlay.name[2:], identifier=overlay, accessible=False)
     if overlay == i_another_device:
@@ -457,7 +458,7 @@ l_lab = Loc(name="lab", identifier=i_research_upgrading, accessible=True)
 l_lab.add_identifier(i_lab_girl)
 
 l_games = Loc(name="games", identifier=i_games, accessible=False)
-l_castle = Loc(name="castle", identifier=i_treasury, accessible=True)
+# l_castle = Loc(name="castle", identifier=i_treasury, accessible=True)
 l_clan = Loc(name="clan", identifier=i_my_clan, accessible=True)
 
 n_attack = Loc(name="attack", identifier=i_find_a_match, accessible=True)
@@ -504,7 +505,7 @@ main.add_path(destination=attack_b2, action="goto_builder", parameter="", expect
 main.add_path(destination=attacking_b, action="goto_builder", parameter="", expected_loc=builder)
 main.add_path(destination=l_lab, action="goto_lab", parameter="", expected_loc=l_lab)
 main.add_path(destination=l_games, action="goto_games", parameter="", expected_loc=l_games)
-main.add_path(destination=l_castle, action="goto_castle", parameter="", expected_loc=l_castle)
+# main.add_path(destination=l_castle, action="goto_castle", parameter="", expected_loc=l_castle)
 main.add_path(destination=l_clan, action="goto_clan", parameter="", expected_loc=l_clan)
 
 # Builder
@@ -524,7 +525,7 @@ l_lab.add_default_path(action="click", parameter=i_red_cross_2, expected_loc=mai
 l_games.add_default_path(action="click", parameter=i_red_cross_games, expected_loc=main)
 
 # Castle
-l_castle.add_default_path(action="click", parameter="bottom_left", expected_loc=main)
+# l_castle.add_default_path(action="click", parameter="bottom_left", expected_loc=main)
 
 # Clan
 l_clan.add_default_path(action="click", parameter="bottom_left", expected_loc=main)

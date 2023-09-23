@@ -1,14 +1,24 @@
 from bot import *
 from games import *
 
-sweep_period = timedelta(minutes=120)
-
 def run():
-    print_info()
     set_current_account()
-    db_update(admin, "sweep", datetime.now())
+    check_status_files_exist()
     while True:
         run_job(db_next_job())
+
+def check_status_files_exist():
+    for account in accounts:
+        for type in ["builders", "gold", "time"]:
+            file = f"temp/tracker/{type}{account.number}.png"
+            if not Path(file).is_file():
+                print("Creating status file:", file)
+                update_images(account, create=True)
+    file = "temp/tracker/status.png"
+    if not Path(file).is_file():
+        print("Creating main status file.")
+        update_image()
+
 
 def run_old():
     print_info()
@@ -165,12 +175,6 @@ def highlight_next_build():
     print(shortest_time_account, shortest_time)
     return shortest_time_account
 
-
-# initial_entries(accounts)
-
-# change_accounts_fast(daen)
-
-# print(is_image_old("status", 20))
 
 run()
 goto(pycharm)

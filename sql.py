@@ -166,7 +166,7 @@ def db_next_job():
 # add_entries_all()
 # db_delete_job("'attack_b'")
 
-
+# db_create_table()
 
 # db_update(6, "attack", datetime.now())
 if __name__ == "__main__":

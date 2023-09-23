@@ -751,6 +751,9 @@ def analyse_build_image(account, include_upgrading=True):
 
 
 def delete_build_files():
+    if not os.path.isdir("temp"):
+        os.makedirs("temp", exist_ok=True)
+        os.makedirs("temp/tracker", exist_ok=True)
     files = os.listdir("temp")
     for file in files:
         result = False

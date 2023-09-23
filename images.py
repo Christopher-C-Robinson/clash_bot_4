@@ -404,7 +404,7 @@ i_red_cross_super_troops = Image(name="i_red_cross_super_troops", file='images/s
 for cross in [i_red_cross, i_red_cross_2, i_red_cross_3]:
     height = 0.5
 i_reload = Image(name="i_reload", file='images/nav/reload.png')
-i_reload_2 = Image(name="i_reload", file='images/nav/reload_2.png')
+# i_reload_2 = Image(name="i_reload", file='images/nav/reload_2.png')
 i_reload_game = Image(name="i_reload_game", file='images/nav/reload_game.png')
 i_return_home = Image(name="i_return_home", file='images/nav/return_home.png')
 i_return_home_2 = Image(name="i_return_home_2", file='images/nav/return_home_2.png', threshold=0.7)
@@ -446,7 +446,7 @@ i_coin_collect = Image(name="coin_collect", file='images/capital_coin/coin_colle
 i_red_cross_coin = Image(name="red_cross_coin", file='images/capital_coin/red_cross_coin.png')
 
 # Castle
-i_treasury = Image(name="i_treasury", file='images/members/i_treasury.png')
+# i_treasury = Image(name="i_treasury", file='images/members/i_treasury.png')
 i_clan = Image(name="i_clan", file='images/members/clan.png')
 i_clan_2 = Image(name="i_clan", file='images/members/clan2.png')
 i_clan_3 = Image(name="i_clan", file='images/members/clan3.png')
@@ -493,34 +493,34 @@ i_red_cross_elixir_cart = Image(name="red_cross_elixir_cart", file="images/attac
 i_barb_b = Image(name="barb_b", file="images/attack_b/barb_b.png")
 i_machine = Image(name="machine", file="images/attack_b/machine.png")
 i_chopper = Image(name="chopper", file="images/attack_b/chopper.png")
-i_bomber = Image(name="bomber", file="images/attack_b/bomb_b.png")
-i_giant = Image(name="giant", file="images/attack_b/giant.png")
-i_cannon = Image(name="cannon", file="images/attack_b/cannon_b.png")
-i_pekka = Image(name="pekka", file="images/attack_b/pekka.png")
+# i_bomber = Image(name="bomber", file="images/attack_b/bomb_b.png")
+# i_giant = Image(name="giant", file="images/attack_b/giant.png")
+# i_cannon = Image(name="cannon", file="images/attack_b/cannon_b.png")
+# i_pekka = Image(name="pekka", file="images/attack_b/pekka.png")
 
 # War
 i_war = Image(name="i_war", file='images/war/war.png', threshold=0.76)
-i_war_1 = Image(name="i_war_1", file='images/war/war_1.png')
-i_clan_wars = Image(name="i_clan_wars", file='images/war/clan_wars.png')
-i_clan_wars_2 = Image(name="i_clan_wars", file='images/war/clan_wars2.png')
+# i_war_1 = Image(name="i_war_1", file='images/war/war_1.png')
+# i_clan_wars = Image(name="i_clan_wars", file='images/war/clan_wars.png')
+# i_clan_wars_2 = Image(name="i_clan_wars", file='images/war/clan_wars2.png')
 i_war_cwl = Image(name="i_war_cwl", file='images/nav/war_cwl.png')
-i_war_cwl_2 = Image(name="i_war_cwl", file='images/war/war_cwl_2.png')
+# i_war_cwl_2 = Image(name="i_war_cwl", file='images/war/war_cwl_2.png')
 i_season_info = Image(name="i_season_info", file='images/war/season_info.png')
-i_war_details = Image(name="i_war_details", file="images/war/war_details.png")
-i_war_my_team = Image(name="i_war_my_team", file="images/war/my_team.png")
-i_war_log = Image(name="i_war_log", file="images/war/war_log.png")
+# i_war_details = Image(name="i_war_details", file="images/war/war_details.png")
+# i_war_my_team = Image(name="i_war_my_team", file="images/war/my_team.png")
+# i_war_log = Image(name="i_war_log", file="images/war/war_log.png")
 i_war_preparation = Image(name="i_war_preparation", file='images/war/preparation.png')
 i_war_battle_day = Image(name="i_battle_day", file='images/war/battle_day.png')
-i_war_battle_day_2 = Image(name="i_battle_day_2", file='images/war/battle_day_2.png')
+# i_war_battle_day_2 = Image(name="i_battle_day_2", file='images/war/battle_day_2.png')
 i_war_left = Image(name="i_war_left", file='images/war/left.png', threshold=0.7, region_limit=[415, 700, 500, 240])
 i_war_right = Image(name="i_war_right", file='images/war/right.png')
 i_war_donate = Image(name="i_war_donate", file='images/war/donate.png')
-i_war_request = Image(name="i_war_request", file='images/war/war_request.png')
+# i_war_request = Image(name="i_war_request", file='images/war/war_request.png')
 i_war_donate_reinforcements = Image(name="i_war_donate_reinforcements", file='images/war/donate_reinforcements.png', threshold=0.7)
-i_clan_army = Image(name="i_clan_army", file="images/troops/clan_army.png")
+# i_clan_army = Image(name="i_clan_army", file="images/troops/clan_army.png")
 i_cwl_prep = Image(name="i_cwl_prep", file="images/war/cwl_prep.png")
-i_cwl_prep_2 = Image(name="i_cwl_prep_2", file="images/war/cwl_prep_2.png")
-i_cwl_last_day = Image(name="i_cwl_last_day", file="images/war/cwl_last_day.png")
+# i_cwl_prep_2 = Image(name="i_cwl_prep_2", file="images/war/cwl_prep_2.png")
+# i_cwl_last_day = Image(name="i_cwl_last_day", file="images/war/cwl_last_day.png")
 i_attacks_available = Image(name="i_attacks_available", file="images/war/attacks_available.png")
 
 # Donate images
@@ -538,7 +538,7 @@ i_suggested_upgrades = Image(name="i_suggested_upgrades", file='images/towers/su
 i_upgrades_in_progress = Image(name="i_upgrades_in_progress", file='images/towers/upgrades_in_progress.png')
 
 # Builder base attacks
-i_attack_b_0 = Image(name="i_attack_b_0", file='images/attack_b/attack_0.png', threshold=0.85)
+# i_attack_b_0 = Image(name="i_attack_b_0", file='images/attack_b/attack_0.png', threshold=0.85)
 
 # Army tab
 i_army_clock = Image(name="i_army_clock", file='images/army_clock.png')
@@ -572,7 +572,7 @@ i_super_barb = Image(name="i_super_barb", file='images/super_boost/super_barb.pn
 i_super_minion = Image(name="i_super_minion", file='images/super_boost/super_minion.png')
 i_potion = Image(name="i_potion", file='images/super_boost/potion.png')
 i_dark = Image(name="i_dark", file='images/super_boost/dark.png')
-i_dark_2 = Image(name="i_dark_2", file='images/super_boost/dark_2.png')
+# i_dark_2 = Image(name="i_dark_2", file='images/super_boost/dark_2.png')
 i_potion_small = Image(name="i_potion_small", file='images/super_boost/potion_small.png')
 
 # Messages
@@ -630,20 +630,20 @@ img_message = cv2.imread('images/message.png', 0)
 # i_hero_upgrade_identifier = Image(name="hero_upgrade_identifier", file="images/upgrades/hero_upgrade_identifier.png")
 
 # People
-i_mail = Image(name="mail", file="images/people/mail.png")
-i_message = Image(name="message", file="images/people/message.png")
-i_profile = Image(name="profile", file="images/people/profile.png")
-i_attack_log = Image(name="attack_log", file="images/people/attack_log.png")
-i_add_friend = Image(name="add_friend", file="images/people/add_friend.png")
-i_invite = Image(name="add_friend", file="images/people/invite.png")
+# i_mail = Image(name="mail", file="images/people/mail.png")
+# i_message = Image(name="message", file="images/people/message.png")
+# i_profile = Image(name="profile", file="images/people/profile.png")
+# i_attack_log = Image(name="attack_log", file="images/people/attack_log.png")
+# i_add_friend = Image(name="add_friend", file="images/people/add_friend.png")
+# i_invite = Image(name="add_friend", file="images/people/invite.png")
 i_clan_back = Image(name="clan_back", file="images/people/clan_back.png")
 files = dir_to_list("people/castles/")
 member_castles = []
 for file in files: member_castles.append(Image(name=file, file='images/' + file + ".png", threshold=0.75))
 
 # GUI
-i_gui_icon = Image(name="gui_icon", file="images/gui/gui_icon.png")
-i_tkinter = Image(name="tkinter", file="images/gui/tkinter.png")
+# i_gui_icon = Image(name="gui_icon", file="images/gui/gui_icon.png")
+# i_tkinter = Image(name="tkinter", file="images/gui/tkinter.png")
 
 def multi_click(images):
     for image in images:
