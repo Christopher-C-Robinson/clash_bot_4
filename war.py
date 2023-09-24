@@ -94,9 +94,9 @@ def set_admin_mode():
         status = "battle_day"
     elif i_season_info.find_screen(war_info, show_image=False):
         status = "cwl"
-        if i_cwl_last_day.find(): status = "battle_day"
+        # if i_cwl_last_day.find(): status = "battle_day"
     elif i_clan_wars.find(fast=False): status = "no war"
-    elif i_clan_wars_2.find(fast=False): status = "no war"
+    # elif i_clan_wars_2.find(fast=False): status = "no war"
     admin.mode = status
     print("Set admin mode:", admin.mode)
     if status in ["preparation", "cwl"]:

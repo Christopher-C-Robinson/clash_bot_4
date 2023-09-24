@@ -1,5 +1,6 @@
 from datetime import timedelta
 import os
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # PRINT_CV2 = False
 # VERBOSE_LOG = False
@@ -254,14 +255,17 @@ WHITE = [(255, 255, 255),(254, 254, 254),(253, 253, 253),]
 # === DEFENCES ===
 # ================
 
+
 def dir_to_list(dir):
     list = []
-    path = "C://Users//darre//PycharmProjects//clash_bot_2//images//" + dir
+    path = ROOT_DIR + "/images/" + dir
+    # print(path)
     dir_list = os.listdir(path)
     for x in dir_list:
         if os.path.isfile(os.path.join(path, x)):
             list.append(dir + "/" + x[:-4])
     return list
+
 
 TH_B = dir_to_list("attack_b/th_b")
 WALL_B = ["wallb1", ]

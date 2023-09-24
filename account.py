@@ -286,7 +286,7 @@ class Account:
         return
 
     def war_goals(self):
-        base_reward = 600000
+        base_reward = 100000
         if self.th <= 4: return [5000, 0, 0]
         if self.th == 5: return [25000, 0, 0]
         if self.th == 6: base_reward = 100000
@@ -515,7 +515,7 @@ def update_image():
     cv2.imwrite("temp/tracker/status.png", result)
 
 def get_account_to_highlight():
-    for x in [1, 2, 3, 4, 6]:
+    for x in [1, 2, 3, 5]:
         file = f"temp/tracker/time{x}.png"
         i = cv2.imread(file, 0)
         result_text = build_time.read_screen(i)

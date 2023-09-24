@@ -1,5 +1,6 @@
 from object_recognition import *
 from regions import *
+from excel import *
 
 images = []
 list_of_new_images = []
@@ -7,27 +8,22 @@ list_of_new_images = []
     # "bomber", "machine",
     # "barb", "bomber", "giant", "pekka", "machine",
 # ]
-
 class Image():
-    def __init__(self, name, file, threshold=0.79, always_slow=False, no_of_regions=5, region_limit=None, type=None, screen=None):
+    def __init__(self, name, file, threshold=0.79, always_slow=False, no_of_regions=5, region_limit=None, type=None, screen=None, level=None):
         self.name = name
-        # file = file.replace("images", "images_ads")
         if not os.path.isfile(file):
-            # print("Missing file:", file, "- improvising")
             scale = 1.14
             file = file.replace("images", "images_ads")
             self.image = cv2.resize(cv2.imread(file, 0), (0,0), fx=scale, fy=scale)
         else:
             self.image = cv2.imread(file, 0)
-        # if self.image is not None and name not in list_of_new_images:
-        #     scale = 1.09
-        #     self.image = cv2.resize(self.image, (0,0), fx=scale, fy=scale)
         self.regions = []
         self.region_limit = region_limit
         self.threshold = threshold
         self.always_slow = always_slow
         self.no_of_regions = no_of_regions
         self.loc = None
+        self.level = level
         if type: self.type = type
         else: self.type = "Not specified"
         self.load_regions()
@@ -150,8 +146,11 @@ class Image():
             rect = (loc[0] + region[0], loc[1] + region[1], self.image.shape[1], self.image.shape[0])
             loc = (int(rect[0] + rect[2] / 2), int(rect[1] + rect[3] / 2))
             if val > self.threshold:
+                # excel_write_image(self, True)
                 return round(val, 2), loc, rect
-        if fast: return 0, 0, 0
+        if fast:
+            # excel_write_image(self, False)
+            return 0, 0, 0
         # Whole screen
         if self.region_limit:
             screen = get_screenshot(self.region_limit)
@@ -163,6 +162,7 @@ class Image():
         try:
             result = cv2.matchTemplate(screen, self.image, method)
         except:
+            # excel_write_image(self, False)
             return 0, 0, 0
         min_val, val, min_loc, loc = cv2.minMaxLoc(result)
         region_limit_x, region_limit_y = 0, 0
@@ -178,9 +178,10 @@ class Image():
             if self.region_limit is None or self.check_region_limit(region):
                 # print("Save region")
                 self.save_region(region)
+        # excel_write_image(self, val > self.threshold)
         return round(val,2), loc, rect
 
-    def find_screen(self, screen, show_image=False, return_location=False, return_result=False):
+    def find_screen(self, screen, show_image=False, return_detail=False, return_location=False, return_result=False):
         if self.image is None:
             print("Find - No image provided:", self.name)
             return False, (0, 0)
@@ -193,6 +194,7 @@ class Image():
         if return_result: return val > self.threshold, round(val,2)
         if return_location: return val > self.threshold, loc
         return val > self.threshold
+
 
     def find_screen_many(self, screen, show_image=False):
         h, w = self.image.shape
@@ -323,6 +325,9 @@ class Image():
         if start > len(self.regions):
             print("Merge regions", self, start, len(self.regions))
         return True
+
+
+
 
 # Navigation images
 i_ad_cross = Image(name="i_ad_cross", file='images/nav/ad_cross.png')
@@ -501,7 +506,7 @@ i_chopper = Image(name="chopper", file="images/attack_b/chopper.png")
 # War
 i_war = Image(name="i_war", file='images/war/war.png', threshold=0.76)
 # i_war_1 = Image(name="i_war_1", file='images/war/war_1.png')
-# i_clan_wars = Image(name="i_clan_wars", file='images/war/clan_wars.png')
+i_clan_wars = Image(name="i_clan_wars", file='images/war/clan_wars.png')
 # i_clan_wars_2 = Image(name="i_clan_wars", file='images/war/clan_wars2.png')
 i_war_cwl = Image(name="i_war_cwl", file='images/nav/war_cwl.png')
 # i_war_cwl_2 = Image(name="i_war_cwl", file='images/war/war_cwl_2.png')
@@ -579,11 +584,15 @@ i_potion_small = Image(name="i_potion_small", file='images/super_boost/potion_sm
 # i_new_message = Image(name="new_message", file="images/message/new_message.png")
 # i_send_message = Image(name="send_message", file="images/message/send_message.png")
 
-def create_image_group(directory, show=False, threshold=0.79):
+def create_image_group(directory, show=False, threshold=0.79, add_levels=False):
     files = dir_to_list(directory)
     image_group = []
     for file in files:
-        new = Image(name=file, file="images/" + file + ".png", threshold=threshold)
+        level = None
+        if add_levels:
+            start = len(directory) + 1
+            level = int(file[start:start+2])
+        new = Image(name=file, file="images/" + file + ".png", threshold=threshold, level=level)
         image_group.append(new)
     if show:
         for x in image_group:
@@ -597,6 +606,10 @@ carts = create_image_group('attack_b/carts', threshold=0.7)
 
 # Castles
 castles = create_image_group("towers/castles/")
+
+town_halls = create_image_group("towers/town_halls/", add_levels=True)
+eagles = create_image_group("towers/eagles/", add_levels=False)
+
 
 def get_image(name):
     return next((x for x in images if x.name == name), None)

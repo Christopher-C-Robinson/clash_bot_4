@@ -175,6 +175,14 @@ def highlight_next_build():
     print(shortest_time_account, shortest_time)
     return shortest_time_account
 
+# app()
+# create_double_screen(bad_daz)
+# app()
+
+# create_double_screen()
+# set_current_account()
+# j_attack.run(bad_daz)
+
 
 run()
 goto(pycharm)

@@ -2,6 +2,7 @@ from account import *
 from lose_trophies import *
 from donate import *
 from people import *
+from image_utilities import *
 # from yolo import *
 
 def return_account(number):
@@ -267,11 +268,15 @@ def assess_village(account, data, war_goals, print_time=False):
 
     # Advanced Town Hall
     if print_time: print("C", datetime.now() - start_time)
-    img = create_double_screen(account)
+    img = create_double_screen()
+    if img is None: print("Returned None image")
     # show(img, scale=0.5)
 
     # pag.screenshot("attacks/attack.png")
-    th, loc = town_hall(img)
+    th = get_th_level(img)
+    if th == -1:
+        print("TH too high:", th)
+        return "Town hall not identified"
     if th > data['max_th'] and account.th > 5 and resources[0] < 900000:
         print("TH too high:", th)
         return "Town hall too high"
@@ -284,7 +289,7 @@ def assess_village(account, data, war_goals, print_time=False):
 
     # Barb drop spot
     if data['name'] == "barbs":
-        DP = ram_drop_point(account, img)
+        DP = ram_drop_point(img)
         if DP is None:
             DP = STANDARD_DP2
 
@@ -637,3 +642,13 @@ def calc_score(img):
     result = calc_score_sub(defences)
     print("Calc score:", result)
     return result
+
+def available_resources():
+    i_end_battle.wait()
+    time.sleep(.5)
+
+    screen = get_screenshot(AVAILABLE_GOLD)
+    gold = available_resource_set.read_screen(screen, return_number=True, show_image=False)
+    print("Available resources (gold):", gold)
+
+    return [gold, 0, 0]

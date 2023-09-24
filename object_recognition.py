@@ -546,6 +546,9 @@ def click_rect(rectangle,region=None):
     return
 
 def town_hall(img):
+    if img is None:
+        print("Town hall - no image")
+        return "No image", "No image"
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     template_str = []
     for x in TH7: template_str.append((x,7))
@@ -636,18 +639,18 @@ def get_many(img, template, confidence):
     rectangles, _ = cv2.groupRectangles(rectangles, 1, 0.2)
     return rectangles
 
-
 def find_tower(i, templates):
     i = cv2.cvtColor(i, cv2.COLOR_BGR2GRAY)
     max_val = 0
     max_rect = None
     for template in templates:
         val, loc, rect = find_cv2(template, screen=i)
-
         if val > max_val:
             max_val = val
             max_rect = rect
     return max_val, max_rect
+
+
 
 def find_tower_many(i, templates, confidence=0.6):
     # i = cv2.cvtColor(i, cv2.COLOR_BGR2GRAY)
@@ -795,67 +798,6 @@ def objects_b(loc_th):
     # show(img_orig, dur=10000)
     return attack_a, attack_b
 
-def ram_drop_point(account, img):
-    # return
-    # print("Ram drop point")
-    if img is None:
-        # print("Ram drop point - Create double screen didn't return image")
-        return
-
-    img_orig = img.copy()
-    val, rect = find_tower(img, TH)
-    result_th, result_eagle = False, False
-    if val > 0.56:
-        cv2.rectangle(img_orig, rect, (255, 255, 255), 2)
-        result_th = True
-    x_th, y_th = pag.center(rect)
-    val, rect = find_tower(img, EAGLE)
-    if val > 0.56:
-        cv2.rectangle(img_orig, rect, (0, 0, 255), 2)
-        result_eagle = True
-    x_eagle, y_eagle = pag.center(rect)
-
-    print("Ram drop point - TH and Eagle results", result_th, result_eagle)
-    if not (result_eagle and result_th):
-        # print("Ram drop point - Couldn't find TH or Eagle")
-        return
-    if x_eagle == x_th:
-        m_eagle = 100
-    else:
-        m_eagle = (y_eagle - y_th) / (x_eagle - x_th)
-
-    best_dp_distance = 1000
-    best_dp = None
-
-    for x0, y0, m0 in lines:
-        try:
-            x_dp = int((y_eagle - y0 + m0 * x0 - m_eagle * x_eagle) / (m0 - m_eagle))
-        except:
-            return
-        y_dp = int(m0 * (x_dp - x0) + y0)
-        distance = ((x_dp - x_eagle) ** 2 + (y_dp - y_eagle) ** 2) ** 0.5
-        if (x_th < x_eagle < x_dp or x_th > x_eagle > x_dp) and distance < best_dp_distance:
-            best_dp_distance = distance
-            best_dp = [x_dp, y_dp]
-
-        cv2.circle(img_orig, best_dp, 20, (255,255,255), -1)
-
-    cv2.line(img_orig, top, right, (255,255,255), 2)
-    cv2.line(img_orig, bottom, right, (255,255,255), 2)
-    cv2.line(img_orig, top, left, (255,255,255), 2)
-    cv2.line(img_orig, bottom, left, (255,255,255), 2)
-
-    # show(img_orig)
-
-    # save the image
-    post = datetime.now().strftime('%I%M%p')
-    x = f'images/attacks{account.number}/attack {post}.png'
-
-    cv2.imwrite(x, img_orig)
-    cv2.imwrite("temp/attack.png", img_orig)
-    print("Ram drop point image saved", x)
-
-    return best_dp
 
 def get_drop_points(account, img, center, target_locs):
     # print("Get drop points")
@@ -909,59 +851,6 @@ def get_drop_points(account, img, center, target_locs):
 
     return drop_points
 
-
-
-def create_double_screen(account):
-    get_double_screen()
-    print("Create double screen")
-    global scroll_adj
-    x_end = 2040
-    y1_end = 600
-    y2_end = 900
-
-    # read screenshots
-    img1 = cv2.imread('temp/attacking1.png', 1)
-    img2 = cv2.imread('temp/attacking2.png', 1)
-
-    # find TH for alignment
-    val, rect1 = find_tower(img1, TH)
-    val, rect2 = find_tower(img2, TH)
-    try:
-        y_adj = rect1[1] - rect2[1]
-        y2_start = y1_end - y_adj
-        scroll_adj = y_adj
-        # print("Scroll adjustment:", scroll_adj)
-    except:
-        # print("Scroll adjustment not set", rect1, rect2)
-        return None
-
-    # crop and combine images
-    # print("Create double screen - crop and combine")
-    img1 = img1[0:        y1_end, 0: x_end]
-    img2 = img2[y2_start: y2_end, 0: x_end]
-    img = np.concatenate((img1, img2), axis=0)
-
-    # save the image
-    post = datetime.now().strftime('%I%M%p')
-    x = f'images/attacks{account.number}/attack {post}.png'
-    # print("Create double screen - save the image:", x)
-    cv2.imwrite(x, img)
-    # print("Create double screen - return")
-    return img
-
-def get_double_screen():
-    # print("Get double screen: Going up")
-    for _ in range(2): pag.scroll(300)
-    pag.moveTo(1000, 500, 0.2)
-    # time.sleep(0.2)
-    pag.screenshot('temp/attacking1.png')
-    # print("Get double screen: Going down")
-    time.sleep(0.2)
-    for _ in range(3): pag.scroll(-300)
-    time.sleep(0.2)
-    pag.screenshot('temp/attacking2.png')
-    time.sleep(0.2)
-    for _ in range(5): pag.scroll(300)
 
 def show(img, dur=5000, label="Image", scale=1):
     img = cv2.resize(img, (0, 0), fx=scale, fy=scale)

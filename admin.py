@@ -12,6 +12,7 @@ class Admin:
         self.log_rollers = True
         self.has_prepped_for_war = False
         self.less_than_one_hour = False
+        self.excel_last_row_images = None
 
 admin = Admin()
 
