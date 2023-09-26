@@ -20,6 +20,7 @@ class Job:
         return "Job: " + self.name
 
     def run(self, account, village=None):
+        start = datetime.now()
         db_update(account, self.name, datetime.now() + timedelta(minutes=5))
         if self not in active_jobs:
             print("Job not active:", self)
@@ -36,7 +37,6 @@ class Job:
             if account.mode == "donate" and admin.mode == "cwl" and admin.war_donations_remaining > 0 and account in war_participants:
                 war_donations(cwl=True)
                 queue_up_troops(account)
-
         if self.name == "coin": coin()
         if self.name == "war_troops": train_war_troops(account)
         if self.name == "cwl_troops": train_war_troops(account)
@@ -56,6 +56,9 @@ class Job:
             if admin.inviting:
                 invite()
             get_capital_coin()
+        time_taken = datetime.now() - start
+        log(admin.mode, account.mode, self.name, account.name, time_taken)
+
         if not self.update_time: # Not updating time because time is updated by the function run immediately above
             print("Not updating time:", self.name)
             return
@@ -71,12 +74,12 @@ class Job:
 
     def get_duration(self, account):
         if self.name == "coin": return get_time_coin()
-        if self.name == "challenge": return timedelta(hours=5 * (5 - account.number))
+        if self.name == "challenge": return timedelta(hours=8 * (len(accounts) - account.number) + 1)
         if self.is_active(account): return self.time_active
         return self.time_inactive
 
     def is_active(self, account):
-        if self.name in ["donate", ] and account.mode in ["donate", ]: return True
+        if self.name in ["donate", ] and account == donating_account(): return True
         if self.name in ["donate_war", ]:
             if admin.mode in ["", "no war", "battle_day"]: return False
             if admin.mode == "no war": return False

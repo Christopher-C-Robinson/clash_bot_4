@@ -53,7 +53,7 @@ def remove_clan_troops():
 
 def war_prep():
     set_current_account()
-    for account in [daz, bob, jon, daen]:
+    for account in [daz, bob, daen]:
     # for account in [bad_daz, daz, bob, jon, daen]:
         change_accounts_fast(account)
         goto(army_tab)

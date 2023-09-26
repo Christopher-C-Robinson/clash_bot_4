@@ -27,7 +27,9 @@ def attack_b(account):
     time.sleep(0.5)
     attack_b_get_screen()
     loc_th = th_b()
-    loc_th = check_loc_th(loc_th)
+    if loc_th is None:
+        loc_th = (1000,500)
+        print("Failed to find TH - used default of 1000,500")
     a, b = objects_b(loc_th)
     for troop, n, loop in account.army_troops_b:
         result = place_b(troop, a, b, n, loop)
@@ -185,8 +187,8 @@ def finish_attack(account, data):
     global current_location
     # wait_cv2("return_home", max_time=80)
     i_return_home.wait(80)
-    # three_stars = i_3_stars.find()
-    # print("Three stars:", three_stars)
+    three_stars = i_3_stars.find()
+    print("Three stars:", three_stars)
     # if three_stars: share_latest_attack()
     i_return_home.click()
     goto(main)
@@ -214,7 +216,7 @@ def attack_prep(account, siege_required=True):
     sufficient_troops, actual_troops = army_prep(account, account.troops_to_build, army_or_total="army")
     if not sufficient_troops: return sufficient_troops
 
-    if siege_required and not account.has_siege and actual_troops and actual_troops[log_thrower] == 0 and account.th > 8:
+    if siege_required and actual_troops and actual_troops[log_thrower] == 0 and account.th > 8:
         print("Log throwers:", actual_troops[log_thrower])
         sufficient_troops = False
         # Donations

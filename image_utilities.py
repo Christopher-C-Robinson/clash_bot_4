@@ -1,18 +1,125 @@
 from images import *
 
-def multi_image_find(screen, images):
+# -----------------
+# ---- GENERAL ----
+# -----------------
+
+def multi_image_find(screen, images, show_results=False):
     screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
     max_val = 0
     max_image = None
     max_loc = None
     for image in images:
         result, val, loc = image.find_screen(screen, return_location=True, return_result=True)
-        # print("Multi image find:", image, val, loc)
+        if show_results:
+            print("Multi image find:", image, val, loc)
         if val > max_val:
             max_val = val
             max_loc = loc
             max_image = image
     return max_image, max_val, max_loc
+
+def to_bw(image):
+    if len(image.shape) == 3:
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    return image
+
+# ------------------
+# ---- ATTACK_B ----
+# ------------------
+
+def th_b():
+    th_size = 120
+    img = cv2.imread('temp/attack_b/attacking_b.png')
+    print("Identify Builder Town Hall")
+    if img is None:
+        print("Th_b - Couldn't read screen")
+        return
+
+    image, val, loc = multi_image_find(img, town_halls_b, show_results=False)
+    result = False
+    if val > 0.6:
+        cv2.rectangle(img, (loc[0], loc[1], th_size, th_size), (255, 255, 255), 2)
+        result = True
+
+    # save the image
+    cv2.imwrite('temp/attack_b/attacking_b2.png', img)
+
+    if result == False: return False
+    return loc[0] + th_size // 2, loc[1] + th_size // 2
+
+def objects_b(loc_th):
+    print("Testing objects b")
+    scale = 0.73  # this is to allow for the x / y perspective
+    gap = 200     # this is the add to the lines
+    img = cv2.imread('temp/attack_b/attacking_b2.png')
+    print("Identify Builder Extremities")
+    if img is None:
+        print("Objects_b - Couldn't read screen")
+        return
+
+    rects = find_tower_many(img, OBJECTS_B, confidence=0.65)
+    for rect in rects:
+        cv2.rectangle(img, rect, (255, 255, 255), 1)
+
+    dist_tl = 0
+    dist_tr = 0
+    dist_bl = 0
+    dist_br = 0
+    for rect in rects:
+        # print(rect)
+        # if not rect: continue
+        loc = pag.center(rect)
+        # print("Objects b", loc, loc_th)
+        try:
+            dist = abs(loc[0]-loc_th[0]) + int((abs(loc[1]-loc_th[1])) / scale)
+        except:
+            continue
+        if dist > 650: dist = 0
+        if loc[0] < loc_th[0]:
+            if loc[1] < loc_th[1]:
+                if dist > dist_tl: dist_tl = dist
+            else:
+                if dist > dist_bl: dist_bl = dist
+        else:
+            if loc[1] < loc_th[1]:
+                if dist > dist_tr: dist_tr = dist
+            else:
+                if dist > dist_br: dist_br = dist
+
+    dist_tl += gap
+    dist_tr += gap
+    dist_bl += int(gap * 1.3) * 1000  # * 1000 to turn off attacks from the south
+    dist_br += int(gap * 1.3) * 1000  # * 1000 to turn off attacks from the south
+    min_dist = min(dist_tl, dist_bl, dist_br, dist_tr)
+
+    attack_a, attack_b = None, None
+    # lines = [(dist_tl, -1, -1), (dist_tr, 1, -1), (dist_bl, -1, 1), (dist_br, 1, 1), ]
+    lines = [(dist_tl, -1, -1), (dist_tr, 1, -1)]
+    for dist, x_dir, y_dir in lines:
+        try:
+            a = (loc_th[0], loc_th[1] + int(dist * scale) * y_dir)
+            b = (loc_th[0] + dist * x_dir, loc_th[1])
+            closest = (dist == min_dist)
+            img = add_lines_and_spots(img, a, b, closest)
+            if closest:
+                attack_a = a
+                attack_b = b
+        except:
+            pass
+
+    # save and show the image
+    cv2.imwrite('temp/attack_b/attacking_b3.png', img)
+    # show(img_orig, dur=10000)
+    return attack_a, attack_b
+
+# print("Result:", objects_b(th_b()))
+
+
+# ----------------
+# ---- ATTACK ----
+# ----------------
+
 
 def get_double_screen():
     # print("Get double screen: Going up")
@@ -44,12 +151,6 @@ def create_double_screen(update_screen=True):
     # find TH for alignment
     image1, val1, loc1 = multi_image_find(img1, town_halls)
     image2, val2, loc2 = multi_image_find(img2, town_halls)
-    print("Val", val1, val2)
-    print("Loc", loc1, loc2)
-    # y_adj = loc1[1] - loc2[1]
-    # y2_start = y1_end - y_adj
-    # scroll_adj = y_adj
-    print("Create double screen - locs", loc1, loc2)
     try:
         y_adj = loc1[1] - loc2[1]
         y2_start = y1_end - y_adj
@@ -76,29 +177,9 @@ def create_double_screen(update_screen=True):
     x = f'temp/attack/attacking.png'
     print("Create double screen - save the image:", x)
     cv2.imwrite(x, img)
-    show(img)
+    # show(img)
     print("Create double screen - return")
     return img
-
-# create_double_screen(1)
-
-def to_bw(image):
-    if len(image.shape) == 3:
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    return(image)
-
-def get_th_level(image):
-    if image is None: return
-    image = to_bw(image)
-    level = -1
-    for town_hall in town_halls:
-        if town_hall.find_screen(image):
-            level = town_hall.level
-        else:
-            if town_hall.level == 14:
-                print(town_hall, town_hall.find_screen(image, show_image=False,  return_result=True))
-    return level
-
 
 def ram_drop_point(img):
     # return
@@ -169,13 +250,19 @@ def ram_drop_point(img):
 
     return best_dp
 
-# img = cv2.imread('temp/attacking1.png', 1)
-# print(img.shape)
-# img = cv2.imread('temp/attacking2.png', 1)
-# print(img.shape)
-# print(1261-1080)
+def get_th_level(image, show_result=False):
+    if image is None: return
+    image = to_bw(image)
+    level = -1
+    for town_hall in town_halls:
+        if town_hall.find_screen(image):
+            level = town_hall.level
+        if show_result:
+            print("Get TH level:", town_hall, town_hall.find_screen(image, show_image=False,  return_result=True))
+    return level
 
-# create_double_screen(False)
-# img = cv2.imread('temp/attack/attacking.png', 1)
-# print(ram_drop_point(img))
-# print(img.shape)
+def test_get_th_level():
+    image = cv2.imread('temp/attack/attacking.png', 1)
+    show(image)
+    print(get_th_level(image))
+

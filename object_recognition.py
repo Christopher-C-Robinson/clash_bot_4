@@ -667,25 +667,6 @@ def find_tower_many(i, templates, confidence=0.6):
     # rectangles, _ = cv2.groupRectangles(rects, 1, 0.2)
     return rectangles
 
-def th_b():
-    img = cv2.imread('temp/attacking_b.png')
-    print("Identify Builder Town Hall")
-    if img is None:
-        print("Th_b - Couldn't read screen")
-        return
-
-    img_orig = img.copy()
-    val, rect = find_tower(img, TH_B)
-    result = False
-    if val > 0.6:
-        cv2.rectangle(img_orig, rect, (255, 255, 255), 2)
-        result = True
-
-    # save the image
-    cv2.imwrite('temp/attacking_b2.png', img_orig)
-
-    if result == False: return False
-    return(pag.center(rect))
 
 def check_loc_th(loc_th):
     if loc_th is None:
@@ -730,73 +711,6 @@ def add_lines_and_spots(img, a, b, closest):
             cv2.circle(img, x, 4, (255,0,0), -1)
     return img
 
-def objects_b(loc_th):
-    print("Testing objects b")
-    scale = 0.73  # this is to allow for the x / y perspective
-    gap = 200     # this is the add to the lines
-    img = cv2.imread('temp/attacking_b2.png')
-    print("Identify Builder Extremities")
-    if img is None:
-        print("Th_b - Couldn't read screen")
-        return
-
-    img_orig = img.copy()
-    rects = find_tower_many(img, OBJECTS_B, confidence=0.65)
-    for rect in rects:
-        cv2.rectangle(img_orig, rect, (255, 255, 255), 1)
-
-    dist_tl = 0
-    dist_tr = 0
-    dist_bl = 0
-    dist_br = 0
-    for rect in rects:
-        # print(rect)
-        # if not rect: continue
-        loc = pag.center(rect)
-        # print("Objects b", loc, loc_th)
-        try:
-            dist = abs(loc[0]-loc_th[0]) + int((abs(loc[1]-loc_th[1])) / scale)
-        except:
-            continue
-        if dist > 650: dist = 0
-        if loc[0] < loc_th[0]:
-            if loc[1] < loc_th[1]:
-                if dist > dist_tl: dist_tl = dist
-            else:
-                if dist > dist_bl: dist_bl = dist
-        else:
-            if loc[1] < loc_th[1]:
-                if dist > dist_tr: dist_tr = dist
-            else:
-                if dist > dist_br: dist_br = dist
-
-    print("Pre", dist_tr, dist_tl)
-    dist_tl += gap
-    dist_tr += gap
-    print("Post", dist_tr, dist_tl)
-    dist_bl += int(gap * 1.3) * 1000  # * 1000 to turn off attacks from the south
-    dist_br += int(gap * 1.3) * 1000  # * 1000 to turn off attacks from the south
-    min_dist = min(dist_tl, dist_bl, dist_br, dist_tr)
-
-    attack_a, attack_b = None, None
-    # lines = [(dist_tl, -1, -1), (dist_tr, 1, -1), (dist_bl, -1, 1), (dist_br, 1, 1), ]
-    lines = [(dist_tl, -1, -1), (dist_tr, 1, -1)]
-    for dist, x_dir, y_dir in lines:
-        try:
-            a = (loc_th[0], loc_th[1] + int(dist * scale) * y_dir)
-            b = (loc_th[0] + dist * x_dir, loc_th[1])
-            closest = (dist == min_dist)
-            img_orig = add_lines_and_spots(img_orig, a, b, closest)
-            if closest:
-                attack_a = a
-                attack_b = b
-        except:
-            pass
-
-    # save and show the image
-    cv2.imwrite('temp/attacking_b3.png', img_orig)
-    # show(img_orig, dur=10000)
-    return attack_a, attack_b
 
 
 def get_drop_points(account, img, center, target_locs):

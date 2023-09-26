@@ -750,12 +750,7 @@ def print_locs():
 
 def attack_b_get_screen():
     time.sleep(1)
-    # zoom_out()
-    # hold_key('s', 0.5)
-    # hold_key('down', 0.5)
-    # time.sleep(1)
-    # hold_key('down', 0.5)
-    pag.screenshot('temp/attacking_b.png')
+    pag.screenshot('temp/attack_b/attacking_b.png')
 
 def zoom_out():
     # print("Zooming out")

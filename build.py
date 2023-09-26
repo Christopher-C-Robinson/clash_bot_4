@@ -658,7 +658,11 @@ def remaining_time_of_upgrading_towers(account):
         # print(tower_string)
         level = None
         if tower:
-            level = tower.return_level(int(level_string))
+            try:
+                level = tower.return_level(int(level_string))
+            except:
+                level = 0
+                print("Remaining time: couldn't read string:", level_string)
         if level:
             total_time_for_tower = tower.remaining_time(level, account.th)
             print(f"{tower}, Level: {level_string}, Time: {total_time_for_tower}")
@@ -767,6 +771,7 @@ def delete_build_files():
 delete_build_files()
 
 def remaining_time_for_th(account):
+    if account == admin: return
     set_current_account()
     change_accounts_fast(account)
     get_build_images(account)

@@ -112,6 +112,7 @@ def initial_entries(accounts):
     for x in accounts:
         for y in ["completion_date", "lose_trophies", "attack", "attack_b", "donate", "war_troops", "cwl_troops", "challenge"]:
             db_add(x, y, time)
+            print("SQL Adding:", x, y, time)
 
     db_add(admin, "sweep", time)
 

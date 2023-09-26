@@ -286,7 +286,7 @@ class Account:
         return
 
     def war_goals(self):
-        base_reward = 100000
+        base_reward = 600000
         if self.th <= 4: return [5000, 0, 0]
         if self.th == 5: return [25000, 0, 0]
         if self.th == 6: base_reward = 100000

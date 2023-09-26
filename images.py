@@ -480,7 +480,7 @@ i_complete = Image(name="i_complete", file="images/games/complete.png", threshol
 # Attack
 # i_single_player = Image(name="i_single_player", file="images/nav/single_player.png")
 i_next_attack = Image(name="i_next_attack", file="images/attacks/next_attack.png")
-# i_3_stars = Image(name="i_3_stars", file="images/attacks/3_stars.png")
+i_3_stars = Image(name="i_3_stars", file="images/attacks/3_stars.png")
 # i_3_stars_2 = Image(name="i_3_stars", file="images/attacks/3_stars_2.png")
 # i_share_replay = Image(name="i_share_replay", file="images/attacks/share_replay.png")
 # i_share_replay_message = Image(name="i_share_replay_message", file="images/attacks/share_replay_message.png")
@@ -577,7 +577,7 @@ i_super_barb = Image(name="i_super_barb", file='images/super_boost/super_barb.pn
 i_super_minion = Image(name="i_super_minion", file='images/super_boost/super_minion.png')
 i_potion = Image(name="i_potion", file='images/super_boost/potion.png')
 i_dark = Image(name="i_dark", file='images/super_boost/dark.png')
-# i_dark_2 = Image(name="i_dark_2", file='images/super_boost/dark_2.png')
+i_dark_2 = Image(name="i_dark_2", file='images/super_boost/dark_2.png')
 i_potion_small = Image(name="i_potion_small", file='images/super_boost/potion_small.png')
 
 # Messages
@@ -610,6 +610,7 @@ castles = create_image_group("towers/castles/")
 town_halls = create_image_group("towers/town_halls/", add_levels=True)
 eagles = create_image_group("towers/eagles/", add_levels=False)
 
+town_halls_b = create_image_group("attack_b/th_b", add_levels=False)
 
 def get_image(name):
     return next((x for x in images if x.name == name), None)

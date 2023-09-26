@@ -1,8 +1,9 @@
 from bot import *
 from games import *
 
+# set_current_account()
 def run():
-    set_current_account()
+    # set_current_account()
     check_status_files_exist()
     while True:
         run_job(db_next_job())
@@ -175,15 +176,15 @@ def highlight_next_build():
     print(shortest_time_account, shortest_time)
     return shortest_time_account
 
-# app()
-# create_double_screen(bad_daz)
-# app()
-
-# create_double_screen()
 # set_current_account()
-# j_attack.run(bad_daz)
+# set_admin_mode()
+# j_donate.run(daz)
+
+# war_prep()
+
+for image in images:
 
 
-run()
+# run()
 goto(pycharm)
 
