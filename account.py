@@ -1,6 +1,6 @@
 from attacks import *
-from sql import *
 from admin import *
+from sql import *
 from sql_account import *
 from utilities import *
 
@@ -410,7 +410,7 @@ def change_accounts_fast(account):
     # Check you arrived
     while not found:
         time.sleep(0.1)
-        for image in [i_builder, i_otto, i_master]:
+        for image in [i_builder, i_master]:
             if image.find():
                 if image == i_builder:
                     new_location = main

@@ -176,15 +176,10 @@ def highlight_next_build():
     print(shortest_time_account, shortest_time)
     return shortest_time_account
 
-# set_current_account()
-# set_admin_mode()
-# j_donate.run(daz)
 
-# war_prep()
+# invite()
 
-for image in images:
+run()
 
-
-# run()
 goto(pycharm)
 

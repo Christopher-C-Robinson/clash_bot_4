@@ -1,6 +1,7 @@
 from object_recognition import *
 from regions import *
 from excel import *
+from sql_image import *
 
 images = []
 list_of_new_images = []
@@ -140,16 +141,17 @@ class Image():
                     return 0, 0, 0
                 print("Image didn't fit in region:", self.name)
                 self.increase_regions()
+                db_image_update(self, False)
                 return 0, 0, 0
 
             min_val, val, min_loc, loc = cv2.minMaxLoc(result)
             rect = (loc[0] + region[0], loc[1] + region[1], self.image.shape[1], self.image.shape[0])
             loc = (int(rect[0] + rect[2] / 2), int(rect[1] + rect[3] / 2))
             if val > self.threshold:
-                # excel_write_image(self, True)
+                db_image_update(self, True)
                 return round(val, 2), loc, rect
         if fast:
-            # excel_write_image(self, False)
+            db_image_update(self, False)
             return 0, 0, 0
         # Whole screen
         if self.region_limit:
@@ -162,7 +164,7 @@ class Image():
         try:
             result = cv2.matchTemplate(screen, self.image, method)
         except:
-            # excel_write_image(self, False)
+            db_image_update(self, False)
             return 0, 0, 0
         min_val, val, min_loc, loc = cv2.minMaxLoc(result)
         region_limit_x, region_limit_y = 0, 0
@@ -179,6 +181,7 @@ class Image():
                 # print("Save region")
                 self.save_region(region)
         # excel_write_image(self, val > self.threshold)
+        db_image_update(self, val > self.threshold)
         return round(val,2), loc, rect
 
     def find_screen(self, screen, show_image=False, return_detail=False, return_location=False, return_result=False):
@@ -330,7 +333,7 @@ class Image():
 
 
 # Navigation images
-i_ad_cross = Image(name="i_ad_cross", file='images/nav/ad_cross.png')
+# i_ad_cross = Image(name="i_ad_cross", file='images/nav/ad_cross.png')
 i_ad_back = Image(name="i_ad_cross", file='images/nav/ad_back.png')
 i_app = Image(name="i_app", file='images/nav/app.png')
 i_another_device = Image(name="i_another_device", file='images/nav/another_device.png')
@@ -369,7 +372,7 @@ i_end_battle = Image(name="i_end_battle", file='images/nav/end_battle.png')
 i_find_a_match = Image(name="i_find_a_match", file='images/nav/find_a_match.png')
 i_find_now = Image(name="i_find_now", file='images/nav/find_now.png')
 i_find_now_b = Image(name="i_find_now", file='images/nav/find_now_b.png')
-i_forge = Image(name="i_forge", file='images/nav/forge.png')
+# i_forge = Image(name="i_forge", file='images/nav/forge.png')
 i_forge_button = Image(name="i_forge_button", file='images/nav/forge_button.png')
 i_forge_path = Image(name="i_forge_path", file='images/nav/forge_path.png')
 i_heart = Image(name="i_heart", file='images/nav/heart.png')
@@ -383,14 +386,14 @@ i_master_builder = Image(name="i_master_builder", file='images/nav/master_builde
 i_maximise = Image(name="i_maximise", file='images/nav/maximise.png')
 i_multiplayer = Image(name="i_multiplayer", file='images/nav/multiplayer.png')
 i_next = Image(name="i_next", file='images/nav/next.png')
-i_next2 = Image(name="i_next2", file='images/nav/next2.png')
+# i_next2 = Image(name="i_next2", file='images/nav/next2.png')
 i_okay = Image(name="i_okay", file='images/nav/okay.png')
-i_okay2 = Image(name="i_okay2", file='images/nav/okay2.png')
-i_okay3 = Image(name="i_okay3", file='images/nav/okay3.png')
-i_okay4 = Image(name="i_okay4", file='images/nav/okay4.png')
-i_okay5 = Image(name="i_okay5", file='images/nav/okay5.png')
-i_otto = Image(name="i_otto", file='images/nav/otto.png')
-i_pre_app = Image(name="i_pre_app", file='images/nav/pre_app.png')
+# i_okay2 = Image(name="i_okay2", file='images/nav/okay2.png')
+# i_okay3 = Image(name="i_okay3", file='images/nav/okay3.png')
+# i_okay4 = Image(name="i_okay4", file='images/nav/okay4.png')
+# i_okay5 = Image(name="i_okay5", file='images/nav/okay5.png')
+# i_otto = Image(name="i_otto", file='images/nav/otto.png')
+# i_pre_app = Image(name="i_pre_app", file='images/nav/pre_app.png')
 i_pycharm = Image(name="i_pycharm", file='images/nav/pycharm.png')
 i_pycharm_icon = Image(name="i_pycharm_icon", file='images/nav/pycharm_icon.png')
 i_pycharm_running = Image(name="i_pycharm_running", file='images/nav/pycharm_running.png')
@@ -425,7 +428,7 @@ i_start_eyes = Image(name="i_start_eyes", file='images/nav/start_eyes.png')
 i_start_eyes_2 = Image(name="i_start_eyes_2", file='images/nav/start_eyes_2.png')
 i_start_eyes_3 = Image(name="i_start_eyes_3", file='images/nav/start_eyes_3.png')
 i_surrender = Image(name="i_surrender", file='images/nav/surrender.png')
-i_surrender_okay = Image(name="i_surrender_okay", file='images/nav/surrender_okay.png')
+# i_surrender_okay = Image(name="i_surrender_okay", file='images/nav/surrender_okay.png')
 i_switch_account = Image(name="i_switch_account", file='images/nav/switch_account.png')
 i_close_switch_account = Image(name="i_close_switch_account", file='images/nav/close_switch_account.png')
 # i_bad_daz = Image(name="i_bad_daz", file='images/nav/bad_daz.png')
@@ -437,7 +440,7 @@ i_war_okay = Image(name="i_war_okay", file='images/war/okay.png')
 i_wins = Image(name="i_wins", file='images/nav/wins.png')
 i_x = Image(name="i_unknown", file='images/nav/x.png')
 
-i_okay_buttons = [i_okay, i_okay2, i_okay3, i_okay4, i_okay5]
+i_okay_buttons = [i_okay,]
 
 # Main screen
 i_trader = Image(name="i_trader", file='images/nav/trader.png')
@@ -520,7 +523,7 @@ i_war_battle_day = Image(name="i_battle_day", file='images/war/battle_day.png')
 i_war_left = Image(name="i_war_left", file='images/war/left.png', threshold=0.7, region_limit=[415, 700, 500, 240])
 i_war_right = Image(name="i_war_right", file='images/war/right.png')
 i_war_donate = Image(name="i_war_donate", file='images/war/donate.png')
-# i_war_request = Image(name="i_war_request", file='images/war/war_request.png')
+i_war_request = Image(name="i_war_request", file='images/war/war_request.png')
 i_war_donate_reinforcements = Image(name="i_war_donate_reinforcements", file='images/war/donate_reinforcements.png', threshold=0.7)
 # i_clan_army = Image(name="i_clan_army", file="images/troops/clan_army.png")
 i_cwl_prep = Image(name="i_cwl_prep", file="images/war/cwl_prep.png")
@@ -649,7 +652,7 @@ img_message = cv2.imread('images/message.png', 0)
 # i_profile = Image(name="profile", file="images/people/profile.png")
 # i_attack_log = Image(name="attack_log", file="images/people/attack_log.png")
 # i_add_friend = Image(name="add_friend", file="images/people/add_friend.png")
-# i_invite = Image(name="add_friend", file="images/people/invite.png")
+i_invite = Image(name="add_friend", file="images/people/invite.png")
 i_clan_back = Image(name="clan_back", file="images/people/clan_back.png")
 files = dir_to_list("people/castles/")
 member_castles = []

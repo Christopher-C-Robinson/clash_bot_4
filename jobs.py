@@ -74,7 +74,7 @@ class Job:
 
     def get_duration(self, account):
         if self.name == "coin": return get_time_coin()
-        if self.name == "challenge": return timedelta(hours=8 * (len(accounts) - account.number) + 1)
+        if self.name == "challenge": return timedelta(hours=8 * (len(accounts) - account.number + 1) + 1)
         if self.is_active(account): return self.time_active
         return self.time_inactive
 

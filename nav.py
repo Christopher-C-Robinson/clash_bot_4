@@ -16,7 +16,7 @@ def start_up():
     while not_there_yet:
         if not_there_yet:
             start_loop_again = False
-        for i in [i_ad_cross, i_maximise, i_start_eyes, i_start_eyes_2, i_start_eyes_3, i_heart, i_bluestacks]:
+        for i in [i_maximise, i_start_eyes, i_start_eyes_2, i_start_eyes_3, i_heart, i_bluestacks]:
             if start_loop_again: continue
             if i.find():
                 i.click()
@@ -423,13 +423,13 @@ chat.height = main.height + 1
 settings = Loc(name="settings", identifier=i_settings, accessible=True)
 change_account = Loc(name="change_account", identifier=i_switch_account, accessible=True, pause=True)
 change_account.height = settings.height + 1
-forge = Loc(name="forge", identifier=i_forge, accessible=True)
+# forge = Loc(name="forge", identifier=i_forge, accessible=True)
 builder = Loc(name="builder", identifier=i_master_builder, accessible=True)
-builder.add_identifier(i_otto)
+# builder.add_identifier(i_otto)
 
 overlays = []
-for overlay in [i_another_device, i_ad_cross, i_ad_back, i_reload, i_reload_game, i_ad_cross, i_try_again, i_return_home, i_pre_app, i_okay, i_okay2, i_okay3, i_okay4, i_okay5,
-                i_next2, i_return_home_2, i_return_home_3, i_red_cross, i_red_cross_2, i_red_cross_3, i_close_app, i_return_home_b]:
+for overlay in [i_another_device, i_ad_back, i_reload, i_reload_game, i_try_again, i_return_home, i_okay,
+                i_return_home_2, i_return_home_3, i_red_cross, i_red_cross_2, i_red_cross_3, i_close_app, i_return_home_b]:
     new_overlay = Loc(name=overlay.name[2:], identifier=overlay, accessible=False)
     if overlay == i_another_device:
         new_overlay.add_default_path(action="reload", parameter=None, expected_loc=main)
@@ -465,13 +465,13 @@ n_attack = Loc(name="attack", identifier=i_find_a_match, accessible=True)
 n_attack.height = 2
 find_a_match = Loc(name="find_a_match", identifier=i_next, accessible=True)
 attacking = Loc(name="attacking", identifier=i_surrender, accessible=False)
-attacking_end_1 = Loc(name="attacking_end_1", identifier=i_surrender_okay, accessible=False)
+# attacking_end_1 = Loc(name="attacking_end_1", identifier=i_surrender_okay, accessible=False)
 attack_end = Loc(name="attack_end", identifier=i_return_home, accessible=False)
 
 attack_b2 = Loc(name="attack_b2", identifier=i_versus_battle, accessible=True)
 attack_b2.height = 3
 attacking_b = Loc(name="attacking_b", identifier=i_defender, accessible=True)
-attacking_b_end_1 = Loc(name="attacking_b_end_1", identifier=i_surrender_okay, accessible=False)
+# attacking_b_end_1 = Loc(name="attacking_b_end_1", identifier=i_surrender_okay, accessible=False)
 
 # ---------------
 # ---- PATHS ----
@@ -497,7 +497,7 @@ main.add_path(destination=spells_tab, action="click", parameter=i_army, expected
 main.add_path(destination=siege_tab, action="click", parameter=i_army, expected_loc=army_tab)
 main.add_path(destination=settings, action='click', parameter=i_settings_on_main, expected_loc=settings)
 main.add_path(destination=change_account, action='click', parameter=i_settings_on_main, expected_loc=settings)
-main.add_path(destination=forge, action='goto_forge', parameter='', expected_loc=forge)
+# main.add_path(destination=forge, action='goto_forge', parameter='', expected_loc=forge)
 main.add_path(destination=builder, action="goto_builder", parameter='', expected_loc=builder)
 main.add_path(destination=find_a_match, action="click", parameter=i_attack, expected_loc=n_attack)
 main.add_path(destination=n_attack, action="click_p", parameter=i_attack, expected_loc=n_attack)
@@ -541,8 +541,8 @@ change_account.add_default_path(action="click", parameter=i_close_switch_account
 change_account.height = settings.height + 1
 
 # Forge
-forge.add_default_path(action="click", parameter=i_red_cross_2, expected_loc=main)
-forge.add_height(main.height + 1)
+# forge.add_default_path(action="click", parameter=i_red_cross_2, expected_loc=main)
+# forge.add_height(main.height + 1)
 
 # Army tabs
 army_tab.add_default_path(action="click", parameter=i_red_cross_5, expected_loc=main)
@@ -572,7 +572,7 @@ n_attack.add_default_path(action="click", parameter=i_red_cross_attack, expected
 attack_b2.add_default_path(action="click", parameter=i_return_home, expected_loc=builder)
 attack_b2.add_path(destination=attacking_b, action='click', parameter=i_find_now_b, expected_loc=attacking_b)
 attacking_b.add_default_path(action='click', parameter=i_surrender, expected_loc=attack_b2)
-attacking_b_end_1.add_default_path(action="click_identifier", parameter=None,expected_loc=attack_b2)
+# attacking_b_end_1.add_default_path(action="click_identifier", parameter=None,expected_loc=attack_b2)
 
 def goto(destination, depth=0):
     global current_location
@@ -666,7 +666,7 @@ def loc(guess=None):
 def click_builder():
     # print("Click builder")
     pag.click(BOTTOM_LEFT)
-    for image in [i_builder, i_master, i_otto]:
+    for image in [i_builder, i_master]:
         if image.find():
             image.click()
             return True

@@ -53,11 +53,12 @@ def remove_clan_troops():
 
 def war_prep():
     set_current_account()
-    for account in [daz, bob, daen]:
+    for account in [bad_daz, daz, bob, daen]:
     # for account in [bad_daz, daz, bob, jon, daen]:
         change_accounts_fast(account)
         goto(army_tab)
         remove_clan_troops()
+        troop_delete_backlog()
         army_prep(account, account.war_troops)
         castle_troops_change(account.clan_troops_war)
 
@@ -123,9 +124,20 @@ def less_than_an_hour():
 
 
 def train_war_troops(account):
-    account.set_mode()
+    # account.set_mode()
+    remove_clan_troops()
     account.update_troops_to_build()
-    army_prep(account, account.troops_to_build, army_or_total="total")
+    troops = account.troops_to_build
+    troops_2 = troops + troops
+
+    troop_delete_backlog()
+    if admin.mode == "cwl":
+        army_prep(account, troops, army_or_total="total")
+    else:
+        army_prep(account, troops, army_or_total="total")
+        army_prep(account, troops_2, army_or_total="total")
+
+    castle_troops_change(account.clan_troops_war)
 
 def donate_war(account):
     print("Donate war. Admin mode:", admin.mode)
@@ -295,7 +307,7 @@ def goto_war_castle(cwl):
     print("Goto war castle")
     goto(main)
     goto_war_screen()
-    print("Goto war castle 2")
+    # print("Goto war castle 2")
 
     if cwl:
         result = goto_cwl_prep()
@@ -326,9 +338,9 @@ def click_war_castle():
     found = False
     for castle in war_castles:
         print(castle, castle.find_detail())
-        if not found and castle.find(show_image=False):
-            found = True
+        if castle.find(show_image=False):
             castle.click()
+            return True
     return found
 
 def remaining_donations():
