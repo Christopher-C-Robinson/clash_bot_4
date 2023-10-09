@@ -27,7 +27,7 @@ def invite():
     time.sleep(1)
     members = get_member_numbers()
     print("No of members:", members)
-    if members >= 49:
+    if members >= 50:
         i_red_cross_clan.click()
         pag.click(BOTTOM_LEFT)
         admin.inviting = False

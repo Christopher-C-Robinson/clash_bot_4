@@ -334,7 +334,7 @@ class Image():
 
 # Navigation images
 # i_ad_cross = Image(name="i_ad_cross", file='images/nav/ad_cross.png')
-i_ad_back = Image(name="i_ad_cross", file='images/nav/ad_back.png')
+# i_ad_back = Image(name="i_ad_cross", file='images/nav/ad_back.png')
 i_app = Image(name="i_app", file='images/nav/app.png')
 i_another_device = Image(name="i_another_device", file='images/nav/another_device.png')
 i_army = Image(name="i_army", file='images/nav/army.png')
@@ -381,7 +381,7 @@ i_log_in = Image(name="i_log_in", file='images/nav/log_in.png')
 i_main = Image(name="i_main", file='images/nav/main.png')
 i_maintenance = Image(name="i_maintenance", file='images/nav/maintenance.png', threshold=0.9)
 i_maintenance2 = Image(name="i_maintenance", file='images/nav/maintenance2.png')
-i_master = Image(name="i_master", file='images/master.png')
+# i_master = Image(name="i_master", file='images/master.png')
 i_master_builder = Image(name="i_master_builder", file='images/nav/master_builder.png')
 i_maximise = Image(name="i_maximise", file='images/nav/maximise.png')
 i_multiplayer = Image(name="i_multiplayer", file='images/nav/multiplayer.png')
@@ -428,7 +428,7 @@ i_start_eyes = Image(name="i_start_eyes", file='images/nav/start_eyes.png')
 i_start_eyes_2 = Image(name="i_start_eyes_2", file='images/nav/start_eyes_2.png')
 i_start_eyes_3 = Image(name="i_start_eyes_3", file='images/nav/start_eyes_3.png')
 i_surrender = Image(name="i_surrender", file='images/nav/surrender.png')
-# i_surrender_okay = Image(name="i_surrender_okay", file='images/nav/surrender_okay.png')
+i_surrender_okay = Image(name="i_surrender_okay", file='images/nav/surrender_okay.png')
 i_switch_account = Image(name="i_switch_account", file='images/nav/switch_account.png')
 i_close_switch_account = Image(name="i_close_switch_account", file='images/nav/close_switch_account.png')
 # i_bad_daz = Image(name="i_bad_daz", file='images/nav/bad_daz.png')
@@ -448,7 +448,7 @@ i_trader_close = Image(name="i_trader_close", file='images/nav/trader_close.png'
 i_raid_medals = Image(name="i_raid_medals", file='images/nav/raid_medals.png', threshold=0.95)
 i_raid_medals_selected = Image(name="i_raid_medals_selected", file='images/nav/raid_medals_selected.png', threshold=0.95)
 i_capital_coin = Image(name="capital_coin", file='images/capital_coin.png')
-i_collect_capital_coin = Image(name="i_collect_capital_coin", file='images/collect_capital_coin.png')
+# i_collect_capital_coin = Image(name="i_collect_capital_coin", file='images/collect_capital_coin.png')
 i_coin_on_main_screen = Image(name="coin_on_main_screen", file='images/capital_coin/coin_on_main_screen.png')
 i_coin_collect = Image(name="coin_collect", file='images/capital_coin/coin_collect.png')
 i_red_cross_coin = Image(name="red_cross_coin", file='images/capital_coin/red_cross_coin.png')
@@ -460,7 +460,7 @@ i_clan_2 = Image(name="i_clan", file='images/members/clan2.png')
 i_clan_3 = Image(name="i_clan", file='images/members/clan3.png')
 # i_details = Image(name="i_details", file='images/members/details.png')
 # i_view_map = Image(name="i_view_map", file='images/members/view_map.png')
-i_collect_castle = Image(name="i_collect_castle", file='images/collect_castle.png')
+# i_collect_castle = Image(name="i_collect_castle", file='images/collect_castle.png')
 # i_remove_castle_troops = Image(name="i_remove_castle_troops", file="images/castle/remove_castle_troops.png")
 i_remove_troops = Image(name="i_remove_troops", file="images/remove_troops.png")
 
@@ -505,6 +505,7 @@ i_chopper = Image(name="chopper", file="images/attack_b/chopper.png")
 # i_giant = Image(name="giant", file="images/attack_b/giant.png")
 # i_cannon = Image(name="cannon", file="images/attack_b/cannon_b.png")
 # i_pekka = Image(name="pekka", file="images/attack_b/pekka.png")
+i_attack_screen_resources = Image(name="attack screen resources", file="images/attack_screen_resources.png")
 
 # War
 i_war = Image(name="i_war", file='images/war/war.png', threshold=0.76)
@@ -526,13 +527,13 @@ i_war_donate = Image(name="i_war_donate", file='images/war/donate.png')
 i_war_request = Image(name="i_war_request", file='images/war/war_request.png')
 i_war_donate_reinforcements = Image(name="i_war_donate_reinforcements", file='images/war/donate_reinforcements.png', threshold=0.7)
 # i_clan_army = Image(name="i_clan_army", file="images/troops/clan_army.png")
-i_cwl_prep = Image(name="i_cwl_prep", file="images/war/cwl_prep.png")
+i_cwl_prep = Image(name="i_cwl_prep", file="images/war/cwl_prep.png", threshold=0.7)
 # i_cwl_prep_2 = Image(name="i_cwl_prep_2", file="images/war/cwl_prep_2.png")
 # i_cwl_last_day = Image(name="i_cwl_last_day", file="images/war/cwl_last_day.png")
 i_attacks_available = Image(name="i_attacks_available", file="images/war/attacks_available.png")
 
 # Donate images
-i_more_donates = Image(name="i_more_donates", file="images/more_donates.png")
+# i_more_donates = Image(name="i_more_donates", file="images/more_donates.png")
 i_donate_cross = Image(name="i_donate_cross", file='images/donate_cross.png')
 
 # Challenge
@@ -540,7 +541,7 @@ i_challenge_start = Image(name="challenge_start", file="images/challenge/challen
 
 # Building images
 i_builder_zero = Image(name="i_builder_zero", file='images/builder_zero.png', threshold=0.75, region_limit=[744, 79, 198, 32])
-i_builder_one = Image(name="i_builder_one", file='images/builder_one.png', threshold=0.75)
+# i_builder_one = Image(name="i_builder_one", file='images/builder_one.png', threshold=0.75)
 i_upgrade_button = Image(name="i_upgrade_button", file='images/upgrade.png', threshold=0.7)
 i_suggested_upgrades = Image(name="i_suggested_upgrades", file='images/towers/suggested_upgrades.png')
 i_upgrades_in_progress = Image(name="i_upgrades_in_progress", file='images/towers/upgrades_in_progress.png')
@@ -560,7 +561,7 @@ i_army_donate_edit = Image(name="i_army_donate_edit", file='images/nav/army_dona
 i_castle_remove = Image(name="i_castle_remove", file='images/castle/castle_remove.png')
 i_castle_confirm = Image(name="i_castle_confirm", file='images/castle/castle_confirm.png')
 i_castle_send = Image(name="i_castle_send", file='images/castle/castle_send.png')
-
+i_army_tab_cancel = Image(name="army_tab_cancel", file="images/nav/army_tab_cancel.png")
 # Members
 # i_accept = Image(name="i_accept", file="images/members/accept_member.png")
 i_perks = Image(name="i_perks", file="images/members/perks.png")
@@ -602,13 +603,17 @@ def create_image_group(directory, show=False, threshold=0.79, add_levels=False):
             x.show()
     return image_group
 
-# Resources
+i_tree_remove = Image(name="remove_tree", file="images/trees/remove_tree.png")
+
+# Image groups
 resource_images_main = create_image_group("resources/main")
 resource_images_builder = create_image_group("resources/builder")
 carts = create_image_group('attack_b/carts', threshold=0.7)
-
-# Castles
 castles = create_image_group("towers/castles/")
+trees_main = create_image_group("trees/main", threshold=0.80)
+trees_builder = create_image_group("trees/builder")
+available_builders = create_image_group("builder/available_builders", threshold=0.88)
+
 
 town_halls = create_image_group("towers/town_halls/", add_levels=True)
 eagles = create_image_group("towers/eagles/", add_levels=False)
@@ -624,7 +629,7 @@ i_barb = get_image("barb")
 i_blank_screen = get_image("blank_screen")
 i_close = get_image("close")
 # i_close_app = get_image("close_app")
-i_maximise = get_image("maximise")
+# i_maximise = get_image("maximise")
 i_minimise = get_image("minimise")
 i_run_as_admin = get_image("run_as_admin")
 i_yes = get_image("yes")
@@ -633,7 +638,7 @@ dir = "war/castles/"
 files = dir_to_list(dir)
 war_castles = []
 for file in files:
-    new = Image(name=file, file='images/' + file + ".png", threshold=0.8)
+    new = Image(name=file, file='images/' + file + ".png", threshold=0.69, no_of_regions=1)
     war_castles.append(new)
 
 # Building
@@ -695,6 +700,9 @@ def shrink_images(directory):
 
 for i in images:
     i.merge_regions()
+
+# for i in war_castles:
+#     print(i, i.no_of_regions, len(i.regions))
 
 
 # shrink_images("images")

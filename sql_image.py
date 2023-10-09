@@ -50,7 +50,7 @@ def db_image_update(image, result):
 def db_image_view():
     file = ROOT_DIR + "/excel/log.xlsx"
 
-    db_str = f"SELECT * FROM {TABLE_NAME} ORDER BY name"
+    db_str = f"SELECT * FROM {TABLE_NAME} ORDER BY success"
     output = db(db_str)
 
     log_wb = xl.load_workbook(file)

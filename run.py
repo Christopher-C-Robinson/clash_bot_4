@@ -3,7 +3,8 @@ from games import *
 
 # set_current_account()
 def run():
-    # set_current_account()
+    set_current_account()
+    set_admin_mode()
     check_status_files_exist()
     while True:
         run_job(db_next_job())
@@ -177,8 +178,12 @@ def highlight_next_build():
     return shortest_time_account
 
 
-# invite()
+# account = daz
+# castle_troops_change(account.army_clan_troops)
+# castle_troops_change(account.clan_troops_war)
 
+
+set_current_account()
 run()
 
 goto(pycharm)

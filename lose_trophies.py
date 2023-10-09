@@ -38,9 +38,9 @@ def lose_trophies(account):
                 break
 
         time.sleep(0.2)
-        click_cv2("surrender")
+        i_surrender.click()
         time.sleep(0.2)
-        click_cv2("surrender_okay")
+        i_surrender_okay.click()
         i_return_home.wait(80)
         i_return_home.click()
         current_location = "return_home"

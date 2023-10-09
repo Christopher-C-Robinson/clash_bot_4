@@ -1,0 +1,31 @@
+To Do
+ - Current Donator (work out which account is best to donate)
+ - Clear out army and build right number of troops
+ - Speed up sweep in builder base
+ - Speed up attack start in builder base
+ - Determine the number of days until build complete
+
+# http://www.graphviz.org/content/cluster
+
+https://dreampuf.github.io/GraphvizOnline/#digraph%20G%20%7B%0D%0A%20%20%20%20constants%20-%3E%20object_recognition%0D%0A%20%20%20%20object_recognition%20-%3E%20ocr%0D%0A%20%20%20%20%7Bocr%2C%20towers_load%7D%20-%3E%20nav%0D%0A%20%20%20%20ocr%20-%3E%20sql%0D%0A%20%20%20%20%7Bmember%2C%20nav%7D%20-%3E%20troops%0D%0A%20%20%20%20%7Bimages%7D%20-%3E%20tower%0D%0A%20%20%20%20tower%20-%3E%20towers_load%0D%0A%20%20%20%20troops%20-%3E%20attacks%0D%0A%20%20%20%20%7Battacks%2C%20sql%7D%20-%3E%20account%0D%0A%20%20%20%20%7Battacks%2C%20sql%7D%20-%3E%20donate%0D%0A%20%20%20%20%7Btracker%2C%20account%7D%20-%3E%20build%0D%0A%20%20%20%20%7Baccount%2C%20lose_trophies%2C%20donate%7D%20-%3E%20attack_logic%0D%0A%20%20%20%20troops%20-%3E%20research%0D%0A%20%20%20%20%7Battack_logic%7D%20-%3E%20games%0D%0A%20%20%20%20%7Battack_logic%7D%20-%3E%20war%0D%0A%20%20%20%20%7Bbuild%2C%20war%2C%20research%2C%20games%7D%20-%3E%20bot%0D%0A%20%20%20%20%7Bbot%2C%20games%7D%20-%3E%20run%0D%0A%7D%0D%0A%0D%0A
+
+digraph G {
+    constants -> object_recognition
+    object_recognition -> ocr
+    {ocr, towers_load} -> nav
+    ocr -> sql
+    {member, nav} -> troops
+    {images} -> tower
+    tower -> towers_load
+    troops -> attacks
+    {attacks, sql} -> account
+    {attacks, sql} -> donate
+    {nav, towers_load, sql, tracker, account} -> build
+    {account, lose_trophies, donate} -> attack_logic
+    troops -> research
+    {attack_logic} -> games
+    {attack_logic} -> war
+    {build, war, research, games} -> bot
+    {bot, games} -> run
+}
+

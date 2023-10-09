@@ -15,6 +15,7 @@ class Admin:
         self.less_than_one_hour = False
         self.excel_last_row_log = None
         self.excel_last_row_image = 3
+        self.goto_depth = 0
 
 admin = Admin()
 

@@ -189,14 +189,7 @@ class Loc():
         elif action == "reload":
             # print("Power down")
             # goto(main)
-            close_app()
-            rest_time = 20
-            end_time = time_to_string(datetime.now() + timedelta(minutes=rest_time))
-            text = f"Power down: {end_time}"
-            print(text)
-            add_power_down_to_image(text)
-            time.sleep(60 * rest_time)
-            open_app()
+            reload()
             outcome = True
         elif action == "key":
             pag.press(parameter)
@@ -209,6 +202,8 @@ class Loc():
         elif action == "wait":
             time.sleep(parameter)
             outcome = True
+        elif action == "from_ld_to_main":
+            from_ld_to_main()
         elif action == "goto_forge":
             hold_key("a", 0.1)
             hold_key("s", 0.1)
@@ -358,6 +353,15 @@ class Loc():
         if self.default_path: return True
         return False
 
+def reload(rest_time=20):
+    close_app()
+    end_time = time_to_string(datetime.now() + timedelta(minutes=rest_time))
+    print(f"Power down: {end_time}")
+    add_power_down_to_image(f"Power down: {end_time}")
+    time.sleep(60 * rest_time)
+    open_app()
+
+
 def goto_builder():
     zoom_out()
     found, count = False, 0
@@ -396,6 +400,28 @@ def add_power_down_to_image(text):
     cv2.putText(image, text, (400, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
     cv2.imwrite("C:/Users/darre/OneDrive/Darren/clash_bot/tracker/status.png", image)
 
+def from_ld_to_main():
+    found, count = False, 0
+    while not found and count < 60:
+        if i_clash_icon.find(fast=False):
+            i_clash_icon.click()
+            found = True
+        if count % 10 == 0: i_app.click()
+    if not found: return
+
+    found, count = False, 0
+    while not found and count < 60:
+        val, loc, rect = i_builder.find_detail()
+        print("From ld to main (builder val):", val)
+        if val > 0.6 and val < i_builder.threshold:
+            i_maximise.click()
+        if val > i_builder.threshold:
+            found = True
+        if count % 20 == 0: i_app.click()
+        count += 1
+        time.sleep(1)
+
+    return found
 
 # -------------------
 # ---- LOCATIONS ----
@@ -428,7 +454,7 @@ builder = Loc(name="builder", identifier=i_master_builder, accessible=True)
 # builder.add_identifier(i_otto)
 
 overlays = []
-for overlay in [i_another_device, i_ad_back, i_reload, i_reload_game, i_try_again, i_return_home, i_okay,
+for overlay in [i_another_device, i_reload, i_reload_game, i_try_again, i_return_home, i_okay,
                 i_return_home_2, i_return_home_3, i_red_cross, i_red_cross_2, i_red_cross_3, i_close_app, i_return_home_b]:
     new_overlay = Loc(name=overlay.name[2:], identifier=overlay, accessible=False)
     if overlay == i_another_device:
@@ -485,7 +511,7 @@ unknown.add_default_path(action="wait", parameter=0.2, expected_loc=main)
 no_app.add_default_path(action="start_app", parameter=None, expected_loc=main)
 # maintenance.add_default_path(action="reload", parameter=None, expected_loc=main)
 maintenance2.add_default_path(action="reload", parameter=None, expected_loc=main)
-l_ldplayer.add_default_path(action="click", parameter=i_clash_icon, expected_loc=main)
+l_ldplayer.add_default_path(action="from_ld_to_main", parameter=None, expected_loc=main)
 
 
 # Main
@@ -576,9 +602,16 @@ attacking_b.add_default_path(action='click', parameter=i_surrender, expected_loc
 
 def goto(destination, depth=0):
     global current_location
-    if depth > 5: return current_location
+    admin.goto_depth += 1
+    # print("Goto depth", admin.goto_depth)
+    if admin.goto_depth > 8:
+        reload(2)
+        admin.goto_depth = 0
+        return current_location
     # print(f"Goto (Initial): {current_location} -> {destination}")
-    if current_location == destination: return
+    if current_location == destination:
+        admin.goto_depth = 0
+        return
     loop_count = 0
     path_found = True
     while current_location != destination and path_found and loop_count < 5 and current_location:
@@ -586,6 +619,7 @@ def goto(destination, depth=0):
         path_found = current_location.has_path(destination)
         result = current_location.goto(destination)
         loop_count += 1
+        # print("Goto loop count:", loop_count)
         if destination.pause: time.sleep(2)
         current_location = loc(current_location) # This validates that expectations match reality wrt location
         # print("Current location:", current_location)
@@ -594,6 +628,12 @@ def goto(destination, depth=0):
         #     print(path)
         # print(current_location, destination, path_found, loop_count)
         print(f"Path not found (loc): {current_location} -> {destination}")
+    if loop_count >= 4:
+        print("Loop count:", loop_count)
+        loop_count = 0
+        reload(2)
+
+    admin.goto_depth = 0
     print("Goto complete:", current_location)
     return current_location
 
@@ -642,7 +682,7 @@ def loc(guess=None):
                 current_location = location
                 print("Loc success (all locations)", location, "FAST", identifier.name, round(val,2), identifier.threshold, result)
                 return current_location
-            print("Loc fail (all locations)", location, "FAST", identifier.name, round(val,2), identifier.threshold, identifier.regions, location.height)
+            # print("Loc fail (all locations)", location, "FAST", identifier.name, round(val,2), identifier.threshold, identifier.regions, location.height)
     time.sleep(0.5)
     for location in locs:
         # print("C", datetime.now() - start_time)
@@ -666,7 +706,7 @@ def loc(guess=None):
 def click_builder():
     # print("Click builder")
     pag.click(BOTTOM_LEFT)
-    for image in [i_builder, i_master]:
+    for image in [i_builder, i_master_builder]:
         if image.find():
             image.click()
             return True

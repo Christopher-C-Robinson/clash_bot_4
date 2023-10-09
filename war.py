@@ -43,6 +43,7 @@ def wait(minutes):
         time.sleep(60)
 
 def remove_clan_troops():
+    goto(army_tab)
     i_army_edit.click()
     for x in range(9):
         super_barb.i_army.click_region(CASTLE_TROOPS, show_image=False)
@@ -51,25 +52,64 @@ def remove_clan_troops():
     i_army_okay2.click()
     time.sleep(0.2)
 
-def war_prep():
+def war_prep(cwl=False):
     set_current_account()
     for account in [bad_daz, daz, bob, daen]:
-    # for account in [bad_daz, daz, bob, jon, daen]:
+        if cwl:
+            troops = account.cwl_troops
+        else:
+            troops = account.war_troops
+            troops_2 = troops + troops
         change_accounts_fast(account)
         goto(army_tab)
         remove_clan_troops()
         troop_delete_backlog()
-        army_prep(account, account.war_troops)
+        if cwl:
+            army_prep(account, troops, army_or_total="total")
+        else:
+            army_prep(account, troops, army_or_total="army")
+            army_prep(account, troops_2, army_or_total="total")
         castle_troops_change(account.clan_troops_war)
 
     change_accounts_fast(account_1)
+    goto(pycharm)
     wait(1)
     for x in range(3):
-        app()
         wait(6)
         donate_basic(account_1)
+        goto(pycharm)
 
     army_prep(account_1, account_1.war_troops)
+
+def has_barbs(dict):
+    try:
+        if dict[super_barb] > 0: return True
+    except:
+        pass
+
+
+def train_war_troops(account, cwl=False):
+    if account.mode != "war_troops": return
+    clan_troops = troops_count_flex(army_tab, CASTLE_TROOPS, siege_troops)
+    if has_barbs(clan_troops): remove_clan_troops()
+
+    if admin.mode == "cwl":
+        army_prep(account, account.cwl_troops, army_or_total="total")
+    else:
+        # Layer 1
+        army_prep(account, account.war_troops, army_or_total="army")
+        # Layer 2
+        actual = troops_count_flex(troops_tab, TRAINING_RANGE, just_troops)
+        print_count("Existing Layer 2", actual)
+        if has_barbs(actual): troop_delete_backlog()
+
+        expected = convert_list_to_troop_count(account.war_troops)
+        required = subtract_dictionaries(actual, expected)
+        for troop in required:
+            if troop.type == "spell": required[troop] = 0
+        restock(required, account)
+
+    castle_troops_change(account.clan_troops_war)
 
 def war_get_status_image():
     print("War get status image")
@@ -93,7 +133,7 @@ def set_admin_mode():
         status = "preparation"
     elif i_war_battle_day.find_screen(war_banner) or i_war_battle_day.find_screen(war_banner):
         status = "battle_day"
-    elif i_season_info.find_screen(war_info, show_image=False):
+    if i_season_info.find_screen(war_info, show_image=False):
         status = "cwl"
         # if i_cwl_last_day.find(): status = "battle_day"
     elif i_clan_wars.find(fast=False): status = "no war"
@@ -122,22 +162,6 @@ def less_than_an_hour():
     # print("Admin - less than one hour", admin.less_than_one_hour)
     return result
 
-
-def train_war_troops(account):
-    # account.set_mode()
-    remove_clan_troops()
-    account.update_troops_to_build()
-    troops = account.troops_to_build
-    troops_2 = troops + troops
-
-    troop_delete_backlog()
-    if admin.mode == "cwl":
-        army_prep(account, troops, army_or_total="total")
-    else:
-        army_prep(account, troops, army_or_total="total")
-        army_prep(account, troops_2, army_or_total="total")
-
-    castle_troops_change(account.clan_troops_war)
 
 def donate_war(account):
     print("Donate war. Admin mode:", admin.mode)
@@ -277,16 +301,18 @@ def goto_cwl_prep():
     start_time = datetime.now()
     for x in range(10):
         if i_cwl_prep.find(fast=False):
+            i_cwl_prep.click()
             prep_found = True
             break
-        if i_cwl_prep_2.find(fast=False):
-            prep_found = True
-            break
+        else:
+            print("Prep find:", i_cwl_prep.find_detail())
+        # if i_cwl_prep_2.find(fast=False):
+        #     prep_found = True
+        #     break
         time.sleep(0.1)
         if x % 3 == 0:
             print("Prep find (time required):", x, datetime.now() - start_time)
     if prep_found:
-        if not i_cwl_prep.click(): i_cwl_prep_2.click()
         return prep_found
     else:
         for x in range(20):
@@ -295,11 +321,11 @@ def goto_cwl_prep():
                 print("Clicked prep")
                 prep_found = True
                 break
-            if i_cwl_prep_2.find(fast=False):
-                i_cwl_prep_2.click()
-                print("Clicked prep 2")
-                prep_found = True
-                break
+            # if i_cwl_prep_2.find(fast=False):
+            #     i_cwl_prep_2.click()
+            #     print("Clicked prep 2")
+            #     prep_found = True
+            #     break
             time.sleep(0.1)
     return prep_found
 
@@ -307,7 +333,6 @@ def goto_war_castle(cwl):
     print("Goto war castle")
     goto(main)
     goto_war_screen()
-    # print("Goto war castle 2")
 
     if cwl:
         result = goto_cwl_prep()
@@ -323,6 +348,7 @@ def goto_war_castle(cwl):
         count += 1
     if not found: return False
 
+    time.sleep(0.2)
     still_moving, count = True, 0
     while still_moving and count < 40:
         i_war_left.click()
@@ -336,11 +362,21 @@ def goto_war_castle(cwl):
 
 def click_war_castle():
     found = False
+    # Fast loop
     for castle in war_castles:
-        print(castle, castle.find_detail())
-        if castle.find(show_image=False):
+        if castle.find(fast=True, show_image=False):
             castle.click()
             return True
+        else:
+            print(castle, castle.find_detail())
+    # Slow loop
+    for castle in war_castles:
+        if castle.find(fast=False, show_image=False):
+            castle.click()
+            return True
+        else:
+            print(castle, castle.find_detail())
+
     return found
 
 def remaining_donations():

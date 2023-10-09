@@ -396,8 +396,50 @@ def remove_tree(r, village):
             builders = False
         count += 1
 
+def remove_trees_main():
+    goto(main)
+    time.sleep(0.1)
+    screen = get_screenshot(region=BUILDER_ZERO_REGION, filename="builders")
+    are_builders_available = False
+    for x in available_builders:
+        if x.find_screen(screen=screen):
+            print(x.find_screen(screen=screen, return_result=True))
+            are_builders_available = True
+    if not are_builders_available:
+        print("No builders available", i_builder_zero.find_detail())
+        return
+    for tree in trees_main:
+        if tree.find():
+            print("Found tree:", tree)
+            tree.click()
+            time.sleep(0.1)
+            i_tree_remove.click()
+        # wait for a builder
+        found, count = False, 0
+        while not found and count < 300:
+            screen = get_screenshot(region=BUILDER_ZERO_REGION, filename="builders")
+            for x in available_builders:
+                print(x, screen.shape, x.image.shape)
+                if x.find_screen(screen=screen):
+                    found = True
+            time.sleep(0.1)
+            count += 1
 
-def remove_trees(village):
+# file = "builder"
+# screen = cv2.imread(f'temp/builders.png', 0)
+# show(screen)
+
+# for x in available_builders:
+#     print(x, x.find_screen(screen=screen, return_result=True))
+
+# i_app.click()
+# time.sleep(0.1)
+# remove_trees_main()
+# time.sleep(0.1)
+# i_app.click()
+
+
+def remove_trees_old(village):
     zoom_out()
     for letter in ['w', 's']:
         hold_key(letter, 0.5)
@@ -641,7 +683,7 @@ def remaining_time_of_upgrading_towers(account):
     total_time_traps = timedelta(days=0)
     total_time = timedelta(days=0)
 
-    step = 50
+    step = 52
     goto_list_very_top("main")
     result = i_upgrades_in_progress.find_detail()
     x = result[1][0]
@@ -697,6 +739,7 @@ def analyse_build_image(account, include_upgrading=True):
     else:
         total_time_heroes, total_time_towers, total_time_traps, total_time = timedelta(), timedelta(), timedelta(), timedelta()
     finished, count, tower_count = False, 0, 1
+    excel_values = []
     while not finished and count <= 60 and tower_count <= 100:
         current_y = current_y + gap
         if current_y + height > max_y:
@@ -721,7 +764,8 @@ def analyse_build_image(account, include_upgrading=True):
                 remaining_towers.append(tower_string)
 
             current_level = tower.get_level_from_cost(cost)
-            total_time_for_tower = tower.remaining_time(current_level, account.th) * mult
+            time_for_one_tower = tower.remaining_time(current_level, account.th)
+            total_time_for_tower = time_for_one_tower * mult
             total_time += total_time_for_tower
             if tower.category == "hero": total_time_heroes += total_time_for_tower
             if tower.category == "defence": total_time_towers += total_time_for_tower
@@ -729,6 +773,11 @@ def analyse_build_image(account, include_upgrading=True):
             print(f"{tower_count}. {tower_string} x{mult}",
                   f"{cost:,.0f}. Total remaining time: {total_time_for_tower.days} days. [{tower.category}]")
             tower_count += 1
+            if current_level is None:
+                excel_values_one = [tower.name, "None", time_for_one_tower.days, mult, total_time_for_tower.days]
+            else:
+                excel_values_one = [tower.name, current_level.number, time_for_one_tower.days, mult, total_time_for_tower.days]
+            excel_values.append(excel_values_one)
         count += 1
 
     print("\nTotal time (assuming 5 builders)")
@@ -750,6 +799,12 @@ def analyse_build_image(account, include_upgrading=True):
     db_account_update(account.number, "completion_string", completion_string)
     print(f"Completion date: {completion_date.day}/{completion_date.month}/{completion_date.year}")
     print(f"Completion string: {completion_string}")
+
+    excel_write_rows(file="remaining_time", sheet=account.number, start_row=4, values=excel_values)
+
+    # for values in excel_values:
+    #     print(values)
+
     return completion_date
     # print(remaining_towers)
 
@@ -768,16 +823,17 @@ def delete_build_files():
             os.remove(file)
             # print("Deleted:", file)
 
-delete_build_files()
+# delete_build_files()
 
-def remaining_time_for_th(account):
+def remaining_time_for_th(account, delete_files=True):
     if account == admin: return
     set_current_account()
     change_accounts_fast(account)
     get_build_images(account)
     create_build_image(account)
     analyse_build_image(account)
-    delete_build_files()
+    if delete_files:
+        delete_build_files()
 
 
 # remaining_time_of_upgrading_towers(bob)

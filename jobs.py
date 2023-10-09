@@ -29,6 +29,7 @@ class Job:
         print("Running:", self.name)
         if account != admin:
             change_accounts_fast(account)
+            if not account.initial_mode_set: account.set_mode(attacks_left_update=True)
         if self.name == "donate":
             donate(account)
             if account.mode == "donate" and admin.mode == "preparation" and admin.war_donations_remaining > 0 and account in war_participants:
@@ -53,9 +54,8 @@ class Job:
         if account != admin:
             update_images(account)
             account.update_resources()
-            if admin.inviting:
-                invite()
             get_capital_coin()
+            remove_trees_main()
         time_taken = datetime.now() - start
         log(admin.mode, account.mode, self.name, account.name, time_taken)
 
@@ -123,6 +123,8 @@ def get_job(job):
 
 def sweep():
     change_accounts_fast(bad_daz)
+    if admin.inviting:
+        invite()
     current_mode = admin.mode
     set_admin_mode()
     if current_mode != admin.mode:
@@ -163,8 +165,8 @@ j_research = Job(data=research_data)
 j_build = Job(data=build_data)
 j_challenge = Job(data=challenge_data)
 j_coin = Job(data=coin_data)
-j_war_troops = Job({'name': "war_troops",'time_active': timedelta(minutes=10),'time_inactive': timedelta(hours=12),'update_time': True})
-j_cwl_troops = Job({'name': "cwl_troops",'time_active': timedelta(minutes=10),'time_inactive': timedelta(hours=12),'update_time': True})
+j_war_troops = Job({'name': "war_troops",'time_active': timedelta(hours=8),'time_inactive': timedelta(hours=8),'update_time': True})
+j_cwl_troops = Job({'name': "cwl_troops",'time_active': timedelta(hours=8),'time_inactive': timedelta(hours=8),'update_time': True})
 j_message = Job(data=message_data)
 j_completion_date = Job(data=completion_date_data)
 j_sweep = Job({'name': "sweep","time_active": timedelta(hours=0.5),"time_inactive": timedelta(hours=0.5),'update_time': True})

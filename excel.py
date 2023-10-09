@@ -40,3 +40,32 @@ def log(admin_mode, account_mode, job, account, duration):
     except:
         print("Couldn't update log")
 
+def excel_write_rows(file, sheet, start_row, values):
+    try:
+        file = ROOT_DIR + "/excel/" + file + ".xlsx"
+        log_wb = xl.load_workbook(file)
+        log_ws = log_wb[str(sheet)]
+        row = start_row
+    except:
+        print("Couldn't update log")
+        return
+
+    for single_row in values:
+        try:
+            for count, value in enumerate(single_row, 1):
+                log_ws.cell(row, count).value = value
+            row += 1
+        except:
+            print("Couldn't update log")
+
+    try:
+        log_wb.save(file)
+        log_wb.close()
+    except:
+        pass
+
+
+# time = timedelta(hours=1)
+
+# excel_write_rows(file="remaining_time", sheet=1, row=4, values=["archer", 5, 6, time, 3, 3 * time])
+

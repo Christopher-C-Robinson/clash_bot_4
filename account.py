@@ -1,10 +1,9 @@
 from attacks import *
-from admin import *
 from sql import *
 from sql_account import *
 from utilities import *
 
-trophy_limits = {0: 0, 1: 100, 2: 200, 3: 300, 4: 400, 5: 500, 6: 600, 7: 1300, 8: 1000, 9: 1200, 10: 1400, 11: 1600, 12: 1800, 13: 2000, 14: 2000}
+trophy_limits = {0: 0, 1: 100, 2: 200, 3: 300, 4: 400, 5: 500, 6: 600, 7: 1300, 8: 1000, 9: 1200, 10: 1400, 11: 1600, 12: 1800, 13: 2000, 14: 2000, 15: 2500}
 
 accounts = []
 
@@ -26,7 +25,7 @@ def get_donation_troops():
             for x in range(troop.donation_count):
                 donation_troops.append(troop)
 
-    if admin.war_donations_remaining > 0:
+    if admin.war_donations_remaining and admin.war_donations_remaining > 0:
         donation_troops += [lava_hound] * 6
 
     # Siege equipment
@@ -112,6 +111,7 @@ class Account:
         self.cwl_donations_left = True
         self.mode = None
         self.request_type = None
+        self.initial_mode_set = False
 
         if self.number in [1,2]:
             self.cwl_donations_left = True
@@ -123,13 +123,18 @@ class Account:
     def set_mode(self, resource_update=True, attacks_left_update=False):
         start_mode = self.mode
         self.update_attacking(resource_update=resource_update)
+        pre = self.attacks_left
         if attacks_left_update: self.update_attacks_left()
+        if self.attacks_left != pre: admin.war_donations_remaining = -1
 
         self.mode = "donate"
         if self.attacking:                                                         self.mode = "attack"
         elif admin.mode == "preparation" and admin.war_donations_remaining == 0:   self.mode = "war_troops"
         elif admin.mode == "battle_day" and self.attacks_left:                     self.mode = "war_troops"
-        elif admin.mode == "cwl" and self.attacks_left:                            self.mode = "cwl_troops"
+        elif admin.mode == "cwl" and admin.war_donations_remaining == 0:           self.mode = "cwl_troops"
+        if self not in war_participants:
+            self.mode = "donate"
+            if self.attacking:                                                     self.mode = "attack"
         if self == donating_account():                                             self.mode = "donate"
 
         if self.mode != start_mode:
@@ -147,14 +152,14 @@ class Account:
         donation_troops = get_donation_troops()
         # if self.has_siege: donation_troops += donation_siege
         # print("Update troops to build", self, self.mode, self.has_siege, donation_troops, donation_siege)
-        print("Updating troops to build:", self.mode)
+        print("Updating troops to build:", self, self.mode)
 
         if self.mode in ["war_troops", ]: self.troops_to_build = self.war_troops
         elif self.mode in ["cwl_troops", ]: self.troops_to_build = self.cwl_troops
         elif self.mode in ["donate", ]: self.troops_to_build = donation_troops
         else: self.troops_to_build = self.convert_attack_to_troops(self.army_troops) + self.siege_troops
 
-        print("Update troops to build:\n", objects_to_str(self.troops_to_build))
+        # print("Update troops to build:\n", objects_to_str(self.troops_to_build))
 
         for troop in self.troops_to_build:
             if type(troop) != type(super_barb): self.troops_to_build.remove(troop)
@@ -410,7 +415,7 @@ def change_accounts_fast(account):
     # Check you arrived
     while not found:
         time.sleep(0.1)
-        for image in [i_builder, i_master]:
+        for image in [i_builder, i_master_builder]:
             if image.find():
                 if image == i_builder:
                     new_location = main
@@ -501,7 +506,7 @@ def update_image():
     # Header
     footer = np.zeros((50, 400, 3), np.uint8)
     text = admin.mode.title()
-    if admin.war_donations_remaining > 0:
+    if admin.war_donations_remaining and admin.war_donations_remaining > 0:
         text += f": {admin.war_donations_remaining}"
     cv2.putText(footer, text, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
@@ -584,7 +589,7 @@ walls_done = [d, t, r,]
 account_data_1 = {
     'name': "Bad Daz",
     'number': 1,
-    'th': 14,
+    'th': 15,
     'has_siege': True,
     'requires_siege': True,
     'building': True,
@@ -595,10 +600,10 @@ account_data_1 = {
     'army_troops': BARBS_60,
     'army_clan_troops': [lightening] * 3 + [log_thrower] + [super_barb] * 9,
     # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
-    'war_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8,
+    'war_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8,
     'cwl_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [bloon] * 4,
     'war_donations': [archer] * 3 + [super_barb] * 14 + [bloon] * 6 + [dragon] * 3 + [edrag] + [lava_hound] * 5 + [ice_golem] + [log_thrower] * 6,
-    'clan_troops_war': [dragon] * 2 + [bloon] + [lightening] * 3,
+    'clan_troops_war': [dragon] * 2 + [bloon] + [lightening] * 3 + [log_thrower],
     'siege_troops': [log_thrower] * 5 + [flinger],
     'donations_from': 2,
     'games_troops': BARBS_60_GAMES,
@@ -615,7 +620,7 @@ account_data_1 = {
 account_data_2 = {
     'name': "Daz",
     'number': 2,
-    'th': 12,
+    'th': 13,
     'has_siege': True,
     'requires_siege': True,
     'building': True,
@@ -626,10 +631,10 @@ account_data_2 = {
     'army_troops': BARBS_56,
     'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 8,
     # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
-    'war_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8,
+    'war_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8,
     'cwl_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [bloon] * 4,
     'war_donations': [archer] * 3 + [super_barb] * 7 + [bloon] * 3 + [dragon] * 1 + [edrag] + [lava_hound] * 3 + [ice_golem],
-    'clan_troops_war': [dragon] * 2 + [lightening] * 2,
+    'clan_troops_war': [dragon] * 2 + [lightening] * 2 + [log_thrower],
     'siege_troops': [ram, blimp, slammer] * 2,
     'donations_from': 1,
     'games_troops': GIANT240_GAMES,
@@ -653,15 +658,15 @@ account_data_3 = {
     'needs_walls': False,
     'attacking': True,
     'building_b': False,
-    'total_gold': 10000000,
+    'total_gold': 16000000,
     'total_elixir': 6000000,
     'total_dark': 200000,
     'army_troops': BARBS_56,
-    'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 7,
+    'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 8,
     # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
-    'war_troops': [edrag] * 2 + [dragon] * 11 + [lightening] * 4 + [freeze] * 7 + [edrag] * 2 + [dragon] * 11 + [lightening] * 4 + [freeze] * 7,
+    'war_troops': [edrag] * 2 + [dragon] * 11 + [lightening] * 4 + [freeze] * 7,
     'cwl_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [bloon] * 4,
-    'clan_troops_war': [edrag] + [bloon] + [lightening] * 2,
+    'clan_troops_war': [dragon] * 2 + [lightening] * 2 + [log_thrower],
     'war_donations': [archer] * 3 + [super_barb] * 7 + [bloon] * 3 + [dragon] * 1 + [lava_hound] * 3,
     'siege_troops': [],
     'donations_from': 1,
@@ -673,37 +678,6 @@ account_data_3 = {
     'researching': True,
     'attacking_b': False,
 }
-
-# account_data_4 = {
-#     'name': "Jon Snow",
-#     'number': 4,
-#     'th': 11,
-#     'has_siege': False,
-#     'requires_siege': True,
-#     'building': True,
-#     'needs_walls': False,
-#     'attacking': True,
-#     'building_b': False,
-#     'total_gold': 10000000,
-#     'total_elixir': 22000,
-#     'total_dark': 160000,
-#     'army_troops': BARBS_52,
-#     'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 7,
-#     # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
-#     'war_troops': [dragon] * 26 + [lightening] * 22,
-#     'cwl_troops': [dragon] * 13 + [lightening] * 14,
-#     'clan_troops_war': [bloon] + [edrag] + [lightening],
-#     'war_donations': [dragon] * 20 + [lightening] * 14,
-#     'siege_troops': [],
-#     'donations_from': 1,
-#     'games_troops': GIANT200_GAMES,
-#     'army_troops_b': troops4,
-#     'required_currency': "gold",
-#     'icon': "jon",
-#     'build_sets': old_th_h,
-#     'researching': False,
-#     'attacking_b': False,
-# }
 
 account_data_4 = {
     'name': "Crusher",
@@ -720,7 +694,7 @@ account_data_4 = {
     'total_dark': 160000,
     'army_troops': BARBS_52,
     'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 7,
-    'war_troops': [dragon] * 26 + [lightening] * 22,
+    'war_troops': [dragon] * 13 + [lightening] * 11,
     'cwl_troops': [dragon] * 13 + [lightening] * 14,
     'clan_troops_war': [bloon] + [edrag] + [lightening],
     'war_donations': [dragon] * 20 + [lightening] * 14,
@@ -745,14 +719,14 @@ account_data_5 = {
     'needs_walls': True,
     'attacking': True,
     'building_b': False,
-    'total_gold': 9000000,
+    'total_gold': 9500000,
     'total_elixir': 22000,
     'total_dark': 160000,
     'army_troops': BARBS_52,
     'army_clan_troops': [log_thrower] + [super_barb] * 7,
-    'war_troops': [dragon] * 26 + [lightening] * 22,
+    'war_troops': [dragon] * 13 + [lightening] * 11,
     'cwl_troops': [dragon] * 13 + [lightening] * 11,
-    'clan_troops_war': [edrag] + [lightening],
+    'clan_troops_war': [edrag] + [bloon] + [lightening] + [log_thrower],
     'war_donations': [dragon] * 20 + [lightening] * 14,
     'siege_troops': [],
     'donations_from': 1,
@@ -803,3 +777,4 @@ current_account = None
 # for account in accounts: print(account)
 
 # change_accounts_fast(account_5)
+

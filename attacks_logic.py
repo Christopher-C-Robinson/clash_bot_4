@@ -213,7 +213,7 @@ def attack_prep(account, siege_required=True):
 
     account.update_troops_to_build()
     # army_prep(account, account.troops_to_build, army_or_total="total")
-    sufficient_troops, actual_troops = army_prep(account, account.troops_to_build, army_or_total="army")
+    sufficient_troops, actual_troops = army_prep(account, account.troops_to_build, include_castle=True, army_or_total="army")
     if not sufficient_troops: return sufficient_troops
 
     if siege_required and actual_troops and actual_troops[log_thrower] == 0 and account.th > 8:
@@ -272,6 +272,8 @@ def assess_village(account, data, war_goals, print_time=False):
     if print_time: print("C", datetime.now() - start_time)
     img = create_double_screen()
     if img is None: print("Returned None image")
+    if resources[1] > 900000:
+        return "Good to go", img
     # show(img, scale=0.5)
 
     # pag.screenshot("attacks/attack.png")
@@ -284,7 +286,7 @@ def assess_village(account, data, war_goals, print_time=False):
         return "Town hall too high"
 
     # Not on attack screen
-    if not wait_cv2("coin"): return "Not on attack screen"
+    if not i_attack_screen_resources.wait(8): return "Not on attack screen"
 
     # Aggressive defences
     if check_towers(data['towers_to_avoid'], img) and resources[0] < 900000: return "Aggressive defence"
@@ -419,21 +421,9 @@ def place(troop, count_total, dp=[400,400], troop_pause=0):
             pag.click(dp1)
             time.sleep(troop_pause)
             time.sleep(pause_dur)
-            prop_troops = int(count / count_total * 100)
-            # damage = read_text(DAMAGE, WHITE, True)
-            # if damage > 100: damage = 0
-            # print("Place:", prop_troops, damage)
-            # if damage + 30 > prop_troops and damage > 30:
-            #     pause_dur += 0.1
-            #     pause_dur = min (1.5, pause_dur)
-            # if damage + 20 > prop_troops and damage > 50:
-            #     reduction = int((1 - prop_troops/damage) * count_total)
-            #     count += reduction * 2
             count += 1
-
-# def place_clan():
-#     i_clan_army.click()
-#     pag.click(STANDARD_DP)
+        if troop == warden:
+            click(troop.i_attack.image, TROOP_ZONE)
 
 def place_line(troop, count_total, dp1, dp2, troop_pause=0):
     if troop in TROOP_ATTACK_EXT: troop = troop + "_attack"

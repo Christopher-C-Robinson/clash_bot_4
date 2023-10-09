@@ -2,7 +2,7 @@ from datetime import timedelta
 import os
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# PRINT_CV2 = False
+PRINT_CV2 = False
 # VERBOSE_LOG = False
 # LEFT_LIMIT = 340
 

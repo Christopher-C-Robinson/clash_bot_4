@@ -97,7 +97,8 @@ class Troop():
         return val > 0.8
 
     def start_train(self, count, account, move_to_start=False):
-        print("Start train:", self)
+        if count == 0: return
+        print("Start train:", self, count)
         global slide_position
         if self.type == "troop":
             goto(troops_tab)
