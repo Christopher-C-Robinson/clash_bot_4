@@ -614,7 +614,7 @@ def goto(destination, depth=0):
         return
     loop_count = 0
     path_found = True
-    while current_location != destination and path_found and loop_count < 5 and current_location:
+    while current_location != destination and path_found and loop_count < 8 and current_location:
         # print(f"Goto: {current_location} => {destination}")
         path_found = current_location.has_path(destination)
         result = current_location.goto(destination)
@@ -628,10 +628,10 @@ def goto(destination, depth=0):
         #     print(path)
         # print(current_location, destination, path_found, loop_count)
         print(f"Path not found (loc): {current_location} -> {destination}")
-    if loop_count >= 4:
+    if loop_count >= 7:
         print("Loop count:", loop_count)
         loop_count = 0
-        reload(2)
+        reload(1)
 
     admin.goto_depth = 0
     print("Goto complete:", current_location)

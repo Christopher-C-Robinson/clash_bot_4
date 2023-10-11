@@ -136,14 +136,16 @@ class Troop():
         # print("Troop delete")
         if self.i_army.image is None: return
         goto(army_tab)
-        click_cv2("edit_army")
+        i_army_edit.click()
         val, loc, rect = find(self.i_army.image, get_screenshot(ARMY_EXISTING))
         rect_adj = [rect[0] + ARMY_EXISTING[0], rect[1] + ARMY_EXISTING[1], rect[2], rect[3]]
         spot = pag.center(rect_adj)
         for x in range(count):
             pag.click(spot)
-        click_cv2("edit_army_okay")
-        click_cv2("surrender_okay")
+        time.sleep(0.1)
+        i_army_okay.click()
+        time.sleep(0.1)
+        i_army_okay2.click()
 
 levels_filename = 'C:/Users/darre/OneDrive/Darren/clash_bot/levels.xlsx'
 
@@ -273,17 +275,17 @@ def slide(slide_pos, slide_pos_target):
         return slide_pos
 
     if slide_pos < slide_pos_target:
-        start_x = 1650
-        end_x = 250
+        start_x = 1500
+        end_x = 350
         slide_pos = min(slide_pos + 1, 2)
     else:
-        start_x = 250
-        end_x = 1650
+        start_x = 350
+        end_x = 1500
         slide_pos = min(slide_pos - 1, 1)
 
     dur = 0.3
-    pag.moveTo(start_x, 600, dur)
-    pag.dragTo(end_x, 600, dur)
+    pag.moveTo(start_x, 660, dur)
+    pag.dragTo(end_x, 660, dur)
     time.sleep(1)
     return slide_pos
 

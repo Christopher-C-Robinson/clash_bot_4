@@ -154,8 +154,10 @@ def merge_regions(string, min_increase=None):
         db(f"INSERT INTO regions VALUES ('{string}', '{x}', '{y}', '{w}', '{h}')")
 
 
-# db(f"DELETE FROM regions WHERE object_name='donate2'")
+# db(f"DELETE FROM regions WHERE object_name='i_builder'")
 
+
+# db_regions_view()
 # db(f"DELETE FROM regions")
 
 # merge_regions("donate2")

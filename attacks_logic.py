@@ -402,7 +402,9 @@ def launch_attack(account, data, image):
     print("Launch attack: final troops")
     for x in data['final_troops']:
         place(x, 1, dp)
-    wait_cv2("return_home")
+    i_return_home.wait(30)
+    i_return_home.click()
+    # wait_cv2("return_home")
 
 def place(troop, count_total, dp=[400,400], troop_pause=0):
     out_of_bounds = True
@@ -423,7 +425,9 @@ def place(troop, count_total, dp=[400,400], troop_pause=0):
             time.sleep(pause_dur)
             count += 1
         if troop == warden:
-            click(troop.i_attack.image, TROOP_ZONE)
+            time.sleep(0.1)
+            print("Activate warden")
+            i_warden_activate.click()
 
 def place_line(troop, count_total, dp1, dp2, troop_pause=0):
     if troop in TROOP_ATTACK_EXT: troop = troop + "_attack"

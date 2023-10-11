@@ -506,6 +506,7 @@ i_chopper = Image(name="chopper", file="images/attack_b/chopper.png")
 # i_cannon = Image(name="cannon", file="images/attack_b/cannon_b.png")
 # i_pekka = Image(name="pekka", file="images/attack_b/pekka.png")
 i_attack_screen_resources = Image(name="attack screen resources", file="images/attack_screen_resources.png")
+i_warden_activate = Image(name="warden_activate", file="images/troops/warden_activate.png")
 
 # War
 i_war = Image(name="i_war", file='images/war/war.png', threshold=0.76)
@@ -646,7 +647,7 @@ i_wall_text = Image(name="i_wall_text", file="images/towers/wall.png")
 
 # i_watch = Image(name="watch", file="images/attack_b/watch.png")
 
-img_message = cv2.imread('images/message.png', 0)
+# img_message = cv2.imread('images/message.png', 0)
 
 # Upgrades
 # i_hero_upgrade_identifier = Image(name="hero_upgrade_identifier", file="images/upgrades/hero_upgrade_identifier.png")

@@ -3,9 +3,9 @@ from games import *
 
 # set_current_account()
 def run():
-    set_current_account()
-    set_admin_mode()
-    check_status_files_exist()
+    # set_current_account()
+    # set_admin_mode()
+    # check_status_files_exist()
     while True:
         run_job(db_next_job())
 
@@ -183,8 +183,46 @@ def highlight_next_build():
 # castle_troops_change(account.clan_troops_war)
 
 
+# goto(locs[29])
+#
+# for count, loc in enumerate(locs):
+#     print(count, loc)
+
+
+# goto(main)
+
+# actual = troops_count_flex(army_tab, TRAINING_RANGE, just_troops, show_image=False, show_image_numbers=False)
+# print_count("Actual", actual)
+
+# count = empty_count()
+# count = troops_count_flex(army_tab, CASTLE_TROOPS, siege_troops, count)
+# print_count("Siege", count)
+#
+# count = empty_count()
+# count = troops_count_flex(army_tab, SPELLS_EXISTING, spells, count)
+# print_count("Spells", count)
+
+# count = {}
+# add_to_dict(count, super_barb, 1)
+# print_count("X", count)
+# goto(army_tab)
+# castle_troops_add(count)
+
+
 set_current_account()
-run()
+j_attack.run(daz)
+
+# run()
+# account = daz
+# army, full = full_count(account)
+# print_count("Army", army)
+# print_count("Full", full)
+
+# army_ready = attack_prep(account, siege_required=account.requires_siege)
+# print(army_ready)
+# run()
+
+# j_attack.run(daz)
 
 goto(pycharm)
 

@@ -32,10 +32,10 @@ class Job:
             if not account.initial_mode_set: account.set_mode(attacks_left_update=True)
         if self.name == "donate":
             donate(account)
-            if account.mode == "donate" and admin.mode == "preparation" and admin.war_donations_remaining > 0 and account in war_participants:
+            if account.mode == "donate" and admin.mode == "preparation" and admin.war_donations_remaining and admin.war_donations_remaining > 0 and account in war_participants:
                 war_donations()
                 queue_up_troops(account)
-            if account.mode == "donate" and admin.mode == "cwl" and admin.war_donations_remaining > 0 and account in war_participants:
+            if account.mode == "donate" and admin.mode == "cwl" and admin.war_donations_remaining and admin.war_donations_remaining > 0 and account in war_participants:
                 war_donations(cwl=True)
                 queue_up_troops(account)
         if self.name == "coin": coin()
@@ -169,13 +169,13 @@ j_war_troops = Job({'name': "war_troops",'time_active': timedelta(hours=8),'time
 j_cwl_troops = Job({'name': "cwl_troops",'time_active': timedelta(hours=8),'time_inactive': timedelta(hours=8),'update_time': True})
 j_message = Job(data=message_data)
 j_completion_date = Job(data=completion_date_data)
-j_sweep = Job({'name': "sweep","time_active": timedelta(hours=0.5),"time_inactive": timedelta(hours=0.5),'update_time': True})
+j_sweep = Job({'name': "sweep","time_active": timedelta(hours=3),"time_inactive": timedelta(hours=3),'update_time': True})
 j_lose_trophies = Job({'name': "lose_trophies", "time_active": timedelta(minutes=5), "time_inactive": timedelta(hours=2), 'update_time': True})
 
 # active_jobs = [j_build, j_donate, j_attack, j_coin, j_challenge, j_war_troops, j_donate_war, j_message]
-# active_jobs = [j_attack, j_donate, j_attack_b]
-active_jobs = [j_attack, j_donate, j_completion_date, j_attack_b, j_war_troops, j_cwl_troops, j_lose_trophies, j_challenge]
-active_jobs.append(j_sweep)
+active_jobs = [j_attack, j_donate, j_attack_b]
+# active_jobs = [j_attack, j_donate, j_completion_date, j_attack_b, j_war_troops, j_cwl_troops, j_lose_trophies, j_challenge]
+# active_jobs.append(j_sweep)
 
 text = "Not running: "
 for job in jobs:

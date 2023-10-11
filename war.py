@@ -299,7 +299,7 @@ def goto_cwl_prep():
     print("Go to cwl prep")
     prep_found = False
     start_time = datetime.now()
-    for x in range(10):
+    for x in range(5):
         if i_cwl_prep.find(fast=False):
             i_cwl_prep.click()
             prep_found = True

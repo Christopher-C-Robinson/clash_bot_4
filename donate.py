@@ -311,35 +311,38 @@ def army_prep(account, required_army, army_or_total="army", include_castle=False
 def troops_count_flex(tab, region, troops, count_dict={}, show_image=False, show_image_numbers=False):
     goto(tab)
     screen = get_screenshot(region)
-    print_count("Troops count flew", count_dict)
     for troop in troops:
         if troop.i_army is None:
             print("Troops count flex: couldn't find file:", troop.name)
             continue
         if tab == army_tab:
             result, loc = troop.i_army.find_screen(screen, return_location=True, show_image=show_image)
+            # print(troop, result)
             # if troop.name == "super_barb":
                 # print("Super Barb:", result)
                 # show(troop.i_army.image)
             if result:
+                print("Found:", troop)
                 x = max(loc[0] - 30, 0)
                 numbers_image = screen[0: 75, x: x + 130]
                 result = troop_numbers.read_screen(numbers_image, return_number=True, show_image=show_image_numbers)
+                # result = troop_numbers.read_screen(numbers_image, return_number=True, show_image=True)
                 # print(troop, result)
                 if result > 200: result = int(result / 10)
                 add_to_dict(count_dict, troop, result)
         else:
             rectangles = troop.i_training.find_screen_many(screen, show_image=show_image)
+            # print(troop, rectangles)
             for loc in rectangles:
                 x = max(loc[0] - 30, 0)
                 numbers_image = screen[0: 70, x: x + 130]
                 # show(numbers_image)
                 result = troop_numbers.read_screen(numbers_image, return_number=True, show_image=show_image_numbers)
-                # print("Troop count flex", result)
+                print("Troop count flex", troop, result)
                 if result > 200: result = int(result / 10)
                 add_to_dict(count_dict, troop, result)
                 # print(count_dict)
-
+    print_count("Troops count flex", count_dict)
     return count_dict
 
 def full_count(account, include_castle=True):
