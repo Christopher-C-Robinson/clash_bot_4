@@ -18,48 +18,42 @@ def invite_latest_attackee():
 
 def invite():
     # return
-    invited = []
-    not_invited = []
     goto(l_clan)
     if not i_find_new_members.wait(dur=2):
         print("Didn't get into the clan")
-        return invited, not_invited
-    time.sleep(1)
+        return
+    time.sleep(0.1)
     members = get_member_numbers()
     print("No of members:", members)
-    if members >= 50:
+    if members >= 49:
         i_red_cross_clan.click()
         pag.click(BOTTOM_LEFT)
         admin.inviting = False
         return
+    print("Clicking find new members")
     i_find_new_members.click()
-    time.sleep(0.5)
+    time.sleep(0.1)
     for castle in member_castles:
         rects = castle.find_many()
         # print(castle, len(rects))
         for rect in rects:
             click_rect(rect)
-            time.sleep(0.5)
+            i_invite.wait()
             member_stars = stars.read(STARS)
             try:
                 member_stars = int(member_stars)
                 print("Member stars:", member_stars)
                 if member_stars > 150:
-                    # print("Heaps of Stars")
                     multi_click([i_invite, i_clan_back])
-                    # i_clan_back.click()
-                    invited.append(member_stars)
                 else:
-                    # print("Not enough stars")
                     i_clan_back.click()
-                    not_invited.append(member_stars)
             except:
                 i_clan_back.click()
         time.sleep(1)
     i_red_cross_clan.click()
     pag.click(BOTTOM_LEFT)
     goto(main)
-    return invited, not_invited
+    return
 
 def get_member_numbers():
     screen = get_screenshot(MEMBER_NUMBERS)
@@ -69,7 +63,7 @@ def get_member_numbers():
         result = int(results[0])
     except:
         result = 0
-    if result == 50:print("Full")
+    if result == 50: print("Full")
     return result
 
 def app():

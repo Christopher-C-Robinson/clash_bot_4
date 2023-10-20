@@ -37,7 +37,7 @@ def get_super_troop(troop):
     hold_key("d", 0.5)
     troop_image = i_super_barb
     if troop == super_minion: troop_image = i_super_minion
-    images = [i_boost, i_boost_on, i_boost_on_2, troop_image, i_potion, i_dark, i_potion_small, i_dark_2, i_red_cross_super_troops]
+    images = [i_boost, i_boost_on, troop_image, i_activate, i_000, i_000v2, i_red_cross_super_troops]
     for image in images:
         time.sleep(0.5)
         if image == i_super_minion:

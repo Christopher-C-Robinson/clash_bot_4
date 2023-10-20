@@ -647,7 +647,7 @@ def create_build_image(account):
     height_of_matching_area = 75
     image = cv2.imread(f'temp/build{account.number}_0.png', 1)
     print(f'temp/build{account.number}_0.png')
-    print(image)
+    # print(image)
     # if not image: return
     for x in range(1, 13):
         if not os.path.isfile(f'temp/build{account.number}_{x}.png'): continue
@@ -662,12 +662,12 @@ def create_build_image(account):
         image = np.concatenate((image, next_image), axis=0)
         # print("Val, y:", val, loc[1])
 
-    # show(image, scale=0.5)
-    cv2.imwrite("temp/build.png", image)
+    show(image, scale=0.5)
+    cv2.imwrite(f"temp/build_{account.number}.png", image)
 
 
-# get_build_images(jon)
-# create_build_image(jon)
+# get_build_images(bad_daz)
+# create_build_image(bad_daz)
 
 def find_image(screen, image, show_image=False):
     if show_image:
@@ -726,8 +726,9 @@ def remaining_time_of_upgrading_towers(account):
 def analyse_build_image(account, include_upgrading=True):
     gap = 40
     height = 65
-    image_bw = cv2.imread(f'temp/build.png', 0)
-    image = cv2.imread(f'temp/build.png', 1)
+    file = f"temp/build_{account.number}.png"
+    image_bw = cv2.imread(file, 0)
+    image = cv2.imread(file, 1)
     max_y, _ = image_bw.shape
     # print(max_y)
     val, loc = find_image(image_bw, i_suggested_upgrades.image, show_image=False)
@@ -808,6 +809,7 @@ def analyse_build_image(account, include_upgrading=True):
     return completion_date
     # print(remaining_towers)
 
+# analyse_build_image(bad_daz, include_upgrading=False)
 
 def delete_build_files():
     if not os.path.isdir("temp"):

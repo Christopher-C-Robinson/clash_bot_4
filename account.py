@@ -445,6 +445,7 @@ def set_current_account():
             current_account = account
             max_result = result
     print("Current account:", current_account.name)
+    return current_account.number
 
 def update_images(account, create=False):
     if not create and not is_old(account, 10): return

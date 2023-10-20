@@ -57,7 +57,7 @@ class Job:
             get_capital_coin()
             remove_trees_main()
         time_taken = datetime.now() - start
-        log(admin.mode, account.mode, self.name, account.name, time_taken)
+        # log(admin.mode, account.mode, self.name, account.name, time_taken)
 
         if not self.update_time: # Not updating time because time is updated by the function run immediately above
             print("Not updating time:", self.name)
@@ -173,7 +173,7 @@ j_sweep = Job({'name': "sweep","time_active": timedelta(hours=3),"time_inactive"
 j_lose_trophies = Job({'name': "lose_trophies", "time_active": timedelta(minutes=5), "time_inactive": timedelta(hours=2), 'update_time': True})
 
 # active_jobs = [j_build, j_donate, j_attack, j_coin, j_challenge, j_war_troops, j_donate_war, j_message]
-active_jobs = [j_attack, j_donate, j_attack_b]
+active_jobs = [j_attack, j_donate, j_attack_b, j_sweep, j_lose_trophies]
 # active_jobs = [j_attack, j_donate, j_completion_date, j_attack_b, j_war_troops, j_cwl_troops, j_lose_trophies, j_challenge]
 # active_jobs.append(j_sweep)
 

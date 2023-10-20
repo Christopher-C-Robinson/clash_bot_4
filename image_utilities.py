@@ -4,6 +4,29 @@ from images import *
 # ---- GENERAL ----
 # -----------------
 
+def colour(region):
+    image = get_screenshot(region, colour=1)
+    if image is None: return False
+    y, x, channels = image.shape
+    # show(image)
+    spots = [(1 / 4, 1 / 4), (1 / 4, 3 / 4), (3 / 4, 1 / 4), (3 / 4, 3 / 4), (7 / 8, 1 / 8), (0.95, 0.05)]
+    colour = 0
+    for s_x, s_y in spots:
+        pixel = image[int(y * s_y)][int(x * s_x)]
+        blue, green, red = int(pixel[0]), int(pixel[1]), int(pixel[2])
+        colour += abs(blue - green) + abs(blue - green) + abs(red - green)
+    return colour
+
+def colour_fancy(region):
+    image = get_screenshot(region, colour=1)
+    if image is None: return False
+    result = cv2.mean(image)
+    blue = result[0]
+    green = result[1]
+    red = result[2]
+    result = abs(blue-green) + abs(blue-red) + abs(green-red)
+    return round(result, 1)
+
 def multi_image_find(screen, images, show_results=False):
     screen = cv2.cvtColor(screen, cv2.COLOR_BGR2GRAY)
     max_val = 0

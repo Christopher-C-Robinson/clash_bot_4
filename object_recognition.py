@@ -19,6 +19,17 @@ def get_screenshot(region=None, colour=0, filename="temp"):
     except:
         return None
 
+def get_screenshot_troop(region, filename):
+    file = f'images/troops_temp/{filename}.png'
+    pag.screenshot(file, region=region)
+    return cv2.imread(file, 1)
+    try:
+        pag.screenshot(file, region=region)
+        return cv2.imread(file, 1)
+    except:
+        return None
+
+
 def attack_screenshot(region=None, colour=0, filename="temp"):
     try:
         pag.screenshot(f'{filename}.png', region=region)

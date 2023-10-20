@@ -318,9 +318,10 @@ def troops_count_flex(tab, region, troops, count_dict={}, show_image=False, show
         if tab == army_tab:
             result, loc = troop.i_army.find_screen(screen, return_location=True, show_image=show_image)
             # print(troop, result)
-            # if troop.name == "super_barb":
-                # print("Super Barb:", result)
+            if troop.name == "super_barb":
+                print("Super Barb:", result)
                 # show(troop.i_army.image)
+                # show(screen)
             if result:
                 print("Found:", troop)
                 x = max(loc[0] - 30, 0)
@@ -388,13 +389,11 @@ def troop_delete_backlog():
     goto(troops_tab)
     remaining_troops = True
     while remaining_troops:
-        val, loc, rect = i_remove_troops.find_detail()
-        # print("Troop delete backlog:", val)
-        center = pag.center(rect)
-        if val > 0.75:
-            for x in range(5): pag.click(center)
+        if i_remove_troops.click_region(TRAINING_RANGE, show_image=False):
+            for x in range(5): i_remove_troops.click_region(TRAINING_RANGE)
         else:
             remaining_troops = False
+    print("Finished deleting backlog")
 
 def siege_in_castle(account):
     for siege in [ram, log_thrower]:
@@ -525,16 +524,16 @@ def castle_troops_remove(troops_to_remove):
 def castle_troops_add(to_add):
     if i_army_tab_cancel.find():
         i_army_tab_cancel.click()
-    i_army_request.click()
-    time.sleep(0.2)
-    i_army_donate_edit.click()
+    goto(l_donation_request_selector)
 
     # Remove the previous troops
     remaining_troops, count = True, 0
-    while remaining_troops and count < 20:
-        if i_remove_troops.find():
-            i_remove_troops.click()
+    while remaining_troops and count < 12:
+        if i_remove_troops_castle.find():
+            i_remove_troops_castle.click()
+            count += 1
         else:
+            print("To add - i_remove_troops_castle not found")
             remaining_troops = False
 
     for troop in to_add:
@@ -543,6 +542,7 @@ def castle_troops_add(to_add):
             time.sleep(0.3)
             print("Castle", troop, troop.i_castle.find_detail(fast=False))
             for _ in range(to_add[troop]):
+                print("To add:", troop)
                 troop.i_castle.click_region(CASTLE_REQUEST_AREA_2)
             time.sleep(.2)
     multi_click([i_castle_confirm, i_castle_send])

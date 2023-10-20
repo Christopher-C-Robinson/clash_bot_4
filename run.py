@@ -1,7 +1,7 @@
 from bot import *
 from games import *
 
-# set_current_account()
+set_current_account()
 def run():
     # set_current_account()
     # set_admin_mode()
@@ -178,51 +178,51 @@ def highlight_next_build():
     return shortest_time_account
 
 
-# account = daz
-# castle_troops_change(account.army_clan_troops)
-# castle_troops_change(account.clan_troops_war)
+# app()
+# time.sleep(0.2)
+# print(i_army_tab.find_detail(show_image=True))
+# app()
+
+# goto(troops_tab)
+
+# invite()
+
+# goto(l_clan)
+# set_current_account()
+# set_admin_mode()
+# daz.mode = "donate"
+# j_donate.run(daz)
+
+# war_prep()
+
+# goto(find_a_match)
+
+# log_thrower.start_train(1, bad_daz)
+
+# count = troops_count_flex(army_tab, ARMY_EXISTING, just_troops, show_image=False, show_image_numbers=False)
+# print_count("Troops", count)
+
+# j_donate.run(bad_daz)
+# j_attack.run(daen)
+# while True:
+#     for account in [daen, micah, bob, daz, bad_daz]:
+#         j_attack.run(account)
+#         j_lose_trophies.run(account)
+#         j_donate.run(account)
+#     goto(pycharm)
+#     print_info()
+#     wait(5)
+#     j_attack_b.run(daen)
 
 
-# goto(locs[29])
-#
-# for count, loc in enumerate(locs):
-#     print(count, loc)
+# count = troops_count_flex(army_tab, ARMY_EXISTING, just_troops, show_image=False)
+# print_count("Army", count)
 
+# goto(l_clan)
 
-# goto(main)
+# full_count(bob)
 
-# actual = troops_count_flex(army_tab, TRAINING_RANGE, just_troops, show_image=False, show_image_numbers=False)
-# print_count("Actual", actual)
-
-# count = empty_count()
-# count = troops_count_flex(army_tab, CASTLE_TROOPS, siege_troops, count)
-# print_count("Siege", count)
-#
-# count = empty_count()
-# count = troops_count_flex(army_tab, SPELLS_EXISTING, spells, count)
-# print_count("Spells", count)
-
-# count = {}
-# add_to_dict(count, super_barb, 1)
-# print_count("X", count)
-# goto(army_tab)
-# castle_troops_add(count)
-
-
-set_current_account()
-j_attack.run(daz)
-
-# run()
-# account = daz
-# army, full = full_count(account)
-# print_count("Army", army)
-# print_count("Full", full)
-
-# army_ready = attack_prep(account, siege_required=account.requires_siege)
-# print(army_ready)
-# run()
-
-# j_attack.run(daz)
+run()
 
 goto(pycharm)
 

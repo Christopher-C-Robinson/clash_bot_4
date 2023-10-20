@@ -51,6 +51,7 @@ class Loc():
         self.id_absence = False
         self.optional = optional
         self.regions = regions
+        self.constant_regions = []
         locs.append(self)
 
     def __str__(self):
@@ -259,6 +260,8 @@ class Loc():
                     print("Couldn't find caravan:", i_caravan.find_detail())
         elif action == "goto_main":
             return_from_builder()
+        elif action == "request_to_army":
+            multi_click([i_castle_confirm, i_castle_send])
         elif action == "start_bluestacks":
             os.startfile("C:\Program Files (x86)\BlueStacks X\BlueStacks X.exe")
             start_up()
@@ -353,6 +356,17 @@ class Loc():
         if self.default_path: return True
         return False
 
+    def add_constant_region(self, region):
+        self.constant_regions.append(region)
+
+    def show_constant_regions(self):
+        goto(self)
+        screen = get_screenshot(colour=1)
+        for rectangle in self.constant_regions:
+            cv2.rectangle(screen, rectangle, (0, 0, 255), 2)
+        show(screen, scale=0.6, dur=20000)
+
+
 def reload(rest_time=20):
     close_app()
     end_time = time_to_string(datetime.now() + timedelta(minutes=rest_time))
@@ -446,6 +460,7 @@ unknown = Loc(name="unknown", identifier=i_x, accessible=False)
 unknown.height = -0.5
 chat = Loc(name="chat", identifier=i_challenge, accessible=True)
 chat.height = main.height + 1
+l_donate = Loc(name="donate", identifier=i_donate_troops)
 settings = Loc(name="settings", identifier=i_settings, accessible=True)
 change_account = Loc(name="change_account", identifier=i_switch_account, accessible=True, pause=True)
 change_account.height = settings.height + 1
@@ -479,6 +494,10 @@ army_tab = Loc(name="army_tab", identifier=i_army_tab, accessible=True, regions=
 troops_tab = Loc(name="troops_tab", identifier=i_troops_tab, accessible=True, height=1)
 spells_tab = Loc(name="spells_tab", identifier=i_spells_tab, accessible=True, height=1)
 siege_tab = Loc(name="siege_tab", identifier=i_siege_tab, accessible=True, height=1)
+
+l_request_reinforcements = Loc(name="request_reinforcments", identifier=i_request_reinforcements, accessible=True, height=1)
+l_donation_request_selector = Loc(name="donation_request_selector", identifier=i_highest_level, accessible=True, height=1)
+
 
 l_lab = Loc(name="lab", identifier=i_research_upgrading, accessible=True)
 l_lab.add_identifier(i_lab_girl)
@@ -517,10 +536,14 @@ l_ldplayer.add_default_path(action="from_ld_to_main", parameter=None, expected_l
 # Main
 main.add_path(destination=pycharm, action="click", parameter=i_pycharm_icon, expected_loc=pycharm)
 main.add_path(destination=chat, action="click", parameter=i_open_chat, expected_loc=chat)
+main.add_path(destination=l_donate, action="click", parameter=i_open_chat, expected_loc=chat)
+
 main.add_path(destination=army_tab, action="click", parameter=i_army, expected_loc=army_tab)
 main.add_path(destination=troops_tab, action="click", parameter=i_army, expected_loc=army_tab)
 main.add_path(destination=spells_tab, action="click", parameter=i_army, expected_loc=army_tab)
 main.add_path(destination=siege_tab, action="click", parameter=i_army, expected_loc=army_tab)
+main.add_path(destination=l_donation_request_selector, action="click", parameter=i_army, expected_loc=army_tab)
+
 main.add_path(destination=settings, action='click', parameter=i_settings_on_main, expected_loc=settings)
 main.add_path(destination=change_account, action='click', parameter=i_settings_on_main, expected_loc=settings)
 # main.add_path(destination=forge, action='goto_forge', parameter='', expected_loc=forge)
@@ -559,6 +582,9 @@ l_clan.add_default_path(action="click", parameter="bottom_left", expected_loc=ma
 # Chat
 chat.add_height(1)
 chat.add_default_path(action="click", parameter=i_close_chat, expected_loc=main)
+chat.add_path(destination=l_donate, action="click", parameter=i_donate, expected_loc=l_donate)
+l_donate.add_default_path(action="key", parameter="esc", expected_loc=chat)
+
 
 # Settings
 settings.add_path(destination=change_account, action="click_p", parameter=i_change_accounts_button, expected_loc=change_account)
@@ -575,10 +601,16 @@ army_tab.add_default_path(action="click", parameter=i_red_cross_5, expected_loc=
 troops_tab.add_default_path(action="click", parameter=i_red_cross_5, expected_loc=main)
 spells_tab.add_default_path(action="click", parameter=i_red_cross_5, expected_loc=main)
 siege_tab.add_default_path(action="click", parameter=i_red_cross_5, expected_loc=main)
+l_request_reinforcements.add_default_path(action="key", parameter="esc", expected_loc=army_tab)
+l_donation_request_selector.add_default_path(action="key", parameter="esc", expected_loc=army_tab)
+l_donation_request_selector.add_path(destination=army_tab, action="request_to_army", parameter=None, expected_loc=army_tab)
 
 army_tab.add_path(destination=troops_tab, action="click", parameter=i_troops_tab_dark, expected_loc=troops_tab)
 army_tab.add_path(destination=spells_tab, action="click", parameter=i_spells_tab_dark, expected_loc=spells_tab)
 army_tab.add_path(destination=siege_tab, action="click", parameter=i_siege_tab_dark, expected_loc=siege_tab)
+army_tab.add_path(destination=l_donation_request_selector, action="click", parameter=i_army_request, expected_loc=l_request_reinforcements)
+l_request_reinforcements.add_path(destination=l_donation_request_selector, action="click", parameter=i_army_donate_edit, expected_loc=l_donation_request_selector)
+
 troops_tab.add_path(destination=spells_tab, action="click", parameter=i_spells_tab_dark, expected_loc=spells_tab)
 troops_tab.add_path(destination=siege_tab, action="click", parameter=i_siege_tab_dark, expected_loc=siege_tab)
 troops_tab.add_path(destination=army_tab, action="click", parameter=i_army_tab_dark, expected_loc=army_tab)

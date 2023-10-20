@@ -127,7 +127,7 @@ war_donation_count = Number(name="war_donation_count", directory="numbers/war_do
 scores = Number(name="war_scores", directory="numbers/scores", confidence=0.85)
 chat_new = Number(name="chat_new", directory="numbers/surveillance", confidence=0.85)
 members = Number(name="Members", directory="numbers/members", confidence=0.90)
-stars = Number(name="Stars", directory="numbers/stars", confidence=0.88)
+stars = Number(name="Stars", directory="numbers/stars", confidence=0.90)
 war_time = Number(name="war_time", directory="numbers/war_time", confidence=0.86)
 
 build_towers = Number(name="build_towers", directory="numbers/build_towers", confidence=0.84)

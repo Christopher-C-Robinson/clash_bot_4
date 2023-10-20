@@ -13,9 +13,12 @@ class Image():
     def __init__(self, name, file, threshold=0.79, always_slow=False, no_of_regions=5, region_limit=None, type=None, screen=None, level=None):
         self.name = name
         if not os.path.isfile(file):
-            scale = 1.14
-            file = file.replace("images", "images_ads")
-            self.image = cv2.resize(cv2.imread(file, 0), (0,0), fx=scale, fy=scale)
+            # scale = 1.14
+            # file = file.replace("images", "images_ads")
+            # self.image = cv2.resize(cv2.imread(file, 0), (0,0), fx=scale, fy=scale)
+            self.image = None
+            admin.missing_images += 1
+            print(f"{admin.missing_images}. No file for:", name)
         else:
             self.image = cv2.imread(file, 0)
         self.regions = []
@@ -93,6 +96,7 @@ class Image():
 
     def check_colour(self, fast=False):
         val, loc, rect = self.find_detail(fast=fast)
+        if val < self.threshold: return False
         image = get_screenshot(rect, colour=1)
         if image is None: return False
         y, x, channels = image.shape
@@ -200,6 +204,8 @@ class Image():
 
 
     def find_screen_many(self, screen, show_image=False):
+        # print("Find screen many:", self)
+        if self.image is None: return []
         h, w = self.image.shape
         if show_image:
             show(self.image)
@@ -223,6 +229,8 @@ class Image():
             show(self.image)
             show(screen)
         result = cv2.matchTemplate(screen, self.image, method)
+        min_val, val, min_loc, loc = cv2.minMaxLoc(result)
+        # print("Find many:", self, val)
         yloc, xloc = np.where(result >= self.threshold)
         z = zip(xloc, yloc)
 
@@ -361,6 +369,7 @@ i_builder = Image(name="i_builder", file='images/nav/builder.png')
 i_challenge = Image(name="i_challenge", file='images/nav/challenge.png')
 i_change_accounts_button = Image(name="i_change_accounts_button", file='images/nav/change_accounts_button.png')
 i_chat = Image(name="i_chat", file='images/nav/chat.png')
+i_donate_troops = Image(name="donate_troops", file="images/nav/donate_troops.png")
 i_close_chat = Image(name="i_close_chat", file='images/nav/close_chat.png')
 i_open_chat = Image(name="i_open_chat", file='images/nav/open_chat.png')
 i_close_close = Image(name="i_close_close", file='images/nav/close_close.png')
@@ -462,7 +471,9 @@ i_clan_3 = Image(name="i_clan", file='images/members/clan3.png')
 # i_view_map = Image(name="i_view_map", file='images/members/view_map.png')
 # i_collect_castle = Image(name="i_collect_castle", file='images/collect_castle.png')
 # i_remove_castle_troops = Image(name="i_remove_castle_troops", file="images/castle/remove_castle_troops.png")
-i_remove_troops = Image(name="i_remove_troops", file="images/remove_troops.png")
+i_remove_troops = Image(name="i_remove_troops", file="images/remove_troops.png", threshold=0.79)
+i_remove_troops_army = Image(name="i_remove_troops_army", file="images/remove_troops_army.png", threshold=0.79)
+i_remove_troops_castle = Image(name="i_remove_troops_castle", file="images/remove_troops_castle.png", threshold=0.79)
 
 # Games
 i_caravan = Image(name="i_caravan", file='images/nav/caravan.png', threshold=0.65)
@@ -572,6 +583,8 @@ i_my_clan = Image(name="i_my_clan", file="images/nav/my_clan.png")
 i_find_new_members = Image(name="i_find_new_members", file="images/people/find_new_members.png")
 i_profile_star = Image(name="i_profile_star", file="images/nav/profile_star.png")
 i_my_clan_tab = Image(name="my_clan_tab", file="images/nav/my_clan_tab.png")
+i_request_reinforcements = Image(name="request_reinforcements", file="images/nav/request_reinforcements.png")
+i_highest_level = Image(name="highest_level", file="images/nav/highest_level.png")
 
 # Super boost
 i_boost = Image(name="i_boost", file='images/super_boost/boost.png', threshold=0.7)
@@ -584,6 +597,10 @@ i_potion = Image(name="i_potion", file='images/super_boost/potion.png')
 i_dark = Image(name="i_dark", file='images/super_boost/dark.png')
 i_dark_2 = Image(name="i_dark_2", file='images/super_boost/dark_2.png')
 i_potion_small = Image(name="i_potion_small", file='images/super_boost/potion_small.png')
+
+i_activate = Image(name="activate", file="images/super_boost/activate.png")
+i_000 = Image(name="000", file="images/super_boost/000.png")
+i_000v2 = Image(name="000", file="images/super_boost/000v2.png")
 
 # Messages
 # i_new_message = Image(name="new_message", file="images/message/new_message.png")
@@ -662,7 +679,7 @@ i_invite = Image(name="add_friend", file="images/people/invite.png")
 i_clan_back = Image(name="clan_back", file="images/people/clan_back.png")
 files = dir_to_list("people/castles/")
 member_castles = []
-for file in files: member_castles.append(Image(name=file, file='images/' + file + ".png", threshold=0.75))
+for file in files: member_castles.append(Image(name=file, file='images/' + file + ".png", threshold=0.65))
 
 # GUI
 # i_gui_icon = Image(name="gui_icon", file="images/gui/gui_icon.png")

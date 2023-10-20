@@ -277,13 +277,13 @@ def assess_village(account, data, war_goals, print_time=False):
     # show(img, scale=0.5)
 
     # pag.screenshot("attacks/attack.png")
-    th = get_th_level(img)
-    if th == -1:
-        print("TH too high:", th)
-        return "Town hall not identified"
-    if th > data['max_th'] and account.th > 5 and resources[0] < 900000:
-        print("TH too high:", th)
-        return "Town hall too high"
+    # th = get_th_level(img)
+    # if th == -1:
+    #     print("TH too high:", th)
+    #     return "Town hall not identified"
+    # if th > data['max_th'] and account.th > 5 and resources[0] < 900000:
+    #     print("TH too high:", th)
+    #     return "Town hall too high"
 
     # Not on attack screen
     if not i_attack_screen_resources.wait(8): return "Not on attack screen"

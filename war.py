@@ -146,9 +146,10 @@ def set_admin_mode():
         remaining = count_remaining_donations(cwl=cwl)
         print("Remaining donations:", remaining)
         admin.war_donations_remaining = remaining
-    if i_return_home_3.find():
-        i_return_home_3.click()
-        time.sleep(0.1)
+    for x in range(2):
+        if i_return_home_3.find():
+            i_return_home_3.click()
+            time.sleep(0.1)
 
 def less_than_an_hour():
     result = war_time.read(region=WAR_BANNER, show_image=False)
