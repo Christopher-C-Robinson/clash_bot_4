@@ -2,6 +2,7 @@ from object_recognition import *
 from regions import *
 from excel import *
 from sql_image import *
+import shutil
 
 images = []
 list_of_new_images = []
@@ -13,12 +14,17 @@ class Image():
     def __init__(self, name, file, threshold=0.79, always_slow=False, no_of_regions=5, region_limit=None, type=None, screen=None, level=None):
         self.name = name
         if not os.path.isfile(file):
-            # scale = 1.14
-            # file = file.replace("images", "images_ads")
-            # self.image = cv2.resize(cv2.imread(file, 0), (0,0), fx=scale, fy=scale)
-            self.image = None
-            admin.missing_images += 1
-            print(f"{admin.missing_images}. No file for:", name)
+            if "troops" in file:
+                try:
+                    scale = 1
+                    source = file.replace("troops", "troops/new")
+                    destination = file
+                    shutil.copy(source, destination)
+                    self.image = cv2.resize(cv2.imread(file, 0), (0,0), fx=scale, fy=scale)
+                except:
+                    self.image = None
+                    admin.missing_images += 1
+                    print(f"{admin.missing_images}. No file for:", name)
         else:
             self.image = cv2.imread(file, 0)
         self.regions = []
@@ -45,12 +51,12 @@ class Image():
             cv2.rectangle(screen, rectangle, (255, 0, 0), 3)
         show(screen, scale=0.6)
 
-    def click(self, button="left"):
+    def click(self, button="left", y_offset=0):
         val, loc, rect = self.find_detail(fast=True)
         if val < self.threshold:
             val, loc, rect = self.find_detail(fast=False, show_image=False)
         if val > self.threshold:
-            loc = (max(loc[0], LIMITS[0]), loc[1])
+            loc = (max(loc[0], LIMITS[0]), loc[1] + y_offset)
             if button == "left":
                 # print("Click left:", loc)
                 pag.click(loc)
@@ -553,8 +559,9 @@ i_challenge_start = Image(name="challenge_start", file="images/challenge/challen
 
 # Building images
 i_builder_zero = Image(name="i_builder_zero", file='images/builder_zero.png', threshold=0.75, region_limit=[744, 79, 198, 32])
-# i_builder_one = Image(name="i_builder_one", file='images/builder_one.png', threshold=0.75)
+i_builder_one = Image(name="i_builder_one", file='images/builder_one.png', threshold=0.75)
 i_upgrade_button = Image(name="i_upgrade_button", file='images/upgrade.png', threshold=0.7)
+i_build_confirm = Image(name="build_confirm", file="images/builder/build_confirm.png")
 i_suggested_upgrades = Image(name="i_suggested_upgrades", file='images/towers/suggested_upgrades.png')
 i_upgrades_in_progress = Image(name="i_upgrades_in_progress", file='images/towers/upgrades_in_progress.png')
 
@@ -675,7 +682,7 @@ i_wall_text = Image(name="i_wall_text", file="images/towers/wall.png")
 # i_profile = Image(name="profile", file="images/people/profile.png")
 # i_attack_log = Image(name="attack_log", file="images/people/attack_log.png")
 # i_add_friend = Image(name="add_friend", file="images/people/add_friend.png")
-i_invite = Image(name="add_friend", file="images/people/invite.png")
+i_invite = Image(name="invite", file="images/people/invite.png")
 i_clan_back = Image(name="clan_back", file="images/people/clan_back.png")
 files = dir_to_list("people/castles/")
 member_castles = []

@@ -277,7 +277,7 @@ def army_prep(account, required_army, army_or_total="army", include_castle=False
                 if x.type == "troop": sufficient_troops = False
                 if x.type == "spell": sufficient_spells = False
             troops_to_build += [x] * (required - actual)
-    # print("Army prep - troops to build:", troop_str(troops_to_build))
+    print("Army prep - troops to build:", troop_str(troops_to_build))
 
     if not sufficient_troops:
         # Delete unneeded troops
@@ -293,6 +293,7 @@ def army_prep(account, required_army, army_or_total="army", include_castle=False
                 backlog_deleted = True
                 x.delete(actual - required)
 
+    print("Sufficent spells:", sufficient_spells)
     if not sufficient_spells:
         # Delete unneeded spells
         for x in troops:
@@ -301,7 +302,7 @@ def army_prep(account, required_army, army_or_total="army", include_castle=False
             except: actual = 0
             required = required_counter[x]
             if actual > required:
-                # print("Attack prep - delete unneeded spells", x.name, required, actual)
+                print("Attack prep - delete unneeded spells", x.name, required, actual)
                 x.delete(actual - required)
 
     restock(troops_to_build, account, extra=extra)
@@ -318,8 +319,8 @@ def troops_count_flex(tab, region, troops, count_dict={}, show_image=False, show
         if tab == army_tab:
             result, loc = troop.i_army.find_screen(screen, return_location=True, show_image=show_image)
             # print(troop, result)
-            if troop.name == "super_barb":
-                print("Super Barb:", result)
+            if troop == lightening:
+                print("Lightening:", result)
                 # show(troop.i_army.image)
                 # show(screen)
             if result:
@@ -339,11 +340,11 @@ def troops_count_flex(tab, region, troops, count_dict={}, show_image=False, show
                 numbers_image = screen[0: 70, x: x + 130]
                 # show(numbers_image)
                 result = troop_numbers.read_screen(numbers_image, return_number=True, show_image=show_image_numbers)
-                print("Troop count flex", troop, result)
+                # print("Troop count flex", troop, result)
                 if result > 200: result = int(result / 10)
                 add_to_dict(count_dict, troop, result)
                 # print(count_dict)
-    print_count("Troops count flex", count_dict)
+    # print_count("Troops count flex", count_dict)
     return count_dict
 
 def full_count(account, include_castle=True):
@@ -448,12 +449,12 @@ def castle_slide(position):
     castle_slide_pos = position
 
 def castle_slide_right():
-    pag.moveTo(1420, 500, 0.3)
+    pag.moveTo(1220, 500, 0.3)
     pag.dragTo(450, 500, 1.0, button="left")
 
 def castle_slide_left():
     pag.moveTo(450, 500, 0.3)
-    pag.dragTo(1420, 500, 1.0, button="left")
+    pag.dragTo(1220, 500, 1.0, button="left")
 
 def convert_list_to_troop_count(list):
     count = empty_count()

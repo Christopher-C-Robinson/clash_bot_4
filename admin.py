@@ -17,6 +17,7 @@ class Admin:
         self.excel_last_row_image = 3
         self.goto_depth = 0
         self.missing_images = 0
+        self.th_loc = None
 
 admin = Admin()
 

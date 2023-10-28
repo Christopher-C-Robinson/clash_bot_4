@@ -59,8 +59,14 @@ class Troop():
         self.donate_preference = donate_preference
         self.currently_training = False
         if type not in ["hero", "clan"]:
+            train_directory = "images/troops/train/"
+            train_files = os.listdir(train_directory)
+            if f"{self.name}_train.png" in train_files:
+                self.i_train = Image(name=f"i_{name}_train", file=f'{train_directory}{name}_train.png', no_of_regions=1, type="train")
+            else:
+                self.i_train = Image(name=f"i_{name}_train", file=f'{troop_directory}{name}_train.png', no_of_regions=1, type="train")
+
             self.i_army = Image(name=f"i_{name}_army", file=f'{troop_directory}{name}_army.png', no_of_regions=1, type="army", threshold=0.72)
-            self.i_train = Image(name=f"i_{name}_train", file=f'{troop_directory}{name}_train.png', no_of_regions=1, type="train")
             self.i_training = Image(name=f"i_{name}_training", file=f'{troop_directory}{name}_training.png', no_of_regions=1, type="training")
             self.i_donate1 = Image(name=f"i_{name}_donate1", file=f'{troop_directory}{name}_donate1.png', no_of_regions=1, type="donate1")
             self.i_donate2 = Image(name=f"i_{name}_donate2", file=f'{troop_directory}{name}_donate2.png', no_of_regions=2, type="donate2")
@@ -137,7 +143,7 @@ class Troop():
         if self.i_army.image is None: return
         goto(army_tab)
         i_army_edit.click()
-        val, loc, rect = find(self.i_army.image, get_screenshot(ARMY_EXISTING))
+        val, loc, rect = find(self.i_army.image, get_screenshot(ARMY_SPELLS_EXISTING))
         rect_adj = [rect[0] + ARMY_EXISTING[0], rect[1] + ARMY_EXISTING[1], rect[2], rect[3]]
         spot = pag.center(rect_adj)
         for x in range(count):
@@ -194,6 +200,7 @@ golem = next((x for x in troops if x.name == 'golem'), None)
 witch = next((x for x in troops if x.name == 'witch'), None)
 lava_hound = next((x for x in troops if x.name == 'lava_hound'), None)
 ice_golem = next((x for x in troops if x.name == 'ice_golem'), None)
+headhunter = next((x for x in troops if x.name == 'headhunter'), None)
 
 super_barb = next((x for x in troops if x.name == 'super_barb'), None)
 super_minion = next((x for x in troops if x.name == 'super_minion'), None)
@@ -206,6 +213,7 @@ freeze = next((x for x in troops if x.name == 'freeze'), None)
 poison = next((x for x in troops if x.name == 'poison'), None)
 skeleton = next((x for x in troops if x.name == 'skeleton'), None)
 clone = next((x for x in troops if x.name == 'clone'), None)
+quake = next((x for x in troops if x.name == 'quake'), None)
 
 queen = next((x for x in troops if x.name == 'queen'), None)
 king = next((x for x in troops if x.name == 'king'), None)
@@ -270,23 +278,30 @@ def drag(a, b):
     time.sleep(1)
 
 def slide(slide_pos, slide_pos_target):
+    # print("Sliding:", slide_pos, slide_pos_target)
     time.sleep(0.2)
     if slide_pos == slide_pos_target:
         return slide_pos
 
     if slide_pos < slide_pos_target:
         start_x = 1500
-        end_x = 350
-        slide_pos = min(slide_pos + 1, 2)
+        end_x = 500
+        # slide_pos = min(slide_pos + 1, 2)
     else:
-        start_x = 350
+        start_x = 500
         end_x = 1500
-        slide_pos = min(slide_pos - 1, 1)
+        # slide_pos = min(slide_pos - 1, 1)
 
     dur = 0.3
-    pag.moveTo(start_x, 660, dur)
-    pag.dragTo(end_x, 660, dur)
-    time.sleep(1)
+    # print(slide_pos, slide_pos_target)
+    # print((slide_pos - slide_pos_target))
+    # print(abs(slide_pos - slide_pos_target))
+    for x in range(abs(slide_pos - slide_pos_target)):
+        print("Slide loop:", x)
+        pag.moveTo(start_x, 660, dur)
+        pag.dragTo(end_x, 660, dur)
+        time.sleep(1)
+    slide_pos = slide_pos_target
     return slide_pos
 
 def merge_troop_regions():

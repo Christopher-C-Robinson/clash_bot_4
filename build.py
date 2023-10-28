@@ -23,7 +23,28 @@ buildings_to_upgrade_b = [
 ]
 
 
-def build(account, village):
+def build():
+    builders = spare_builders()
+    # print("Build - spare builders", builders)
+    if builders == 0: return
+    goto_list_top("main")
+    i_suggested_upgrades.click(y_offset=40)
+    time.sleep(0.3)
+    if has_cash():
+        multi_click([i_upgrade_button, i_build_confirm])
+    else:
+        print("Build - insufficient cash")
+
+def has_cash():
+    result, loc, rect = i_upgrade_button.find_detail()
+    cash_rect = [rect[0], rect[1] - 105, rect[2], rect[3]]
+    image = get_screenshot(cash_rect, colour=1)
+    # print(cv2.mean(image))
+    return cv2.mean(image)[0] > 170
+
+
+
+def build_x(account, village):
     start_build_items = account.build_items
     builders = spare_builders(account, village)
     print("Build - spare builders", builders)
@@ -406,7 +427,7 @@ def remove_trees_main():
             print(x.find_screen(screen=screen, return_result=True))
             are_builders_available = True
     if not are_builders_available:
-        print("No builders available", i_builder_zero.find_detail())
+        # print("No builders available", i_builder_zero.find_detail())
         return
     for tree in trees_main:
         if tree.find():
@@ -512,7 +533,7 @@ def upgrade_wall(currency, select_tower_bool=True):
     return True
 
 
-def has_cash(region):
+def has_cash_old(region):
     # Warden: Counter({(128, 128, 128): 3475, (0, 128, 128): 949, (0, 0, 0): 814, (0, 128, 0): 159, (0, 0, 128): 3})
     # Mortar: Counter({(128, 128, 128): 4093, (0, 0, 0): 924, (0, 128, 128): 131, (0, 128, 0): 52})
     # Wall (inadequate cash): Counter({(128, 128, 128): 3818, (0, 0, 0): 668, (0, 128, 128): 416, (0, 0, 128): 298})

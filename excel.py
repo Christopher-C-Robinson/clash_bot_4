@@ -18,7 +18,7 @@ def set_last_row():
         print("You've got Excel open.")
         # time.sleep(60)
 
-set_last_row()
+# set_last_row()
 
 
 

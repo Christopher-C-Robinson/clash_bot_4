@@ -21,7 +21,7 @@ def get_donation_troops():
     # Troops
     donation_troops = []
     for troop in troops:
-        if troop.donations > 0 and troop.type != "siege":
+        if troop.donations > 0 and troop.type != "siege" and troop != super_minion:
             for x in range(troop.donation_count):
                 donation_troops.append(troop)
 
@@ -154,9 +154,9 @@ class Account:
         # print("Update troops to build", self, self.mode, self.has_siege, donation_troops, donation_siege)
         print("Updating troops to build:", self, self.mode)
 
-        if self.mode in ["war_troops", ]: self.troops_to_build = self.war_troops
-        elif self.mode in ["cwl_troops", ]: self.troops_to_build = self.cwl_troops
-        elif self.mode in ["donate", ]: self.troops_to_build = donation_troops
+        if self.mode in ["war_troops", ]: self.troops_to_build = self.war_troops + self.siege_troops
+        elif self.mode in ["cwl_troops", ]: self.troops_to_build = self.cwl_troops + self.siege_troops
+        elif self.mode in ["donate", ]: self.troops_to_build = donation_troops + self.siege_troops
         else: self.troops_to_build = self.convert_attack_to_troops(self.army_troops) + self.siege_troops
 
         # print("Update troops to build:\n", objects_to_str(self.troops_to_build))
@@ -169,7 +169,7 @@ class Account:
         for x, no in data['troop_group']:
             troops_required += [x] * no * data['troop_groups']
 
-        troops_required += [lightening] * data['lightening']
+        troops_required += data['spells']
         if self.has_siege:
             troops_required += [siege_troops]
 
@@ -526,7 +526,7 @@ def get_account_to_highlight():
         i = cv2.imread(file, 0)
         result_text = build_time.read_screen(i)
         result = text_to_time_2(result_text)
-        print(x, result_text, result)
+        # print(x, result_text, result)
         # show(i)
         if x == 1:
             shortest_time = result
@@ -534,7 +534,7 @@ def get_account_to_highlight():
         elif result and result < shortest_time:
             shortest_time = result
             shortest_time_account = x
-    print(shortest_time_account, shortest_time)
+    # print(shortest_time_account, shortest_time)
     return shortest_time_account, shortest_time
 
 def add_green_border(image):
@@ -564,14 +564,13 @@ def is_image_old(file, limit_minutes):
     result = time_since_modification > timedelta(minutes=limit_minutes)
     return result
 
-def get_capital_coin():
+def get_coin():
+    for image in resource_images_main:
+        if image.find(): image.click()
     if i_coin_on_main_screen.find():
         for x in [i_coin_on_main_screen, i_coin_collect, i_red_cross_coin]:
             x.click()
             time.sleep(0.1)
-    else:
-        print("Couldn't find coin")
-
 
 a = ["barracks", "camp", "clan_castle", "spell", "lab", "pet_house"]
 h = ["champ", "king", "queen", "warden", ]
@@ -599,7 +598,7 @@ account_data_1 = {
     'total_elixir': 20000000,
     'total_dark': 350000,
     'army_troops': BARBS_60,
-    'army_clan_troops': [lightening] * 3 + [log_thrower] + [super_barb] * 9,
+    'army_clan_troops': [quake] * 3 + [log_thrower] + [super_barb] * 9,
     # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
     'war_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8,
     'cwl_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [bloon] * 4,
@@ -630,13 +629,13 @@ account_data_2 = {
     'total_elixir': 10000000,
     'total_dark': 200000,
     'army_troops': BARBS_56,
-    'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 8,
+    'army_clan_troops': [quake] * 2 + [log_thrower] + [super_barb] * 8,
     # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
     'war_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8,
     'cwl_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [bloon] * 4,
     'war_donations': [archer] * 3 + [super_barb] * 7 + [bloon] * 3 + [dragon] * 1 + [edrag] + [lava_hound] * 3 + [ice_golem],
     'clan_troops_war': [dragon] * 2 + [lightening] * 2 + [log_thrower],
-    'siege_troops': [ram, blimp, slammer] * 2,
+    'siege_troops': [log_thrower] * 6,
     'donations_from': 1,
     'games_troops': GIANT240_GAMES,
     'army_troops_b': troops4,
@@ -663,13 +662,13 @@ account_data_3 = {
     'total_elixir': 6000000,
     'total_dark': 200000,
     'army_troops': BARBS_56,
-    'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 8,
+    'army_clan_troops': [quake] * 2 + [log_thrower] + [super_barb] * 8,
     # 'army_clan_troops': [lightening] * 1 + [log_thrower] + [super_barb] * 3 + [super_minion],
     'war_troops': [edrag] * 2 + [dragon] * 11 + [lightening] * 4 + [freeze] * 7,
     'cwl_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [bloon] * 4,
     'clan_troops_war': [dragon] * 2 + [lightening] * 2 + [log_thrower],
     'war_donations': [archer] * 3 + [super_barb] * 7 + [bloon] * 3 + [dragon] * 1 + [lava_hound] * 3,
-    'siege_troops': [],
+    'siege_troops': [ram, blimp, slammer] * 2,
     'donations_from': 1,
     'games_troops': GIANT200_GAMES,
     'army_troops_b': troops4,
@@ -694,7 +693,7 @@ account_data_4 = {
     'total_elixir': 22000,
     'total_dark': 160000,
     'army_troops': BARBS_52,
-    'army_clan_troops': [lightening] * 2 + [log_thrower] + [super_barb] * 7,
+    'army_clan_troops': [quake] * 2 + [log_thrower] + [super_barb] * 7,
     'war_troops': [dragon] * 13 + [lightening] * 11,
     'cwl_troops': [dragon] * 13 + [lightening] * 14,
     'clan_troops_war': [bloon] + [edrag] + [lightening],
@@ -724,7 +723,7 @@ account_data_5 = {
     'total_elixir': 22000,
     'total_dark': 160000,
     'army_troops': BARBS_52,
-    'army_clan_troops': [log_thrower] + [super_barb] * 7 + [lightening] * 2,
+    'army_clan_troops': [quake] * 2 + [log_thrower] + [super_barb] * 7,
     'war_troops': [dragon] * 13 + [lightening] * 11,
     'cwl_troops': [dragon] * 13 + [lightening] * 11,
     'clan_troops_war': [edrag] + [bloon] + [lightening] + [log_thrower],

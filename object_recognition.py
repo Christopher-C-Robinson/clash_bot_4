@@ -20,9 +20,7 @@ def get_screenshot(region=None, colour=0, filename="temp"):
         return None
 
 def get_screenshot_troop(region, filename):
-    file = f'images/troops_temp/{filename}.png'
-    pag.screenshot(file, region=region)
-    return cv2.imread(file, 1)
+    file = f'images/troops/new/{filename}.png'
     try:
         pag.screenshot(file, region=region)
         return cv2.imread(file, 1)
@@ -77,7 +75,7 @@ def click(image, region=None, confidence=0.6, show_image=False):
         # print("Click spot", spot)
     return val, outcome
 
-def wait(templates, regions, dur=5):
+def wait_for_image(templates, regions, dur=5):
     for x in range(dur):
         result = find_images_bool(templates, regions, show_image=False)
         if result: return True

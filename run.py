@@ -202,27 +202,78 @@ def highlight_next_build():
 # count = troops_count_flex(army_tab, ARMY_EXISTING, just_troops, show_image=False, show_image_numbers=False)
 # print_count("Troops", count)
 
-# j_donate.run(bad_daz)
-# j_attack.run(daen)
-# while True:
-#     for account in [daen, micah, bob, daz, bad_daz]:
-#         j_attack.run(account)
-#         j_lose_trophies.run(account)
-#         j_donate.run(account)
-#     goto(pycharm)
-#     print_info()
-#     wait(5)
-#     j_attack_b.run(daen)
+def seconds_to_half_hour():
+    now = datetime.now()
+    result = (now.replace(minute=30 * (now.minute//30), second=0, microsecond=0) + timedelta(minutes=30) - now).seconds
+    return result
+
+def run_simple():
+    while True:
+        for account in [daen, micah, bob, daz, bad_daz]:
+            j_attack.run(account)
+            j_lose_trophies.run(account)
+            j_donate.run(account)
+        goto(pycharm)
+        print_info()
+        j_attack_b.run(daen)
+        time.sleep(seconds_to_half_hour())
+
+def th_checker(loops=5):
+    goto(find_a_match)
+    zoom_out()
+    for _ in range(loops):
+        img = create_double_screen()
+        th = "TH:" + str(get_th_level(img, show_result=False))
+        cv2.rectangle(img, (5, 5, 150, 50), (25, 25, 25), -1)
+        cv2.putText(img, th, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+
+        time_string = str(datetime.now().hour) + " " + str(datetime.now().minute) + " " + str(datetime.now().second)
+        cv2.imwrite(f'images/attack_screens/attack {time_string}.png', img)
+        next_village()
+        time.sleep(2)
+        print("Current Location:", current_location)
+
+    goto(pycharm)
+
+def th_checker_2():
+    files = dir_to_list("attack_screens")
+    print(files)
+    for file in files:
+        filename = "images/" + file+".png"
+        print(filename)
+        screen_0 = cv2.imread(filename, 0)
+        screen_1 = cv2.imread(filename, 1)
+        max_result = 0
+        max_townhall = None
+        for town_hall in town_halls:
+            result = cv2.matchTemplate(screen_0, town_hall.image, method)
+            min_val, val, min_loc, loc = cv2.minMaxLoc(result)
+            if val > max_result:
+                max_result = val
+                max_townhall = town_hall
+        max_result = round(max_result, 2)
+        print(max_townhall, max_result)
+
+        show(screen_1, label=max_townhall.name + ": " + str(max_result))
 
 
-# count = troops_count_flex(army_tab, ARMY_EXISTING, just_troops, show_image=False)
-# print_count("Army", count)
+# count = troops_count_flex(army_tab, SPELLS_EXISTING, spells, show_image=False)
+# print_count("Spells", count)
 
 # goto(l_clan)
+# count = troops_count_flex(siege_tab, TRAINING_RANGE_SIEGE, siege_troops, show_image=True)
+# print_count("Siege", count)
+# layer_1, layer_1_2 = full_count(bad_daz)
+# # count = troops_count_flex(army_tab, ARMY_EXISTING, just_troops)
+# print_count("Layer 1", layer_1)
+# print_count("Layer 1 and 2", layer_1_2)
 
-# full_count(bob)
 
-run()
+# freeze.delete(1)
+
+j_attack.run(bad_daz)
+
+# run()
 
 goto(pycharm)
 

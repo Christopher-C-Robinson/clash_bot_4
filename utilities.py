@@ -6,6 +6,11 @@ import numpy as np
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+def wait(minutes):
+    for x in range(minutes):
+        print(f"Waiting: {x} of {minutes} minutes")
+        time.sleep(60)
+
 def combine_image_horizontal(images):
     max_height = 0
     for image in images:

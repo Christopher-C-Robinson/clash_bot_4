@@ -230,7 +230,7 @@ class Loc():
                     time.sleep(0.2)
                     break
         elif action == "goto_clan":
-            print("Goto clan")
+            # print("Goto clan")
             pag.click(BOTTOM_LEFT)
             goto(main)
             for image in [i_profile_star, i_my_clan_tab]:
@@ -239,8 +239,8 @@ class Loc():
                     if image.find():
                         image.click()
                         found = True
-                    else:
-                        print(image.name, image.find_detail())
+                    # else:
+                    #     print(image.name, image.find_detail())
                     count += 1
         elif action == "goto_games":
             pag.click(BOTTOM_LEFT)
@@ -262,6 +262,8 @@ class Loc():
             return_from_builder()
         elif action == "request_to_army":
             multi_click([i_castle_confirm, i_castle_send])
+        elif action == "main_to_change_account":
+            main_to_change_account()
         elif action == "start_bluestacks":
             os.startfile("C:\Program Files (x86)\BlueStacks X\BlueStacks X.exe")
             start_up()
@@ -365,6 +367,9 @@ class Loc():
         for rectangle in self.constant_regions:
             cv2.rectangle(screen, rectangle, (0, 0, 255), 2)
         show(screen, scale=0.6, dur=20000)
+
+def main_to_change_account():
+    multi_click([i_settings_on_main, i_change_accounts_button])
 
 
 def reload(rest_time=20):
@@ -545,8 +550,8 @@ main.add_path(destination=siege_tab, action="click", parameter=i_army, expected_
 main.add_path(destination=l_donation_request_selector, action="click", parameter=i_army, expected_loc=army_tab)
 
 main.add_path(destination=settings, action='click', parameter=i_settings_on_main, expected_loc=settings)
-main.add_path(destination=change_account, action='click', parameter=i_settings_on_main, expected_loc=settings)
-# main.add_path(destination=forge, action='goto_forge', parameter='', expected_loc=forge)
+# main.add_path(destination=change_account, action='click', parameter=i_settings_on_main, expected_loc=settings)
+main.add_path(destination=change_account, action='main_to_change_account', parameter=i_settings_on_main, expected_loc=change_account)
 main.add_path(destination=builder, action="goto_builder", parameter='', expected_loc=builder)
 main.add_path(destination=find_a_match, action="click", parameter=i_attack, expected_loc=n_attack)
 main.add_path(destination=n_attack, action="click_p", parameter=i_attack, expected_loc=n_attack)
@@ -767,7 +772,7 @@ def goto_list_top(village):
     count = 0
     time.sleep(0.2)
     while not at_top and count < 3:
-        # print(i_suggested_upgrades.find_detail(fast=False))
+        print(i_suggested_upgrades.find_detail(fast=False))
         if i_suggested_upgrades.find(fast=False, show_image=False):
             at_top = True
         if not at_top:
@@ -778,7 +783,7 @@ def goto_list_top(village):
     val, loc, rect = i_suggested_upgrades.find_detail()
     # print("Goto list top", val)
     pag.moveTo(855, loc[1])
-    pag.dragTo(855,210, .5)
+    pag.dragTo(855, 250, 1)
     time.sleep(2)
 
 def goto_list_very_top(village):
@@ -825,16 +830,10 @@ def attack_b_get_screen():
     pag.screenshot('temp/attack_b/attacking_b.png')
 
 def zoom_out():
-    # print("Zooming out")
     time.sleep(0.1)
-
     pag.keyDown('ctrl')
-
-    for x in range(7):
-        hold_key('o', 0.2)
-
+    for x in range(4): hold_key('o', 0.2)
     pag.keyUp('ctrl')
-
 
 def start():
     click_cv2('bluestacks_icon')
@@ -934,17 +933,9 @@ def tour(start=0, end=13):
             goto(location)
         count += 1
 
-def spare_builders(account, village):
-    # print(village)
-    if village == "main":
-        # print("Spare builder - going to main")
-        goto(main)
-        region = BUILDER_ZERO_REGION
-    else:
-        # print("Spare builder - going to builder")
-        goto(builder)
-        region = BUILDER_B_ZERO_REGION
-    screen = get_screenshot(region, filename=f"tracker/builders{account.number}{village}")
+def spare_builders():
+    goto(main)
+    screen = get_screenshot(BUILDER_ZERO_REGION)
     if i_builder_zero.find_screen(screen, show_image=False): return 0
     if i_builder_one.find_screen(screen): return 1
     return 2

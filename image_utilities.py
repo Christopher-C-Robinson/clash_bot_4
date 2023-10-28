@@ -159,6 +159,34 @@ def get_double_screen():
     for _ in range(5): pag.scroll(300)
 
 def create_double_screen(update_screen=True):
+    global scroll_adj
+    if update_screen:
+        get_double_screen()
+    x1, x2 = 1300, 1400
+    y1, y2 = 600, 700
+    # read screenshots
+    img1 = cv2.imread('temp/attack/attacking1.png', 1)
+    img2 = cv2.imread('temp/attack/attacking2.png', 1)
+    # print(img1.shape)
+    match_point = img1[y1:y2, x1:x2]
+    # show(match_point)
+
+    min_val, val_1, min_loc, loc_1 = cv2.minMaxLoc(cv2.matchTemplate(img1, match_point, method))
+    min_val, val_2, min_loc, loc_2 = cv2.minMaxLoc(cv2.matchTemplate(img2, match_point, method))
+    print(loc_1, loc_2)
+    scroll_adj = loc_1[1] - loc_2[1]
+    print(scroll_adj)
+
+    img1 = img1[0:loc_1[1]]
+    img2 = img2[loc_2[1]:]
+    img = np.concatenate((img1, img2), axis=0)
+    # show(img, dur=10000)
+    return img
+
+# create_double_screen(update_screen=False)
+
+
+def create_double_screen_old(update_screen=True):
     if update_screen:
         get_double_screen()
     print("Create double screen")
@@ -222,6 +250,7 @@ def ram_drop_point(img):
         cv2.rectangle(img, rect, (255, 255, 255), 2)
         result_th = True
     x_th, y_th = loc[0] + 40, loc[1] + 40
+    admin.th_loc = (x_th, y_th)
     image, val, loc = multi_image_find(img, eagles)
     print("Eagle Image", image)
     rect = (loc[0], loc[1], 80, 80)
@@ -260,14 +289,7 @@ def ram_drop_point(img):
     cv2.line(img, top, left, (255, 255, 255), 2)
     cv2.line(img, bottom, left, (255, 255, 255), 2)
 
-    # show(img_orig)
-
-    # save the image
-    # post = datetime.now().strftime('%I%M%p')
     file = "temp/attack/attacking_th_eagle.png"
-    # x = f'images/attacks{account.number}/attack.png'
-
-    # cv2.imwrite(x, img_orig)
     cv2.imwrite(file, img)
     print("Ram drop point image saved", file)
 

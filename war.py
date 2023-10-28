@@ -37,10 +37,7 @@ troops1 = ["edrag"] * 8 + ["dragon"] * 2 + ["lightening"] * 11
 troops2 = ["dragon"] * 12 + ["balloon"] + ["lightening"] * 11
 data = [(1, troops1), (2, troops2)]
 
-def wait(minutes):
-    for x in range(minutes):
-        print(f"Waiting: {x} of {minutes} minutes")
-        time.sleep(60)
+
 
 def remove_clan_troops():
     goto(army_tab)

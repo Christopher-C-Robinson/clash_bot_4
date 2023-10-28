@@ -5,6 +5,11 @@ from people import *
 import os
 import shutil
 
+train_directory = troop_directory + "/train/"
+train_files = os.listdir(train_directory)
+new_directory = troop_directory + "/new/"
+new_files = os.listdir(new_directory)
+
 def delete_army_troops(region):
     goto(army_tab)
     time.sleep(0.2)
@@ -36,33 +41,46 @@ def delete_castle_request_troops():
         if not i_remove_troops_castle.click_region(CASTLE_REQUEST_AREA_1):
             found = False
 
-def wait_for_colour(region):
+# def wait_for_colour(region):
+#     found, count = False, 0
+#     while not found and count < 1000:
+#         result = colour_fancy(region)
+#         print(result)
+#         if result > 28: return
+#         time.sleep(0.3)
 
-    found, count = False, 0
-    while not found and count < 1000:
-        result = colour_fancy(region)
+def wait_for_clock():
+    goto(army_tab)
+    count = 0
+    while count < 1000:
+        result = i_army_clock.find()
         print(result)
-        if result > 30: return
+        if not result: return
         time.sleep(0.3)
 
 def create_image_library(troop, account_1, attack_required=True):
     global current_location
     # load_troops()
     file = f"{troop.name}_"
-    base_image = troop.i_train.image[:, 10:105]
+    # base_image = troop.i_train.image[:, 10:105]
     set_current_account()
     change_accounts_fast(account_1)
     delete_army_troops(ARMY_EXISTING_NOT_SIEGE)
+    delete_army_troops(SPELLS_EXISTING)
     delete_army_troops(CASTLE_TROOPS)
     # Training
     print("\nTraining")
     troop.start_train(1, account_1)
+    time.sleep(0.5)
     get_screenshot_troop(TRAINING_RANGE_FIRST_TROOP, file + "training")
     # Army
     print("\nArmy")
     goto(army_tab)
-    wait_for_colour(ARMY_EXIST_FIRST_TROOP)
-    get_screenshot_troop(ARMY_EXIST_FIRST_TROOP, file + "army")
+    wait_for_clock()
+    time.sleep(4)
+    result, loc = get_image_variable_size(troop, type="army", region=ARMY_SPELLS_EXISTING)
+    if not result:
+        print("Failure:", troop, "Army")
     # Attack
     print("\nAttack")
     if attack_required:
@@ -77,14 +95,14 @@ def create_image_library(troop, account_1, attack_required=True):
     time.sleep(0.3)
     result, loc = get_image_variable_size(troop, "castle", region=CASTLE_REQUEST_AREA_2)
     if result:
-        print("Clicking", loc)
         pag.click(loc)
-        time.sleep(0.1)
+        time.sleep(0.3)
         i_castle_confirm.click()
-        time.sleep(0.1)
+        time.sleep(0.3)
         i_castle_send.click()
-        time.sleep(0.1)
-        current_location = main
+        time.sleep(0.3)
+        # current_location = main
+        change_current_location(main)
         # goto(army_tab)
         time.sleep(0.3)
     else:
@@ -103,29 +121,31 @@ def create_image_library(troop, account_1, attack_required=True):
     result, loc = get_image_variable_size(troop, type="donate2", region=DONATE_AREA)
     if not result:
         print("Failure:", troop, "Donate 2")
-
-def create_troop_image(troop):
-    print(troop)
-    file = f"{troop.name}_"
-    change_accounts_fast(bad_daz)
-    goto(l_donate)
-    adj_image = cv2.resize(troop.i_army.image, (0, 0), fx=0.87, fy=0.87)
-    screen = get_screenshot()
-    result = cv2.matchTemplate(screen, adj_image, method)
-    min_val, val, min_loc, loc = cv2.minMaxLoc(result)
-    if val > 0.8:
-        region = (loc[0] - 10, loc[1], 80, 35)
-        get_screenshot_troop(region, file + "donate2")
-    else:
-        print("Failure:", troop, "Donate 2")
-        return
+    determine_required_troop_types(troop)
 
 
-def create_image_libraries(troops_to_create):
-    change_accounts_fast(bad_daz)
-    troop_delete_backlog()
-    for troop in troops_to_create:
-        create_image_library(troop)
+
+# def create_troop_image(troop):
+#     print(troop)
+#     file = f"{troop.name}_"
+#     change_accounts_fast(bad_daz)
+#     goto(l_donate)
+#     adj_image = cv2.resize(troop.i_army.image, (0, 0), fx=0.87, fy=0.87)
+#     screen = get_screenshot()
+#     result = cv2.matchTemplate(screen, adj_image, method)
+#     min_val, val, min_loc, loc = cv2.minMaxLoc(result)
+#     if val > 0.8:
+#         region = (loc[0] - 10, loc[1], 80, 35)
+#         get_screenshot_troop(region, file + "donate2")
+#     else:
+#         print("Failure:", troop, "Donate 2")
+#         return
+
+# def create_image_libraries(troops_to_create):
+#     change_accounts_fast(bad_daz)
+#     troop_delete_backlog()
+#     for troop in troops_to_create:
+#         create_image_library(troop)
 
 def find_image_multiple(loc, troop):
     base_image = troop.i_train.image[:, 10:105]
@@ -138,10 +158,10 @@ def find_image_multiple(loc, troop):
         min_val, val, min_loc, loc = cv2.minMaxLoc(result)
         print(scale, val, loc)
 
-def copy_train_file(troop):
-    source = "images/troops_temp/" + f"{troop.name}_train.png"
-    destination = "images/troops/" + f"{troop.name}_train.png"
-    shutil.copy(source, destination)
+# def copy_train_file(troop):
+#     source = "images/troops_temp/" + f"{troop.name}_train.png"
+#     destination = "images/troops/" + f"{troop.name}_train.png"
+#     shutil.copy(source, destination)
 
 def get_image_variable_size(troop, type, region=None):
     x1, x2, y1, y2 = -10, 110, 0, 65
@@ -180,23 +200,28 @@ def get_image_variable_size(troop, type, region=None):
             print(result)
         return False, max_loc
 
+def determine_required_troop_types(troop):
+    required_types = ["training", "donate1", "donate2", "attack", "castle", "army"]
+    for image_type in ["training", "donate1", "donate2", "attack", "castle", "army"]:
+        current_file = f"{troop.name}_{image_type}.png"
+        if current_file in new_files:
+            required_types.remove(image_type)
+    if len(required_types) == 0:
+        print("All images exist:", troop)
+    else:
+        print("Required image types:", troop, required_types)
+    return required_types
+
 def update_troop_files(action=True, account_number=0):
-    dir = "images/troops_temp/"
-    files = os.listdir(dir)
-
-    for troop in troops:
-        if f"{troop.name}_train.png" in files:
-            copy_train_file(troop)
-    load_troops()
-
     count = account_number
+    print("In train directory:", train_files)
     for troop in troops:
-        if f"{troop.name}_train.png" in files:
+        if f"{troop.name}_train.png" in train_files:
             required_types = ["training", "donate1", "donate2", "attack", "castle", "army"]
             for image_type in ["training", "donate1", "donate2", "attack", "castle", "army"]:
                 # print("Start:", troop, image_type)
                 current_file = f"{troop.name}_{image_type}.png"
-                if current_file in files:
+                if current_file in new_files:
                     required_types.remove(image_type)
                     # print("Removing", image_type, "Left:", required_types)
                 else:
@@ -209,81 +234,26 @@ def update_troop_files(action=True, account_number=0):
                     attack_required = False
                 print("Work on:", troop, attack_required, required_types)
                 if action:
+                    # set_current_account()
                     create_image_library(troop, accounts[count], attack_required=attack_required)
                     count += 1
-                    if count > 4:
+                    if count > 3:
                         goto(pycharm)
-                        time.sleep(5 * 60)
-                        count = 1
+                        wait(2)
+                        # time.sleep(5 * 60)
+                        count = 0
     goto(pycharm)
 
 
-# app()
-# get_image_variable_size(super_barb)
-# app()
-
-troop = barb
-print("\nCastle")
-goto(l_donation_request_selector)
-delete_castle_request_troops()
-castle_slide(troop.castle_slide)
-time.sleep(0.3)
-result, loc = get_image_variable_size(troop, "castle", region=CASTLE_REQUEST_AREA_2)
-if result:
-    print("Clicking", loc)
-    pag.click(loc)
-    time.sleep(0.1)
-    i_castle_confirm.click()
-    time.sleep(0.1)
-    i_castle_send.click()
-    time.sleep(0.1)
-    current_location = main
-    # goto(army_tab)
-    time.sleep(0.3)
-else:
-    print("Failure:", troop, "Castle")
-#
+# create_image_library(freeze, bad_daz, attack_required=True)
 
 
-# goto(find_a_match)
-# result, loc = get_image_variable_size(troop, type="army")
-# if not result:
-#     print("Failure:", troop, "Army")
+# print(headhunter.slide)
 
+# time.sleep(5)
+# update_troop_files(action=False, account_number=0)
+# update_troop_files(action=True, account_number=1)
 
-# goto(army_tab)
-# barb.start_train
-# wait_for_colour(ARMY_EXIST_FIRST_TROOP)
-
-
-set_current_account()
-# print("Account number:", account_number)
-update_troop_files(action=True, account_number=1)
-
-
-# print(account_number)
-# # delete_army_troops(ARMY_EXISTING_NOT_SIEGE)
-# # delete_castle_request_troops()
-
-# create_image_library(super_barb, daen)
-# print(current_account.number)
-
-# delete_army_troops(ARMY_EXISTING_NOT_SIEGE)
-# delete_army_troops(CASTLE_TROOPS)
-
-
-# copy_train_file(bloon)
-# troop = bloon
-# show(troop.i_train.image)
-# show(troop.i_train.image[:,10:105])
-# find_image_multiple(l_donation_request_selector,troop)
-
-
-
-# app()
-# # result = get_screenshot(ARMY_EXIST_FIRST_TROOP, colour=1)
-# print(colour_fancy(ARMY_EXIST_FIRST_TROOP))
-# app()
-# show(result)
+print(edrag.slide)
 
 goto(pycharm)

@@ -154,6 +154,7 @@ def attack(account, data, siege_required=True, attack_regardless=False, print_ti
 
     # Find a match
     goto(find_a_match)
+    zoom_out()
     match_found = False
     war_goals = account.war_goals()
     while not match_found:
@@ -225,7 +226,7 @@ def attack_prep(account, siege_required=True):
             account.request_type = "Army troops"
         else:
             request(account)
-        db_update(return_account(1), "donate", datetime.now())
+        # db_update(return_account(1), "donate", datetime.now())
 
     print("Attack prep - sufficient troops", sufficient_troops)
     return sufficient_troops
@@ -277,13 +278,21 @@ def assess_village(account, data, war_goals, print_time=False):
     # show(img, scale=0.5)
 
     # pag.screenshot("attacks/attack.png")
-    # th = get_th_level(img)
-    # if th == -1:
-    #     print("TH too high:", th)
-    #     return "Town hall not identified"
-    # if th > data['max_th'] and account.th > 5 and resources[0] < 900000:
-    #     print("TH too high:", th)
-    #     return "Town hall too high"
+    th = get_th_level(img)
+    print("Town hall:", th)
+    if th == -1:
+        print("TH not identified:", th)
+        th = "TH:" + str(get_th_level(img, show_result=False))
+        cv2.rectangle(img, (5, 5, 150, 50), (25, 25, 25), -1)
+        cv2.putText(img, th, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+
+        time_string = str(datetime.now().hour) + " " + str(datetime.now().minute) + " " + str(datetime.now().second)
+        cv2.imwrite(f'images/attack_screens/attack {time_string}.png', img)
+
+        # return "Town hall not identified"
+    elif th > data['max_th'] and account.th > 5 and resources[0] < 900000:
+        print("TH too high:", th)
+        return "Town hall too high"
 
     # Not on attack screen
     if not i_attack_screen_resources.wait(8): return "Not on attack screen"
@@ -367,6 +376,8 @@ def launch_attack(account, data, image):
         dp2 = None
 
     print("Launch attack: bombing")
+    earth_quake()
+
     # if data['bomb']: bomb(data['bomb_target'], image)
     # if data['bomb_target2'] is not None: bomb(data['bomb_target2'], image)
     troop_pause = data['troop_pause']
@@ -405,6 +416,14 @@ def launch_attack(account, data, image):
     i_return_home.wait(30)
     i_return_home.click()
     # wait_cv2("return_home")
+
+def earth_quake():
+    if not admin.th_loc:
+        print("TH Loc not set")
+        return
+    quake.i_attack.click()
+    pag.click(admin.th_loc)
+
 
 def place(troop, count_total, dp=[400,400], troop_pause=0):
     out_of_bounds = True
