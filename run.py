@@ -1,13 +1,19 @@
 from bot import *
 from games import *
 
-set_current_account()
+# set_current_account()
 def run():
     # set_current_account()
     # set_admin_mode()
     # check_status_files_exist()
     while True:
         run_job(db_next_job())
+        if in_time_zone(20, 23):
+        #     war_prep(cwl=True)
+        #     goto(pycharm)
+        #     admin.war_donations_remaining = -1
+            wait(60 * 3)
+
 
 def check_status_files_exist():
     for account in accounts:
@@ -207,6 +213,8 @@ def seconds_to_half_hour():
     result = (now.replace(minute=30 * (now.minute//30), second=0, microsecond=0) + timedelta(minutes=30) - now).seconds
     return result
 
+
+
 def run_simple():
     while True:
         for account in [daen, micah, bob, daz, bad_daz]:
@@ -257,23 +265,17 @@ def th_checker_2():
         show(screen_1, label=max_townhall.name + ": " + str(max_result))
 
 
-# count = troops_count_flex(army_tab, SPELLS_EXISTING, spells, show_image=False)
-# print_count("Spells", count)
+run()
 
-# goto(l_clan)
-# count = troops_count_flex(siege_tab, TRAINING_RANGE_SIEGE, siege_troops, show_image=True)
-# print_count("Siege", count)
-# layer_1, layer_1_2 = full_count(bad_daz)
-# # count = troops_count_flex(army_tab, ARMY_EXISTING, just_troops)
-# print_count("Layer 1", layer_1)
-# print_count("Layer 1 and 2", layer_1_2)
+# j_donate.run(daz)
 
 
-# freeze.delete(1)
+# print("Army:\n", objects_to_str(daz.convert_attack_to_troops(daz.army_troops)))
+# print("Siege:\n", objects_to_str(daz.siege_troops))
 
-j_attack.run(bad_daz)
+# daz.update_troops_to_build()
+# print(daz.troops_to_build)
 
-# run()
 
 goto(pycharm)
 

@@ -475,7 +475,7 @@ BARBS_52 = {
             "bomb_target": wizard_tower,
             "bomb_target2": None,
             "lightening": 0,
-            "spells": [],
+            "spells": [quake] * 12,
             "initial_troops": [king, log_thrower, queen, warden, champ],
             "troop_group": [(super_barb, 52), ],
             "troop_groups": 1,
@@ -497,7 +497,7 @@ BARBS_56 = {
             "bomb_target": wizard_tower,
             "bomb_target2": None,
             "lightening": 11,
-            "spells": [],
+            "spells": [quake] * 12,
             "initial_troops": [king, log_thrower, queen, warden, champ],
             "troop_group": [(super_barb, 56), ],
             "troop_groups": 1,
@@ -550,6 +550,39 @@ BARBS_60 = {
             "drop_point_troops": [],
             "th_gold_adj": False,
         }
+
+BARBS_64 = {
+            "name": "barbs",
+            # "resource_objective": [300000,0,5000],
+            # "resource_objective": [0,0,5000],
+            "max_th": 14,
+            "wizard_check": False,
+            "towers_to_avoid": NOTHING,
+            "bomb": True,
+            "bomb_target": wizard_tower,
+            "bomb_target2": None,
+            "spells": [quake] * 12,
+            "initial_troops": [king, log_thrower, queen, warden, champ],
+            "troop_group": [(super_barb, 62), ],
+            "troop_groups": 1,
+            "final_troops": [],
+            "troop_pause": 0.45,
+            "drop_points": False,
+            "drop_point_troops": [],
+            "th_gold_adj": False,
+        }
+
+TITANS = {
+            "name": "titans",
+            "max_th": 14,
+            "spells": [quake] * 12,
+            "initial_troops": [king, log_thrower, queen, warden, champ],
+            "troop_group": [(titan, 9), ],
+            "troop_groups": 1,
+            "final_troops": [],
+            "troop_pause": 0.45,
+        }
+
 
 BARBS_60_GAMES = {
             "name": "barbs",

@@ -176,7 +176,7 @@ def attack(account, data, siege_required=True, attack_regardless=False, print_ti
 
     # Donations
     if account.request_type is None:
-        castle_troops_change(account.army_clan_troops)
+        castle_troops_change(account.clan_troops_army)
         account.request_type = "Army troops"
     else:
         request(account)
@@ -217,15 +217,16 @@ def attack_prep(account, siege_required=True):
     sufficient_troops, actual_troops = army_prep(account, account.troops_to_build, include_castle=True, army_or_total="army")
     if not sufficient_troops: return sufficient_troops
 
-    if siege_required and actual_troops and actual_troops[log_thrower] == 0 and account.th > 8:
-        print("Log throwers:", actual_troops[log_thrower])
-        sufficient_troops = False
-        # Donations
-        if account.request_type is None:
-            castle_troops_change(account.army_clan_troops)
-            account.request_type = "Army troops"
-        else:
-            request(account)
+    if siege_required and actual_troops and account.th > 8:
+        if log_thrower not in actual_troops.keys() or actual_troops[log_thrower] == 0:
+            print("No log throwers")
+            sufficient_troops = False
+            # Donations
+            if account.request_type is None:
+                castle_troops_change(account.clan_troops_army)
+                account.request_type = "Army troops"
+            else:
+                request(account)
         # db_update(return_account(1), "donate", datetime.now())
 
     print("Attack prep - sufficient troops", sufficient_troops)
@@ -298,7 +299,7 @@ def assess_village(account, data, war_goals, print_time=False):
     if not i_attack_screen_resources.wait(8): return "Not on attack screen"
 
     # Aggressive defences
-    if check_towers(data['towers_to_avoid'], img) and resources[0] < 900000: return "Aggressive defence"
+    # if check_towers(data['towers_to_avoid'], img) and resources[0] < 900000: return "Aggressive defence"
 
     # Barb drop spot
     if data['name'] == "barbs":
@@ -418,12 +419,21 @@ def launch_attack(account, data, image):
     # wait_cv2("return_home")
 
 def earth_quake():
-    if not admin.th_loc:
-        print("TH Loc not set")
-        return
+    step_x, step_y = 80, 160
+    base_x, base_y = 900, 100
+    hit_codes = [(0,0), (-1, 1), (1, 1), (-2, 2), (0, 2), (2, 2), (-3, 3), (-1, 3), (1, 3), (3, 3), (-2, 4), (0, 4), (2, 4)]
+    hits = []
+    for x, y in hit_codes:
+        hit_loc = (base_x + step_x * x, base_y + step_y * y)
+        hits.append(hit_loc)
     quake.i_attack.click()
-    pag.click(admin.th_loc)
+    for x, y in hits:
+        pag.click(x, y)
+        time.sleep(0.1)
 
+    # pag.click(admin.th_loc)
+
+# earth_quake()
 
 def place(troop, count_total, dp=[400,400], troop_pause=0):
     out_of_bounds = True

@@ -2,7 +2,6 @@ import openpyxl as xl
 from utilities import *
 from admin import *
 
-
 def set_last_row():
     file = ROOT_DIR + "/excel/log.xlsx"
     try:
@@ -17,10 +16,6 @@ def set_last_row():
         print()
         print("You've got Excel open.")
         # time.sleep(60)
-
-# set_last_row()
-
-
 
 def log(admin_mode, account_mode, job, account, duration):
     file = ROOT_DIR + "/excel/log.xlsx"
@@ -43,26 +38,32 @@ def log(admin_mode, account_mode, job, account, duration):
 def excel_write_rows(file, sheet, start_row, values):
     try:
         file = ROOT_DIR + "/excel/" + file + ".xlsx"
-        log_wb = xl.load_workbook(file)
-        log_ws = log_wb[str(sheet)]
+        wb = xl.load_workbook(file)
+        ws = wb[str(sheet)]
         row = start_row
     except:
         print("Couldn't update log")
         return
 
+    for row_x in ws['A4:E100']:
+        for cell in row_x:
+            cell.value = None
+
     for single_row in values:
         try:
             for count, value in enumerate(single_row, 1):
-                log_ws.cell(row, count).value = value
+                ws.cell(row, count).value = value
             row += 1
         except:
             print("Couldn't update log")
 
     try:
-        log_wb.save(file)
-        log_wb.close()
+        wb.save(file)
+        wb.close()
     except:
         pass
+
+
 
 
 # time = timedelta(hours=1)

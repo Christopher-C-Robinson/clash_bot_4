@@ -22,7 +22,7 @@ def load_towers():
         # print("Creating tower:", name)
         Tower(name=name, village=village, category=category, resource=resource, priority=priority, yolo_code=yolo_code)
 
-    print()
+    # print()
 
 def load_levels():
     wb = xl.load_workbook(levels_filename)
@@ -37,7 +37,7 @@ def load_levels():
         days = sheet.cell(row, 7).value
 
         name = name.replace(" ", "_").lower()
-        # print(name, level, th, gold, elixir, dark, days)
+        # print(name, number, th, gold, elixir, dark, days)
 
         if gold is None: gold = 0
         if elixir is None: elixir = 0
@@ -46,6 +46,7 @@ def load_levels():
         tower = next((x for x in towers if x.name == name.lower()), None)
         if tower:
             if type(days) == str: days = int(days)
+            # print("Loading level:", tower, number, th, gold, elixir, dark, days)
             tower.add_level(tower, number, th, gold, elixir, dark, days)
         # else:
         #     print(f"No {name.lower()} found")
@@ -74,6 +75,8 @@ inferno = return_tower("air_defence")
 
 for tower in [lab, wizard_tower, air_defence, inferno]:
     tower.get_images()
+
+# print(wizard_tower.levels)
 
 # print(cannon.remaining_time(1, 5))
 

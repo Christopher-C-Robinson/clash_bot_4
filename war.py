@@ -147,6 +147,8 @@ def set_admin_mode():
         if i_return_home_3.find():
             i_return_home_3.click()
             time.sleep(0.1)
+            return
+        time.sleep(0.1)
 
 def less_than_an_hour():
     result = war_time.read(region=WAR_BANNER, show_image=False)

@@ -11,6 +11,8 @@ def place(troop):
         troop.i_attack.click()
         time.sleep(0.2)
         pag.click(STANDARD_DP2)
+        return True
+    return False
 
 def calc_trophies():
     goto(main)
@@ -33,9 +35,9 @@ def lose_trophies(account):
             val, loc, rect = find(troop.i_attack.image, get_screenshot(TROOP_ZONE))
             print("Lose trophies:", troop.name, val)
             if val > 0.65:
-                place(troop)
-                print("Unleashed", troop)
-                break
+                if place(troop):
+                    print("Unleashed", troop)
+                    break
 
         time.sleep(0.2)
         i_surrender.click()

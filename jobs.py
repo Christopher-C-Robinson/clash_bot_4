@@ -44,7 +44,9 @@ class Job:
         if self.name == "donate_war": donate_war(account)
         if self.name == "attack": attack(account, account.army_troops)
         if self == j_attack_b and account.attacking_b: attack_b_multi(account)
-        if self.name == "challenge": challenge()
+        if self.name == "challenge":
+            challenge()
+            for account in accounts: job_pause(account.number, "challenge", 30)
         if self.name == "research": research(account)
         if self.name == "build": build(account, "main")
         if self.name == "message": message()
@@ -52,12 +54,19 @@ class Job:
         if self == j_sweep: sweep()
         if self == j_lose_trophies: lose_trophies(account)
         if account != admin:
-            build()
-            update_images(account)
-            account.update_resources()
-            get_coin()
-            remove_trees_main()
-        time_taken = datetime.now() - start
+            print("Admin:", account, account.admin_hour, datetime.now().hour, account.admin_hour != datetime.now().hour)
+            if account.admin_hour != datetime.now().hour:
+                build(account)
+                update_images(account)
+                account.update_resources()
+                get_coin(account)
+                remove_trees_main()
+                account.admin_hour = datetime.now().hour
+                db_account_update(account.number, "admin_hour", datetime.now().hour)
+            else:
+                print("Admin tasks done for this hour")
+
+        # time_taken = datetime.now() - start
         # log(admin.mode, account.mode, self.name, account.name, time_taken)
 
         if not self.update_time: # Not updating time because time is updated by the function run immediately above
@@ -174,7 +183,7 @@ j_sweep = Job({'name': "sweep","time_active": timedelta(hours=3),"time_inactive"
 j_lose_trophies = Job({'name': "lose_trophies", "time_active": timedelta(minutes=5), "time_inactive": timedelta(hours=2), 'update_time': True})
 
 # active_jobs = [j_build, j_donate, j_attack, j_coin, j_challenge, j_war_troops, j_donate_war, j_message]
-active_jobs = [j_attack, j_donate, j_attack_b, j_sweep, j_lose_trophies, j_completion_date, j_challenge]
+active_jobs = [j_attack, j_donate, j_attack_b, j_sweep, j_lose_trophies, j_completion_date, j_war_troops, j_cwl_troops]
 # active_jobs = [j_attack, j_donate, j_completion_date, j_attack_b, j_war_troops, j_cwl_troops, j_lose_trophies, j_challenge]
 # active_jobs.append(j_sweep)
 

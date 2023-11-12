@@ -29,6 +29,7 @@ def db_account_update(account, variable, value):
     existing = len(db(db_str))
     if existing == 0: db_str = f"INSERT INTO accounts VALUES ({account}, '{variable}', '{value}')"
     else: db_str = f"UPDATE accounts SET value='{value}'" + condition
+    # print("Execution string in db_account_update:", db_str)
     db(db_str)
 
 def db_account_read(account, variable):
@@ -55,3 +56,6 @@ def db_account_view():
 
 # db_create_table()
 # db_account_view()
+
+if __name__ == "__main__":
+    db_account_view()

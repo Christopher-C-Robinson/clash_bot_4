@@ -44,7 +44,11 @@ def get_super_troop(troop):
             pag.moveTo(1070, 928)
             pag.dragTo(1070, 287, .6)
         print(image, image.find_detail())
-        image.click()
+        result = image.click()
+        if not result:
+            if image == i_000: i_00.click()
+            if image == i_000v2: i_00v2.click()
+
 
 
 
@@ -181,6 +185,9 @@ def load_troops():
 # clan = Troop(name="clan", type="clan", slide=1, castle_slide=1, training_time=0, donate_bool=False,
                # donate_preference=100, donations=0, donation_count=0)
 
+def get_troop(string):
+    return next((x for x in troops if x.name == string), None)
+
 load_troops()
 clan = next((x for x in troops if x.name == 'clan'), None)
 
@@ -201,6 +208,7 @@ witch = next((x for x in troops if x.name == 'witch'), None)
 lava_hound = next((x for x in troops if x.name == 'lava_hound'), None)
 ice_golem = next((x for x in troops if x.name == 'ice_golem'), None)
 headhunter = next((x for x in troops if x.name == 'headhunter'), None)
+titan = next((x for x in troops if x.name == 'titan'), None)
 
 super_barb = next((x for x in troops if x.name == 'super_barb'), None)
 super_minion = next((x for x in troops if x.name == 'super_minion'), None)

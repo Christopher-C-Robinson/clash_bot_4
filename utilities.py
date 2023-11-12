@@ -6,6 +6,10 @@ import numpy as np
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+def in_time_zone(start, end):
+    current_hour = datetime.now().hour
+    return current_hour >= start and current_hour < end
+
 def wait(minutes):
     for x in range(minutes):
         print(f"Waiting: {x} of {minutes} minutes")

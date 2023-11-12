@@ -18,8 +18,10 @@ def empty_count():
     return count
 
 def print_count(label, count):
+    print(count)
     string = label + ": "
     for key in count:
+        print(key)
         if count[key] > 0:
             string += f"{key}:{count[key]}. "
     print(string)
@@ -56,19 +58,15 @@ def donate_get_required_troops(account):
             if troop == minion: show_image = False
             val, loc, rect = find(troop.i_donate1.image, screen, text=troop.name, show_image=show_image)
             if val > 0.65:
-                # print("Required troop:", troop)
                 if troop not in required_troops:
                     required_troops.append(troop)
                 if troop.donation_count == 0: troop.donation_count = 1
-    # print("Donate (get troops):", troop_str(required_troops))
     return required_troops
 
 def donate_train_required_troops(account, required_troops):
     time.sleep(0.2)
     time_required = 20 * 60
-    # print("Donate - train required troops")
     for troop in required_troops:
-        # print("Donate - train required troops:", troop.name.capitalize())
         if troop.type == "siege":
             if not account.has_siege: continue
         if troop.i_training.find(fast=True):
@@ -86,11 +84,9 @@ def donate_give_required_troops(required_troops):
     end_time = datetime.now() + timedelta(minutes=3)
     requests = find_many("donate", DONATE_BUTTONS, 0.8)
     while datetime.now() < end_time and len(required_troops) > 0:
-        # print("Donate - give", troop_str(required_troops))
         for x in requests:
             click_rect(x)
             time.sleep(0.4)
-            # print("Required troops", troop_str(required_troops))
             for x in required_troops:
                 if x.i_donate2.find() and x.i_donate2.check_colour():
                     x.i_donate2.image.click()
@@ -107,32 +103,6 @@ def check_troop_colour_donate(troop):
     rect_adj = [rect[0] + DONATE_AREA[0], rect[1] + DONATE_AREA[1], rect[2], rect[3], ]
     colour = check_colour_rect(rect_adj, show_image=False, text=troop.name)
     return colour
-
-# def donate_go_up():
-#     goto(chat)
-#     val, loc, rect = i_more_donates.find_detail()
-#     if val > i_more_donates.threshold:
-#         rect_adj = [rect[0] + DONATE_BUTTONS[0], rect[1] + DONATE_BUTTONS[1], rect[2], rect[3], ]
-#         click_rect(rect_adj)
-#         time.sleep(0.5)
-
-# def message():
-#     donator = donating_account()
-#     if donator == account_1: message = "The bot is on, request dragons, edrags, super barbs and log rollers"
-#     elif donator == account_2: message = "The bot is on, request dragons, edrags and super barbs"
-#     elif donator == account_3: message = "The bot is on, request dragons, edrags and super barbs"
-#     elif donator == account_4: message = "The bot is on, request dragons"
-#     else: return
-#     print("Clan message:", donator, message)
-#     message_send(message)
-
-# def message_send(text):
-#     goto(chat)
-#     if not i_new_message.click(): return
-#     time.sleep(0.1)
-#     pag.write(text)
-#     pag.press('enter')
-#     time.sleep(2)
 
 def print_training():
     for troop in troops:
@@ -169,12 +139,9 @@ def print_total_donations():
             print(f" - {troop.name}s: {troop.donations}")
 
 def donate_basic(account):
-    # print("Donate")
     goto(chat)
-    # i_accept.click()
     donate_buttons = i_donate.find_many()
-    # print("Donate request buttoms:", donate_buttons)
-    start_time = datetime.now()
+    print("Donate basic - buttons found:", len(donate_buttons))
     for x, y, w, h in donate_buttons:
         pag.click(x + w/2, y + h/2)
         region = (160, y - 150, 560, 120)
@@ -185,20 +152,12 @@ def donate_basic(account):
                 show_image = False
                 if troop == super_barb: show_image = False
                 val, loc, rect = find(troop.i_donate2.image, screen, troop.name, show_image=show_image)
-                # print("Donate basic:", troop.name, round(val,2), datetime.now() - start_time)
                 if val > 0.65:
                     count = 0
                     screen = get_screenshot(DONATE_AREA, colour=1)
                     image_colour = screen[rect[1]:rect[1]+rect[3], rect[0]:rect[0]+rect[2]]
                     colour = check_colour_screen(image_colour)
-                    # if not colour and account == account_1 and troop == log_thrower:
-                    #     new_attack_time = datetime.now() + timedelta(hours=1)
-                    #     for account in accounts:
-                    #         db_update(account, "attack", new_attack_time + timedelta(minutes=account.number * 5))
-                    #     print("No log-rollers - resetting attack times")
-                    # print(troop.name, val, colour)
                     while colour and count < 10:
-                        # print("Donate - clicking:", troop.name)
                         click(troop.i_donate2.image, DONATE_AREA)
                         troop.donations += 1
                         time.sleep(0.1)
@@ -208,8 +167,7 @@ def donate_basic(account):
                         colour = check_colour_screen(image_colour)
 
         i_donate_cross.click()
-        # print("Donate:", datetime.now() - start_time)
-        time.sleep(0.2)
+        time.sleep(0.1)
 
 def check_colour_screen(image):
     spots = [(1 / 4, 1 / 4), (1 / 4, 3 / 4), (3 / 4, 1 / 4), (3 / 4, 3 / 4), (7 / 8, 1 / 8), (0.95, 0.05)]
@@ -219,10 +177,8 @@ def check_colour_screen(image):
         pixel = image[int(y * s_y)][int(x * s_x)]
         blue, green, red = int(pixel[0]), int(pixel[1]), int(pixel[2])
         if abs(blue - green) > 5 or abs(blue - red) > 5: count += 1
-        # print("Check colour screen", blue, green, red, count)
     colour = False
     if count > 1: colour = True
-    # print("Check colour", colour)
     return colour
 
 def siege_prep(account):
@@ -241,17 +197,16 @@ def siege_prep(account):
                 x.start_train(required - actual, account=account)
 
 def army_prep(account, required_army, army_or_total="army", include_castle=False, include_backlog=True, troops_only=False, extra=False):
-    # print("Army prep")
-
     troops_to_build = []
 
     # Get required troops
     required_counter = Counter(required_army)
 
     # Get actual troops
+    print("Full count starting")
     actual_army_counter, actual_total_counter = full_count(account, include_castle=include_castle)
-    # print("Actual", actual_army_counter)
-    # print("Actual (total)", actual_total_counter)
+    # print_count("Actual", actual_army_counter)
+    # print_count("Actual (total)", actual_total_counter)
     if actual_army_counter == "Still training":
         print("Still training")
         return False, None

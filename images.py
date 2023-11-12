@@ -234,8 +234,12 @@ class Image():
         if show_image:
             show(self.image)
             show(screen)
-        result = cv2.matchTemplate(screen, self.image, method)
-        min_val, val, min_loc, loc = cv2.minMaxLoc(result)
+        try:
+            result = cv2.matchTemplate(screen, self.image, method)
+        except:
+            print("Find many failure:", screen.shape, self.image.shape)
+            return []
+        # min_val, val, min_loc, loc = cv2.minMaxLoc(result)
         # print("Find many:", self, val)
         yloc, xloc = np.where(result >= self.threshold)
         z = zip(xloc, yloc)
@@ -608,6 +612,8 @@ i_potion_small = Image(name="i_potion_small", file='images/super_boost/potion_sm
 i_activate = Image(name="activate", file="images/super_boost/activate.png")
 i_000 = Image(name="000", file="images/super_boost/000.png")
 i_000v2 = Image(name="000", file="images/super_boost/000v2.png")
+i_00 = Image(name="000", file="images/super_boost/00.png")
+i_00v2 = Image(name="000", file="images/super_boost/00v2.png")
 
 # Messages
 # i_new_message = Image(name="new_message", file="images/message/new_message.png")

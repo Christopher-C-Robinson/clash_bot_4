@@ -22,15 +22,24 @@ buildings_to_upgrade_b = [
     "mortar", "roaster", "tesla", "war_machine",
 ]
 
+def increase_next_suggested_build(account):
+    account.next_suggested_build += 1
+    if account.next_suggested_build == 4: account.next_suggested_build = 1
+    db_account_update(account.number, "next_suggested_build", account.next_suggested_build)
 
-def build():
+def build(account):
+    if not account.building: return
     builders = spare_builders()
     # print("Build - spare builders", builders)
     if builders == 0: return
+    remove_trees_main()
     goto_list_top("main")
-    i_suggested_upgrades.click(y_offset=40)
+    y_offset = account.next_suggested_build * 50
+    increase_next_suggested_build(account)
+    i_suggested_upgrades.click(y_offset=y_offset)
     time.sleep(0.3)
     if has_cash():
+        # multi_click([i_upgrade_button, ])
         multi_click([i_upgrade_button, i_build_confirm])
     else:
         print("Build - insufficient cash")
@@ -424,27 +433,47 @@ def remove_trees_main():
     are_builders_available = False
     for x in available_builders:
         if x.find_screen(screen=screen):
-            print(x.find_screen(screen=screen, return_result=True))
+            # print(x.find_screen(screen=screen, return_result=True))
             are_builders_available = True
     if not are_builders_available:
         # print("No builders available", i_builder_zero.find_detail())
         return
     for tree in trees_main:
-        if tree.find():
-            print("Found tree:", tree)
-            tree.click()
-            time.sleep(0.1)
-            i_tree_remove.click()
-        # wait for a builder
-        found, count = False, 0
-        while not found and count < 300:
-            screen = get_screenshot(region=BUILDER_ZERO_REGION, filename="builders")
-            for x in available_builders:
-                print(x, screen.shape, x.image.shape)
-                if x.find_screen(screen=screen):
-                    found = True
-            time.sleep(0.1)
-            count += 1
+        print("Looking for tree:", tree)
+        found_tree = True
+        while found_tree:
+            found_tree = False
+            if tree.find():
+                print("Found tree:", tree)
+                tree.click()
+                time.sleep(0.2)
+                result, _, _ = i_tree_remove.find_detail()
+                if result > i_tree_remove.threshold:
+                    i_tree_remove.click()
+                    found_tree = True
+                else:
+                    print("Remove tree not found", result)
+                    time.sleep(0.5)
+                    result, _, _ = i_tree_remove.find_detail()
+                    if result > i_tree_remove.threshold:
+                        i_tree_remove.click()
+                        found_tree = True
+
+            if not found_tree:
+                print("Continuing")
+                continue
+
+            print("Waiting for builder")
+            # wait for a builder
+            found, count = False, 0
+            while not found and count < 300:
+                screen = get_screenshot(region=BUILDER_ZERO_REGION, filename="builders")
+                for x in available_builders:
+                    # print(x, screen.shape, x.image.shape)
+                    if x.find_screen(screen=screen):
+                        found = True
+                time.sleep(0.1)
+                count += 1
 
 # file = "builder"
 # screen = cv2.imread(f'temp/builders.png', 0)
@@ -683,7 +712,7 @@ def create_build_image(account):
         image = np.concatenate((image, next_image), axis=0)
         # print("Val, y:", val, loc[1])
 
-    show(image, scale=0.5)
+    # show(image, scale=0.5)
     cv2.imwrite(f"temp/build_{account.number}.png", image)
 
 
@@ -762,16 +791,19 @@ def analyse_build_image(account, include_upgrading=True):
         total_time_heroes, total_time_towers, total_time_traps, total_time = timedelta(), timedelta(), timedelta(), timedelta()
     finished, count, tower_count = False, 0, 1
     excel_values = []
-    while not finished and count <= 60 and tower_count <= 100:
+    while count <= 60 and tower_count <= 100:
         current_y = current_y + gap
         if current_y + height > max_y:
-            finished = True
+            # print(current_y, max_y)
+            # print("Finished")
             break
         region = image[current_y: current_y + height]
+        # show(region)
         region_bw = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
         region_bw_mult = region_bw[:, 0:350]
         # show(region_bw_mult)
         tower_string, y = build_towers.read_screen(region_bw, return_y=True)
+        # print(tower_string)
         mult = build_towers_mult.read_one_screen(region_bw_mult)
         cost = build_towers_cost.read_screen(region_bw, return_number=True)
         tower_string = tower_string.replace("barracksbarracks", "barracks")
@@ -792,8 +824,7 @@ def analyse_build_image(account, include_upgrading=True):
             if tower.category == "hero": total_time_heroes += total_time_for_tower
             if tower.category == "defence": total_time_towers += total_time_for_tower
             if tower.category == "trap": total_time_traps += total_time_for_tower
-            print(f"{tower_count}. {tower_string} x{mult}",
-                  f"{cost:,.0f}. Total remaining time: {total_time_for_tower.days} days. [{tower.category}]")
+            print(f"{tower_count}. {tower_string} x{mult} {cost:,.0f}. Total remaining time: {total_time_for_tower.days} days. [{tower.category}]")
             tower_count += 1
             if current_level is None:
                 excel_values_one = [tower.name, "None", time_for_one_tower.days, mult, total_time_for_tower.days]
@@ -859,7 +890,20 @@ def remaining_time_for_th(account, delete_files=True):
         delete_build_files()
 
 
-# remaining_time_of_upgrading_towers(bob)
+# level = wizard_tower.get_level_from_cost(10200000)
+# print(level)
+
+# account = daen
+# set_current_account()
+# change_accounts_fast(account)
+# delete_build_files()
+# get_build_images(account)
+# create_build_image(account)
+# analyse_build_image(account, include_upgrading=False)
+# remaining_time_for_th(daz)
+# goto(pycharm)
+# analyse_build_image(bad_daz, include_upgrading=False)
+
 
 # for tower in towers: print(tower.name, tower.category)
 

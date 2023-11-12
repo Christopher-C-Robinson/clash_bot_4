@@ -153,6 +153,20 @@ def db_next_job():
     else:
         return result[0]
 
+def job_pause(account_number, job, minutes):
+    current_job_time = db_read(account_number, job)
+    requested_time = datetime.now() + timedelta(minutes=minutes)
+    selected_time = max(current_job_time, requested_time)
+    # print(current_job_time)
+    # print(requested_time)
+    # print(selected_time)
+    db_update(account_number, job, selected_time)
+    print("Pausing. Account:", account_number, "Job:", job, "Minutes", minutes, "New time", selected_time)
+    # print(db_read(account_number, job))
+
+
+
+# job_pause(1, "donate", 10)
 
 # db_create_table()
 # db_delete('all')
@@ -172,5 +186,6 @@ def db_next_job():
 # db_update(6, "attack", datetime.now())
 if __name__ == "__main__":
     db_view(no=100)
+    # pass
 
 # db_next_job()

@@ -69,6 +69,7 @@ class Tower():
 
     def get_level_from_cost(self, cost):
         for level in self.levels:
+            # print("Get level from cost", level.cost, cost)
             if level.cost >= cost:
                 next_level = level
                 return self.return_level(next_level.number - 1)
