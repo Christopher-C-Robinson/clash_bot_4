@@ -18,10 +18,10 @@ def empty_count():
     return count
 
 def print_count(label, count):
-    print(count)
     string = label + ": "
+    # print(count)
     for key in count:
-        print(key)
+        # print(key)
         if count[key] > 0:
             string += f"{key}:{count[key]}. "
     print(string)
@@ -115,8 +115,8 @@ def donate(account):
         db_update(account, "donate", datetime.now() + timedelta(days=1))
         return
     required_troops = donate_get_required_troops(account)
-    print("Required troops")
-    print(objects_to_str(required_troops))
+    # print("Required troops")
+    # print(objects_to_str(required_troops))
     queue_up_troops(account, extra_troops=required_troops)
     for account_x in accounts:
         if account_x.number > account.number and not account_x.has_siege and not account_x.mode == "donate" and admin.war_donations_remaining == 0:
@@ -129,8 +129,8 @@ def queue_up_troops(account, extra_troops=[]):
         troop.donations += 1
     account.update_troops_to_build()
     army_prep(account, account.troops_to_build, army_or_total="total")
-    if account.has_siege:
-        siege_prep(account)
+    # if account.has_siege:
+    #     siege_prep(account)
 
 def print_total_donations():
     print("\nTOTAL DONATIONS")
@@ -203,13 +203,14 @@ def army_prep(account, required_army, army_or_total="army", include_castle=False
     required_counter = Counter(required_army)
 
     # Get actual troops
-    print("Full count starting")
+    # print("Full count starting")
     actual_army_counter, actual_total_counter = full_count(account, include_castle=include_castle)
     # print_count("Actual", actual_army_counter)
     # print_count("Actual (total)", actual_total_counter)
     if actual_army_counter == "Still training":
         print("Still training")
         return False, None
+    # print("Army prep marker B")
     if army_or_total == "army": actual_troops = actual_army_counter
     else: actual_troops = actual_total_counter
 
@@ -219,6 +220,7 @@ def army_prep(account, required_army, army_or_total="army", include_castle=False
     print_count("Required", required_counter)
     sufficient_troops = True
     sufficient_spells = True
+    # print("Army prep marker C")
     for x in required_counter:
         if x.type == "siege" and not account.has_siege: continue
         if x and x.type != "hero":
@@ -232,7 +234,7 @@ def army_prep(account, required_army, army_or_total="army", include_castle=False
                 if x.type == "troop": sufficient_troops = False
                 if x.type == "spell": sufficient_spells = False
             troops_to_build += [x] * (required - actual)
-    print("Army prep - troops to build:", troop_str(troops_to_build))
+    # print("Army prep - troops to build:", troop_str(troops_to_build))
 
     if not sufficient_troops:
         # Delete unneeded troops
@@ -274,12 +276,12 @@ def troops_count_flex(tab, region, troops, count_dict={}, show_image=False, show
         if tab == army_tab:
             result, loc = troop.i_army.find_screen(screen, return_location=True, show_image=show_image)
             # print(troop, result)
-            if troop == lightening:
-                print("Lightening:", result)
+            # if troop == lightening:
+            #     print("Lightening:", result)
                 # show(troop.i_army.image)
                 # show(screen)
             if result:
-                print("Found:", troop)
+                # print("Found:", troop)
                 x = max(loc[0] - 30, 0)
                 numbers_image = screen[0: 75, x: x + 130]
                 result = troop_numbers.read_screen(numbers_image, return_number=True, show_image=show_image_numbers)
@@ -303,7 +305,7 @@ def troops_count_flex(tab, region, troops, count_dict={}, show_image=False, show
     return count_dict
 
 def full_count(account, include_castle=True):
-    # print("Full count - start")
+    print("Full count - start")
     count = empty_count()
     if still_training(account, just_troops=True): return "Still training", "Still training"
     count = troops_count_flex(army_tab, ARMY_EXISTING, just_troops, count)
@@ -317,7 +319,7 @@ def full_count(account, include_castle=True):
     if account.th >= 5:
         count = troops_count_flex(spells_tab, TRAINING_RANGE, spells, count)
     if account.has_siege:
-        count = troops_count_flex(siege_tab, TRAINING_RANGE_SIEGE, siege_troops, count)
+        count = troops_count_flex(siege_tab, TRAINING_RANGE_SIEGE, siege_troops, count, show_image=False)
     count_with_backlog = count
     return count_no_backlog, count_with_backlog
 
@@ -377,7 +379,7 @@ def request(account):
     # print("Request")
     goto(army_tab)
     val, loc, rect = i_army_request.find_detail()
-    print("Request: 'request' val", val)
+    # print("Request: 'request' val", val)
     if val > 0.7:
         if i_army_request.check_colour():
             i_army_request.click()
@@ -480,11 +482,15 @@ def castle_troops_remove(troops_to_remove):
 def castle_troops_add(to_add):
     if i_army_tab_cancel.find():
         i_army_tab_cancel.click()
+    if len(to_add) == 0: return
+    goto(army_tab)
+    if i_army_request.colours()[0] > 170: return
+
     goto(l_donation_request_selector)
 
     # Remove the previous troops
     remaining_troops, count = True, 0
-    while remaining_troops and count < 12:
+    while remaining_troops and count < 14:
         if i_remove_troops_castle.find():
             i_remove_troops_castle.click()
             count += 1

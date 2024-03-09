@@ -157,10 +157,6 @@ def run_job(job):
     if time_to_string(job_time) == "Now":
         if job_object: job_object.run(account)
 
-        # elif job == "sweep":
-        #     next_sweep = datetime.now() + (datetime.min - datetime.now()) % sweep_period
-        #     db_update(admin, "sweep", next_sweep)
-        #     sweep()
         elif job == "games":
             if not admin.games:
                 db_update(admin, "games", datetime.now() + timedelta(days=27))
@@ -168,14 +164,6 @@ def run_job(job):
             next_games = datetime.now() + timedelta(minutes=10)
             db_update(admin, "games", next_games)
             run_games()
-        # elif job == "lose_trophies":
-        #     change_accounts_fast(account)
-        #     if lose_trophies(account):  minutes = 5
-        #     else:                       minutes = 120
-        #     print(minutes)
-        #     job_time = datetime.now() + timedelta(minutes=minutes)
-        #     print("Run - lose trophies", datetime.now(), timedelta(minutes=minutes), job_time)
-        #     db_update(account, job, job_time)
         else:
             job_time = datetime.now() + timedelta(hours=24)
             db_update(account, job, job_time)
@@ -186,31 +174,49 @@ def run_job(job):
         except:
             print("Run job - couldn't set mode. Account:", account)
     else:
-        if admin.inviting: invite()
+        if admin.inviting and account.number <= 3:
+            change_accounts_fast(account)
+
+            print("Inviting", account, account.number)
+            try:    no_of_loops = min(49 - admin.no_of_members, 5)
+            except: no_of_loops = 1
+            if no_of_loops >= 1:
+                for x in range(no_of_loops):
+                    invite()
         update_image()
         rest_time = job_time - datetime.now()
-        if admin.tkinter:
-            return rest_time
-        elif admin.surveillance:
-            surveillance(donating_account(), job_time)
+        if admin.watch:
+            watch(rest_time.seconds)
         else:
             print("Rest time:", rest_time)
             goto(pycharm)
             print_info()
-            if rest_time > timedelta(): #Check that the rest_time calc is positive
+            if rest_time > timedelta(): # Check that the rest_time calc is positive
                 time.sleep(rest_time.seconds)
 
-def surveillance(account, end_time):
+def watch(dur=5):
+    account = donating_account()
+    if not account: account = bad_daz
+    start = datetime.now()
     change_accounts_fast(account)
     goto(main)
-    while datetime.now() < end_time:
-        result = chat_new.read_one(CHAT_NEW)
-        if result != "0":
-            donate(account)
+    val, loc, rect = i_open_chat.find_detail(fast=False)
+    x_adj, y_adj = 20, 10
+    offsets = [(-x_adj, -y_adj), (0,-y_adj), (x_adj,-y_adj), (x_adj,0), (x_adj,y_adj), (0,y_adj), (-x_adj,y_adj), (-x_adj,0) ]
+    x, y = loc
+    x_pos, y_pos = x, y
+
+    while datetime.now() < start + timedelta(seconds=dur):
+        for x_offset, y_offset in offsets:
+            delay = abs((x_pos - x - x_offset + y_pos - y - y_offset) / 100)
+            x_pos, y_pos = x + x_offset, y + y_offset
+            pag.moveTo(x_pos, y_pos, delay)
+        request_made = i_chat_flag.find()
+        if request_made:
+            j_donate.run(account)
             goto(main)
-        time.sleep(1)
-        if not i_tkinter.find():
-            i_gui_icon.click()
+        if i_reload_game.find():
+            i_reload_game.click()
 
 def db_view_next():
     db_str = "SELECT * FROM next ORDER BY account"
@@ -344,50 +350,3 @@ def get_time_build_b():
     print("Builder build time:", result)
     return result
 
-
-
-# def current_resources():
-#     time.sleep(.1)
-#     result = []
-#
-#     for region in [RESOURCES_G, RESOURCES_E, RESOURCES_D]:
-#         result_ind = resource_numbers.read(region)
-#         try:
-#             result.append(int(result_ind))
-#         except:
-#             result.append(0)
-
-    # for name, region in [(gold, RESOURCES_G), (elixir, RESOURCES_E), (dark, RESOURCES_D)]:
-    #     pag.screenshot(f'temp/current_{name}.png', region=region)
-    #     i = cv2.imread(f"temp/current_{name}.png", 0)
-    #     result_ind = read_resources(i)
-    #     try:
-    #         result_ind = int(result_ind)
-    #     except:
-    #         result_ind = 0
-
-    # print("Available Resources:", result)
-    #
-    # return result
-
-
-# def current_resources_old():
-#     time.sleep(.1)
-#     result = []
-#
-#     for name, region in [(gold, RESOURCES_G), (elixir, RESOURCES_E), (dark, RESOURCES_D)]:
-#         pag.screenshot(f'temp/current_{name}.png', region=region)
-#         i = cv2.imread(f"temp/current_{name}.png", 0)
-#         result_ind = read_resources(i)
-#         try:
-#             result_ind = int(result_ind)
-#         except:
-#             result_ind = 0
-#         result.append(result_ind)
-#
-#     print("Available Resources:", result)
-#
-#
-#     return result
-
-# clock()

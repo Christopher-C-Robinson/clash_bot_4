@@ -28,27 +28,53 @@ def increase_next_suggested_build(account):
     db_account_update(account.number, "next_suggested_build", account.next_suggested_build)
 
 def build(account):
-    if not account.building: return
     builders = spare_builders()
-    # print("Build - spare builders", builders)
+    print("Build - spare builders", builders)
     if builders == 0: return
     remove_trees_main()
+    if not account.building: return
     goto_list_top("main")
     y_offset = account.next_suggested_build * 50
     increase_next_suggested_build(account)
     i_suggested_upgrades.click(y_offset=y_offset)
     time.sleep(0.3)
-    if has_cash():
+    # if has_cash():
         # multi_click([i_upgrade_button, ])
-        multi_click([i_upgrade_button, i_build_confirm])
+    upgrade_1, loc, rect = i_upgrade_button.find_detail()
+    upgrade_2, loc, rect = i_upgrade_2_button.find_detail()
+    if upgrade_1 > upgrade_2:
+        i_upgrade_button.click()
+        # multi_click([i_upgrade_button, i_build_confirm_2])
     else:
-        print("Build - insufficient cash")
+        i_upgrade_2_button.click()
+        # multi_click([i_upgrade_2_button, i_build_confirm_2])
+    if has_cash():
+        i_confirm.click()
+    # else:
+    #     print("Build - insufficient cash")
 
 def has_cash():
-    result, loc, rect = i_upgrade_button.find_detail()
+    result, loc, rect = i_confirm.find_detail()
+    print("Has cash, i_confirm", result,loc,rect)
+    cash_rect = [rect[0] - 20, rect[1] + 50, rect[2], rect[3]]
+    image = get_screenshot(cash_rect, colour=1)
+    # show(image)
+    # print("Colour mean:", cv2.mean(image))
+    return cv2.mean(image)[0] > 130
+
+# Colour mean: (102.513357619915, 149.82999392835458, 192.66302367941714, 0.0)
+# Colour mean: (165.40437158469948, 207.59532483302976, 192.94231936854888, 0.0)
+
+def has_cash_old():
+    result, loc, rect = i_upgrade_button.find_detail(show_image=False, fast=False)
+    result_hero, loc_hero, rect_hero = i_upgrade_button.find_detail(show_image=False, fast=False)
+    if result_hero > result:
+        result, loc, rect = result_hero, loc_hero, rect_hero
+    # print("Colour rect:", rect, result)
     cash_rect = [rect[0], rect[1] - 105, rect[2], rect[3]]
     image = get_screenshot(cash_rect, colour=1)
-    # print(cv2.mean(image))
+    # show(image)
+    # print("Colour mean:", cv2.mean(image))
     return cv2.mean(image)[0] > 170
 
 
@@ -241,7 +267,7 @@ def identify_towers(village, all_upgrades, available_upgrades):
                     get_screenshot(tower_region, filename="temp_tower")
                     i = cv2.imread("temp/temp_tower.png", 1)
                     all_upgrades.append(tower)
-                    if tower == wall: show(i)
+                    # if tower == wall: show(i)
                     cash = has_cash_2(i)
                     print("Cash:", cash)
                     if cash:
@@ -439,7 +465,7 @@ def remove_trees_main():
         # print("No builders available", i_builder_zero.find_detail())
         return
     for tree in trees_main:
-        print("Looking for tree:", tree)
+        # print("Looking for tree:", tree)
         found_tree = True
         while found_tree:
             found_tree = False
@@ -460,7 +486,7 @@ def remove_trees_main():
                         found_tree = True
 
             if not found_tree:
-                print("Continuing")
+                # print("Continuing")
                 continue
 
             print("Waiting for builder")
@@ -474,20 +500,6 @@ def remove_trees_main():
                         found = True
                 time.sleep(0.1)
                 count += 1
-
-# file = "builder"
-# screen = cv2.imread(f'temp/builders.png', 0)
-# show(screen)
-
-# for x in available_builders:
-#     print(x, x.find_screen(screen=screen, return_result=True))
-
-# i_app.click()
-# time.sleep(0.1)
-# remove_trees_main()
-# time.sleep(0.1)
-# i_app.click()
-
 
 def remove_trees_old(village):
     zoom_out()
@@ -809,8 +821,11 @@ def analyse_build_image(account, include_upgrading=True):
         tower_string = tower_string.replace("barracksbarracks", "barracks")
         tower_string = tower_string.replace("bombbomb", "bomb")
         tower = return_tower(tower_string)
-        if mult != 0 and cost != 0 and str(mult) == str(cost)[0]:
-            cost = int(str(cost)[1:])
+        try:
+            if mult != 0 and cost != 0 and str(mult) == str(cost)[0]:
+                cost = int(str(cost)[1:])
+        except:
+            pass
         if mult == 0 or not mult: mult = 1
         if y: current_y += y
         if len(tower_string) > 0 and tower is not None:
@@ -890,38 +905,3 @@ def remaining_time_for_th(account, delete_files=True):
         delete_build_files()
 
 
-# level = wizard_tower.get_level_from_cost(10200000)
-# print(level)
-
-# account = daen
-# set_current_account()
-# change_accounts_fast(account)
-# delete_build_files()
-# get_build_images(account)
-# create_build_image(account)
-# analyse_build_image(account, include_upgrading=False)
-# remaining_time_for_th(daz)
-# goto(pycharm)
-# analyse_build_image(bad_daz, include_upgrading=False)
-
-
-# for tower in towers: print(tower.name, tower.category)
-
-# file = f"temp/tracker/time{6}.png"
-# i = cv2.imread(file, 1)
-# i = add_green_border(i)
-# show(i)
-
-
-
-# create_build_image(bob)
-
-# print(analyse_build_image(bob))
-
-
-# account = account_3
-# print(account.th)
-# create_build_image(jon)
-# remaining_time_for_th(jon)
-# analyse_build_image(account)
-# goto(pycharm)

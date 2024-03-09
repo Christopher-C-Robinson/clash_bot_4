@@ -14,8 +14,10 @@ def read_troops():
     troops_db = []
     output = []
     row = 1
-    for col in range(3, last_col):
+    # print(last_col)
+    for col in range(3, last_col + 1):
         troop_string = ws.cell(row, col).value
+        # print(troop_string)
         troop = get_troop(troop_string)
         troops_db.append(troop)
         # print(troop)

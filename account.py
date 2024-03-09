@@ -4,7 +4,7 @@ from sql_account import *
 from utilities import *
 from read_troops import troop_db
 
-trophy_limits = {0: 0, 1: 100, 2: 200, 3: 300, 4: 400, 5: 500, 6: 600, 7: 1300, 8: 1000, 9: 1200, 10: 1400, 11: 1600, 12: 1800, 13: 2000, 14: 2000, 15: 2500}
+trophy_limits = {0: 0, 1: 100, 2: 200, 3: 300, 4: 400, 5: 500, 6: 600, 7: 1300, 8: 1000, 9: 1200, 10: 1400, 11: 1600, 12: 1800, 13: 2000, 14: 2000, 15: 2000}
 
 accounts = []
 
@@ -18,16 +18,26 @@ def extend_string(string, length):
         string = string + " " * extra_spaces
     return string
 
-def get_donation_troops():
+def get_donation_troops(account):
     # Troops
     donation_troops = []
     for troop in troops:
-        if troop.donations > 0 and troop.type != "siege" and troop != super_minion:
+        if troop.donations > 0 and troop.type != "siege" and troop != super_minion and troop != super_dragon:
             for x in range(troop.donation_count):
                 donation_troops.append(troop)
 
-    if admin.war_donations_remaining and admin.war_donations_remaining > 0:
-        donation_troops += [lava_hound] * 6
+    if admin.war_donations_remaining and admin.war_donations_remaining > 0 and account.number == 1:
+        print("Get donation troops - adding lava hounds", account.number)
+        donation_troops += [lava_hound] * 3
+
+    if admin.mode in ["cwl", "battle_day"] and account in war_participants:
+        print("Get donation troops - adding dragons", account, admin.mode)
+        donation_troops += [lava_hound] * 6 + [freeze] * 7 + [lightening] * 2
+
+    if admin.mode in ["cwl", "preparation"] and account in war_participants:
+        print("Get donation troops - adding dragons", account, admin.mode)
+        donation_troops += [lava_hound] * 6 + [lava_hound] * 6
+
 
     # Siege equipment
     # donation_siege = [x for x in troops if x.type == 'siege' and x.donations > 0]
@@ -87,13 +97,14 @@ class Account:
         # self.siege_troops = data['siege_troops']
 
         self.donations_from = data['donations_from']
-        self.games_troops = data['games_troops']
+        # self.games_troops = data['games_troops']
         self.army_troops_b = data['army_troops_b']
         icon = data['icon']
-        self.icon = Image(icon, f"images/accounts/{icon}.png", threshold=0.84)
+        # print("Account set up:", self, icon)
+        self.icon = Image(name=icon, file=f"images/accounts/{icon}.png", threshold=0.84)
         # self.icon_b = Image(icon, f"images/accounts/{icon}_b.png", threshold=0.84)
         # icon2 = data['icon2']
-        self.icon2 = Image(icon + "_2", f"images/accounts/{icon}_2.png", threshold=0.84)
+        self.icon2 = Image(name=icon + "_2", file=f"images/accounts/{icon}_2.png", threshold=0.84)
         self.troops_to_build = None
         self.attacking = data['attacking']
         self.attacking_b = data['attacking_b']
@@ -140,13 +151,18 @@ class Account:
         if self.attacks_left != pre: admin.war_donations_remaining = -1
 
         self.mode = "donate"
-        if self.attacking:                                                         self.mode = "attack"
-        elif admin.mode == "preparation" and admin.war_donations_remaining == 0:   self.mode = "war_troops"
-        elif admin.mode == "battle_day" and self.attacks_left:                     self.mode = "war_troops"
-        elif admin.mode == "cwl" and admin.war_donations_remaining == 0:           self.mode = "cwl_troops"
+        if self.attacking:
+            # print("Admin remaining", admin.war_donations_remaining)
+            if admin.war_donations_remaining and admin.war_donations_remaining > 0 and self in war_participants: self.mode = "donate"
+            else:                                                                   self.mode = "attack"
+        elif admin.mode == "preparation" and admin.war_donations_remaining == 0:    self.mode = "war_troops"
+        elif admin.mode == "battle_day" and self.attacks_left:                      self.mode = "war_troops"
+        elif admin.mode == "cwl" and admin.war_donations_remaining == 0:            self.mode = "cwl_troops"
         if self not in war_participants:
             self.mode = "donate"
             if self.attacking:                                                     self.mode = "attack"
+        else:
+            if admin.war_donations_remaining and admin.war_donations_remaining > 0:                                  self.mode = "donate"
         if self == donating_account():                                             self.mode = "donate"
 
         if self.mode != start_mode:
@@ -161,17 +177,17 @@ class Account:
             self.attacks_left = False
 
     def update_troops_to_build(self):
-        donation_troops = get_donation_troops()
+        donation_troops = get_donation_troops(self)
         # if self.has_siege: donation_troops += donation_siege
         # print("Update troops to build", self, self.mode, self.has_siege, donation_troops, donation_siege)
-        print("Updating troops to build:", self, self.mode)
+        # print("Updating troops to build:", )
 
         if self.mode in ["war_troops", ]: self.troops_to_build = self.war_troops + self.siege_troops
         elif self.mode in ["cwl_troops", ]: self.troops_to_build = self.cwl_troops + self.siege_troops
         elif self.mode in ["donate", ]: self.troops_to_build = donation_troops + self.siege_troops
-        else: self.troops_to_build = self.convert_attack_to_troops(self.army_troops) + self.siege_troops
+        else: self.troops_to_build = attack_troops_required(self.army_troops) + self.siege_troops
 
-        print("Update troops to build:\n", objects_to_str(self.troops_to_build))
+        print(f"Update troops to build: {self} {self.mode}\n", objects_to_str(self.troops_to_build))
 
         for troop in self.troops_to_build:
             if type(troop) != type(super_barb): self.troops_to_build.remove(troop)
@@ -182,8 +198,8 @@ class Account:
             troops_required += [x] * no * data['troop_groups']
 
         troops_required += data['spells']
-        if self.has_siege:
-            troops_required += [siege_troops]
+        # if self.has_siege:
+        #     troops_required += [siege_troops]
 
         return troops_required
 
@@ -329,16 +345,16 @@ class Account:
         text += str(self.mode)
         text = extend_string(text, 30)
         if self.gold and self.total_gold > 0: text += f"Gold {int(round(self.gold / self.total_gold, 2) * 100)}% "
-        text = extend_string(text, 40)
-        if self.dark and self.total_dark > 0: text += f"Dark {int(round(self.dark / self.total_dark, 2) * 100)}% "
-        text = extend_string(text, 52)
-        text += f"War goals {self.war_goals()} "
-        text = extend_string(text, 80)
-        if self.building: text += f"Build {time_to_string(self.next_build)} "
-        text = extend_string(text, 102)
-        if self.building_b: text += f"Build_b {time_to_string(self.next_build_b)} "
-        text = extend_string(text, 122)
-        text += f"Research {time_to_string(self.next_research)} "
+        # text = extend_string(text, 40)
+        # if self.dark and self.total_dark > 0: text += f"Dark {int(round(self.dark / self.total_dark, 2) * 100)}% "
+        # text = extend_string(text, 52)
+        # text += f"War goals {self.war_goals()} "
+        # text = extend_string(text, 80)
+        # if self.building: text += f"Build {time_to_string(self.next_build)} "
+        # text = extend_string(text, 102)
+        # if self.building_b: text += f"Build_b {time_to_string(self.next_build_b)} "
+        # text = extend_string(text, 122)
+        # text += f"Research {time_to_string(self.next_research)} "
         print(text)
         return text
 
@@ -465,7 +481,7 @@ def update_images(account, create=False):
     goto(main)
     pag.click(BOTTOM_LEFT)
     i_builder.click()
-    data = [(BUILDER_ZERO_REGION, "builders"), (BUILDER_LIST_TIMES, "time"), (RESOURCES_G, "gold")]
+    data = [(BUILDER_ZERO_REGION, "builders"), (RESEARCH_ZERO_REGION, "research"), (BUILDER_LIST_TIMES, "time"), (RESOURCES_G, "gold")]
     for region, name in data:
         image = get_screenshot(region, colour=1)
         cv2.imwrite(f'temp/tracker/{name}{account.number}.png', image)
@@ -492,6 +508,7 @@ def update_image():
 
         cv2.putText(i_name, account.name, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, colour, 2, cv2.LINE_AA)
         i_builders = cv2.imread(f'temp/tracker/builders{no}.png', 1)
+        i_research = cv2.imread(f'temp/tracker/research{no}.png', 1)
         i_time = cv2.imread(f'temp/tracker/time{no}.png', 1)
         if account.number == account_to_highlight:
             i_time = add_green_border(i_time)
@@ -505,14 +522,17 @@ def update_image():
         if account.completion_string:
             cv2.putText(i_completion_text, account.completion_string, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
-        combined = combine_image_horizontal([i_mode, i_name, i_builders, i_time, i_gold, i_completion_date, i_completion_text])
+        combined = combine_image_horizontal([i_mode, i_name, i_research, i_builders, i_time, i_gold, i_completion_date, i_completion_text])
         account_images.append(combined)
         max_width = max(max_width, combined.shape[1])
 
     # Header
     header = np.zeros((50, 400, 3), np.uint8)
     time_string_now = datetime.now().strftime("%I:%M") + datetime.now().strftime("%p").lower()
-    time_string_build = next_build.strftime("%I:%M") + next_build.strftime("%p").lower()
+
+    time_string_build = ""
+    if next_build: time_string_build = next_build.strftime("%I:%M") + next_build.strftime("%p").lower()
+
     time_string = time_string_now + " => " + time_string_build
     cv2.putText(header, time_string, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
@@ -543,7 +563,7 @@ def get_account_to_highlight():
         if x == 1:
             shortest_time = result
             shortest_time_account = 1
-        elif result and result < shortest_time:
+        elif result and shortest_time and result < shortest_time:
             shortest_time = result
             shortest_time_account = x
     # print(shortest_time_account, shortest_time)
@@ -576,13 +596,27 @@ def is_image_old(file, limit_minutes):
     result = time_since_modification > timedelta(minutes=limit_minutes)
     return result
 
-def get_coin(account):
+def get_coin():
     for image in resource_images_main:
         if image.find(fast=True): image.click()
     if i_coin_on_main_screen.find():
         for x in [i_coin_on_main_screen, i_coin_collect, i_red_cross_coin]:
             x.click()
             time.sleep(0.1)
+
+def get_gems():
+    goto(builder)
+    for image in resource_images_builder + [i_clock_1, i_clock_2, i_clock_3]:
+        if image.find(fast=False):
+            image.click()
+            print("Clicking", image)
+
+        else:
+            print("Get gems (not found):", image, image.find_detail())
+        time.sleep(0.5)
+    click(BOTTOM_LEFT)
+    goto(main)
+
 
 a = ["barracks", "camp", "clan_castle", "spell", "lab", "pet_house"]
 h = ["champ", "king", "queen", "warden", ]
@@ -604,9 +638,10 @@ account_data_1 = {
     'th': 15,
     'has_siege': True,
     'requires_siege': True,
-    'building': False,
+    'building': True,
     'building_b': False,
     'total_gold': 20000000,
+    # 'total_gold': 8000000,
     'total_elixir': 20000000,
     'total_dark': 350000,
     'army_troops': BARBS_64,
@@ -614,9 +649,8 @@ account_data_1 = {
     'war_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8,
     'cwl_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [bloon] * 4,
     'clan_troops_war': [dragon] + [edrag] + [lightening] * 3 + [log_thrower],
-    'siege_troops': [log_thrower] * 5 + [flinger],
+    # 'siege_troops': [log_thrower] * 4 + [flinger, drill],
     'donations_from': 2,
-    'games_troops': BARBS_60_GAMES,
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "bad_daz",
@@ -635,7 +669,7 @@ account_data_2 = {
     'requires_siege': True,
     'building': True,
     'building_b': False,
-    'total_gold': 14000000,
+    'total_gold': 17000000,
     'total_elixir': 10000000,
     'total_dark': 200000,
     'army_troops': BARBS_60,
@@ -643,9 +677,8 @@ account_data_2 = {
     'war_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8,
     'cwl_troops': [edrag] * 2 + [dragon] * 12 + [lightening] * 3 + [freeze] * 8 + [edrag] * 2 + [bloon] * 4,
     'clan_troops_war': [dragon] * 2 + [lightening] * 2 + [log_thrower],
-    'siege_troops': [log_thrower] * 5 + [ram],
+    # 'siege_troops': [log_thrower] * 5 + [ram],
     'donations_from': 1,
-    'games_troops': GIANT240_GAMES,
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "daz",
@@ -659,8 +692,8 @@ account_data_2 = {
 account_data_3 = {
     'name': "Bob",
     'number': 3,
-    'th': 12,
-    'has_siege': False,
+    'th': 13,
+    'has_siege': True,
     'requires_siege': True,
     'building': True,
     'needs_walls': False,
@@ -677,19 +710,18 @@ account_data_3 = {
     'clan_troops_war': [dragon] * 2 + [lightening] * 2 + [log_thrower],
     'siege_troops': [ram, blimp, slammer] * 2,
     'donations_from': 1,
-    'games_troops': GIANT200_GAMES,
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "bob",
     'build_sets': old_th_h,
     'researching': True,
-    'attacking_b': False,
+    'attacking_b': True,
 }
 
 account_data_4 = {
     'name': "Crusher",
     'number': 4,
-    'th': 11,
+    'th': 12,
     'has_siege': False,
     'requires_siege': True,
     'building': True,
@@ -707,7 +739,6 @@ account_data_4 = {
     'war_donations': [dragon] * 20 + [lightening] * 14,
     'siege_troops': [],
     'donations_from': 1,
-    'games_troops': GIANT200_GAMES,
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "crusher",
@@ -719,14 +750,14 @@ account_data_4 = {
 account_data_5 = {
     'name': "Daenerys",
     'number': 5,
-    'th': 11,
+    'th': 12,
     'has_siege': False,
     'requires_siege': True,
     'building': True,
     'needs_walls': True,
     'attacking': True,
     'building_b': False,
-    'total_gold': 9500000,
+    'total_gold': 10000000,
     'total_elixir': 22000,
     'total_dark': 160000,
     'army_troops': BARBS_52,
@@ -737,13 +768,12 @@ account_data_5 = {
     'war_donations': [dragon] * 20 + [lightening] * 14,
     'siege_troops': [],
     'donations_from': 1,
-    'games_troops': GIANT200_GAMES,
     'army_troops_b': troops4,
     'required_currency': "gold",
     'icon': "daenerys",
     'build_sets': old_th_h,
     'researching': False,
-    'attacking_b': False,
+    'attacking_b': True,
 }
 
 
@@ -786,7 +816,8 @@ daen = account_5
 #     print(troop)
 
 
-war_participants = [bad_daz, daz, bob, jon, daen]
+# war_participants = [bad_daz, daz, bob, daen, micah]
+war_participants = [daen, bob, daz]
 
 current_account = None
 

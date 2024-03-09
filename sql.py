@@ -176,8 +176,6 @@ def job_pause(account_number, job, minutes):
 # update_entries()
 # db_view()
 # add_entries()
-# for x in [account_3,]:
-#     db_update(x, "attack", datetime.now() + timedelta(minutes=3))
 # add_entries_all()
 # db_delete_job("'attack_b'")
 

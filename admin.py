@@ -8,7 +8,7 @@ class Admin:
         self.inviting = True
         self.games = False
         self.auto = True
-        self.surveillance = False
+        self.watch = True
         self.tkinter = False
         self.log_rollers = True
         self.has_prepped_for_war = False
@@ -18,6 +18,8 @@ class Admin:
         self.goto_depth = 0
         self.missing_images = 0
         self.th_loc = None
+        self.army_slide = 1
+        self.no_of_members = 0
 
 admin = Admin()
 

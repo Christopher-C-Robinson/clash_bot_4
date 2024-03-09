@@ -11,8 +11,10 @@ list_of_new_images = []
     # "barb", "bomber", "giant", "pekka", "machine",
 # ]
 class Image():
-    def __init__(self, name, file, threshold=0.79, always_slow=False, no_of_regions=5, region_limit=None, type=None, screen=None, level=None):
+    def __init__(self, file, name=None, threshold=0.79, always_slow=False, no_of_regions=5, region_limit=None, type=None, screen=None, level=None):
+        if not name: name = file
         self.name = name
+        self.image = None
         if not os.path.isfile(file):
             if "troops" in file:
                 try:
@@ -24,8 +26,9 @@ class Image():
                 except:
                     self.image = None
                     admin.missing_images += 1
-                    print(f"{admin.missing_images}. No file for:", name)
+                    print(f"{admin.missing_images}. No troop file for:", name)
         else:
+            # print("Set up image (file found):", self, file)
             self.image = cv2.imread(file, 0)
         self.regions = []
         self.region_limit = region_limit
@@ -40,7 +43,10 @@ class Image():
         images.append(self)
 
     def __str__(self):
-        return self.name
+        if self.name:
+            return self.name
+        else:
+            return "No name provided"
 
     def add_loc(self, loc):
         self.loc = loc
@@ -51,14 +57,15 @@ class Image():
             cv2.rectangle(screen, rectangle, (255, 0, 0), 3)
         show(screen, scale=0.6)
 
-    def click(self, button="left", y_offset=0):
+    def click(self, button="left", y_offset=0, show_loc=False):
         val, loc, rect = self.find_detail(fast=True)
         if val < self.threshold:
             val, loc, rect = self.find_detail(fast=False, show_image=False)
         if val > self.threshold:
             loc = (max(loc[0], LIMITS[0]), loc[1] + y_offset)
             if button == "left":
-                # print("Click left:", loc)
+                if show_loc:
+                    print("Click left:", loc)
                 pag.click(loc)
             else:
                 pag.moveTo(loc)
@@ -96,8 +103,10 @@ class Image():
         if val > self.threshold: return True
         return False
 
-    def find(self, show_image=False, fast=False):
+    def find(self, show_image=False, fast=False, show_result=False):
         val, loc, rect = self.find_detail(show_image=show_image, fast=fast)
+        if show_result:
+            print("Find:", val, self.threshold, val > self.threshold, loc)
         return val > self.threshold
 
     def check_colour(self, fast=False):
@@ -116,20 +125,25 @@ class Image():
         if count > 1: colour = True
         return colour
 
-    def colour(self):
+    def colour(self, show_image=False):
         val, loc, rect = self.find_detail(fast=False)
         image = get_screenshot(rect, colour=1)
         if image is None: return False
+        if show_image: show(image)
         y, x, channels = image.shape
-        # show(image)
         spots = [(1 / 4, 1 / 4), (1 / 4, 3 / 4), (3 / 4, 1 / 4), (3 / 4, 3 / 4), (7 / 8, 1 / 8), (0.95, 0.05)]
         colour = 0
-        image_name = "i_war_right"
         for s_x, s_y in spots:
             pixel = image[int(y * s_y)][int(x * s_x)]
             blue, green, red = int(pixel[0]), int(pixel[1]), int(pixel[2])
             colour += abs(blue - green) + abs(blue - green) + abs(red - green)
         return colour
+
+    def colours(self):
+        val, loc, rect = self.find_detail(fast=False)
+        image = get_screenshot(rect, colour=1)
+        if image is None: return False
+        return cv2.mean(image)
 
     def find_detail(self, show_image=False, fast=False):
         if self.image is None:
@@ -182,6 +196,8 @@ class Image():
             region_limit_x = self.region_limit[0]
             region_limit_y = self.region_limit[1]
 
+        # print("Region limit:", self, region_limit_x, region_limit_y)
+
         rect = (loc[0] + region_limit_x, loc[1] + region_limit_y, self.image.shape[1], self.image.shape[0])
         loc = (int(rect[0] + rect[2] / 2 + region_limit_x), int(rect[1] + rect[3] / 2 + region_limit_y))
         region = [max(rect[0] - 1, 0), max(rect[1] - 1, 0), rect[2] + 2, rect[3] + 2]
@@ -194,7 +210,7 @@ class Image():
         db_image_update(self, val > self.threshold)
         return round(val,2), loc, rect
 
-    def find_screen(self, screen, show_image=False, return_detail=False, return_location=False, return_result=False):
+    def find_screen(self, screen, show_image=False, return_location=False, return_result=False):
         if self.image is None:
             print("Find - No image provided:", self.name)
             return False, (0, 0)
@@ -376,12 +392,14 @@ i_close_app = Image(name="i_close_app", file='images/nav/close_app.png', thresho
 i_boat_to = Image(name="i_boat_to", file='images/nav/boat_to.png')
 i_boat_back = Image(name="i_boat_back", file='images/nav/boat_back.png', threshold=0.75)
 i_builder = Image(name="i_builder", file='images/nav/builder.png')
-i_challenge = Image(name="i_challenge", file='images/nav/challenge.png')
+i_builder_goblin = Image(file='images/nav/builder_goblin.png')
 i_change_accounts_button = Image(name="i_change_accounts_button", file='images/nav/change_accounts_button.png')
 i_chat = Image(name="i_chat", file='images/nav/chat.png')
+i_chat_flag = Image(file='images/donate/chat_flag.png', threshold=0.9)
 i_donate_troops = Image(name="donate_troops", file="images/nav/donate_troops.png")
 i_close_chat = Image(name="i_close_chat", file='images/nav/close_chat.png')
 i_open_chat = Image(name="i_open_chat", file='images/nav/open_chat.png')
+i_challenge = Image(name="i_challenge", file='images/nav/challenge.png')
 i_close_close = Image(name="i_close_close", file='images/nav/close_close.png')
 i_close_cross = Image(name="i_close_cross", file='images/nav/close_cross.png')
 i_coin = Image(name="i_coin", file='images/nav/coin.png')
@@ -527,7 +545,10 @@ i_chopper = Image(name="chopper", file="images/attack_b/chopper.png")
 # i_cannon = Image(name="cannon", file="images/attack_b/cannon_b.png")
 # i_pekka = Image(name="pekka", file="images/attack_b/pekka.png")
 i_attack_screen_resources = Image(name="attack screen resources", file="images/attack_screen_resources.png")
+i_king_activate = Image(name="king_activate", file="images/troops/king_activate.png")
+i_queen_activate = Image(name="queen_activate", file="images/troops/queen_activate.png")
 i_warden_activate = Image(name="warden_activate", file="images/troops/warden_activate.png")
+i_champ_activate = Image(name="champ_activate", file="images/troops/champ_activate.png")
 
 # War
 i_war = Image(name="i_war", file='images/war/war.png', threshold=0.76)
@@ -545,6 +566,7 @@ i_war_battle_day = Image(name="i_battle_day", file='images/war/battle_day.png')
 # i_war_battle_day_2 = Image(name="i_battle_day_2", file='images/war/battle_day_2.png')
 i_war_left = Image(name="i_war_left", file='images/war/left.png', threshold=0.7, region_limit=[415, 700, 500, 240])
 i_war_right = Image(name="i_war_right", file='images/war/right.png')
+i_war_right_2 = Image(name="i_war_right_2", file='images/war/right_2.png')
 i_war_donate = Image(name="i_war_donate", file='images/war/donate.png')
 i_war_request = Image(name="i_war_request", file='images/war/war_request.png')
 i_war_donate_reinforcements = Image(name="i_war_donate_reinforcements", file='images/war/donate_reinforcements.png', threshold=0.7)
@@ -565,7 +587,11 @@ i_challenge_start = Image(name="challenge_start", file="images/challenge/challen
 i_builder_zero = Image(name="i_builder_zero", file='images/builder_zero.png', threshold=0.75, region_limit=[744, 79, 198, 32])
 i_builder_one = Image(name="i_builder_one", file='images/builder_one.png', threshold=0.75)
 i_upgrade_button = Image(name="i_upgrade_button", file='images/upgrade.png', threshold=0.7)
+i_upgrade_2_button = Image(name="i_upgrade_button", file='images/upgrade_2.png', threshold=0.7)
+i_confirm = Image(file='images/upgrade/confirm.png')
+i_upgrade_hero_button = Image(name="i_upgrade_hero_button", file='images/upgrade_hero.png', threshold=0.7)
 i_build_confirm = Image(name="build_confirm", file="images/builder/build_confirm.png")
+i_build_confirm_2 = Image(name="build_confirm", file="images/builder/build_confirm_2.png")
 i_suggested_upgrades = Image(name="i_suggested_upgrades", file='images/towers/suggested_upgrades.png')
 i_upgrades_in_progress = Image(name="i_upgrades_in_progress", file='images/towers/upgrades_in_progress.png')
 
@@ -585,12 +611,25 @@ i_castle_remove = Image(name="i_castle_remove", file='images/castle/castle_remov
 i_castle_confirm = Image(name="i_castle_confirm", file='images/castle/castle_confirm.png')
 i_castle_send = Image(name="i_castle_send", file='images/castle/castle_send.png')
 i_army_tab_cancel = Image(name="army_tab_cancel", file="images/nav/army_tab_cancel.png")
+
 # Members
-# i_accept = Image(name="i_accept", file="images/members/accept_member.png")
 i_perks = Image(name="i_perks", file="images/members/perks.png")
 i_my_clan = Image(name="i_my_clan", file="images/nav/my_clan.png")
-# i_promote_coleader = Image(name="i_promote_coleader", file="images/members/promote_coleader.png")
-# i_promote_elder = Image(name="i_promote_elder", file="images/members/promote_elder.png")
+i_war_league_on = Image(name="i_war_league_on", file="images/nav/war_league_on.png")
+i_war_classic_on = Image(name="i_war_classic_on", file="images/nav/war_classic_on.png")
+i_war_classic_off = Image(name="i_war_classic_off", file="images/nav/war_classic_off.png")
+i_war_league_on = Image(name="i_war_league_on", file="images/nav/war_league_on.png")
+i_warlog = Image(name="warlog", file="images/nav/warlog.png")
+i_war_details = Image(file="images/nav/war_details.png")
+i_war_details_map = Image(file="images/nav/war_details_map.png")
+i_view_map = Image(file="images/nav/view_map.png")
+i_war_results = Image("images/nav/war_results.png")
+i_war_stats_on = Image("images/nav/war_stats_on.png")
+i_war_team_on = Image("images/nav/war_team_on.png")
+i_war_team_off = Image("images/nav/war_team_off.png")
+
+i_war_star = Image("images/members/war_star.png")
+
 i_find_new_members = Image(name="i_find_new_members", file="images/people/find_new_members.png")
 i_profile_star = Image(name="i_profile_star", file="images/nav/profile_star.png")
 i_my_clan_tab = Image(name="my_clan_tab", file="images/nav/my_clan_tab.png")
@@ -639,6 +678,9 @@ i_tree_remove = Image(name="remove_tree", file="images/trees/remove_tree.png")
 # Image groups
 resource_images_main = create_image_group("resources/main")
 resource_images_builder = create_image_group("resources/builder")
+i_clock_1 = Image(file="images/resources/clock/clock_1.png")
+i_clock_2 = Image(file="images/resources/clock/clock_2.png")
+i_clock_3 = Image(file="images/resources/clock/clock_3.png")
 carts = create_image_group('attack_b/carts', threshold=0.7)
 castles = create_image_group("towers/castles/")
 trees_main = create_image_group("trees/main", threshold=0.80)
@@ -647,7 +689,14 @@ available_builders = create_image_group("builder/available_builders", threshold=
 
 
 town_halls = create_image_group("towers/town_halls/", add_levels=True)
-eagles = create_image_group("towers/eagles/", add_levels=False)
+eagles = create_image_group("towers/eagles/")
+monoliths = create_image_group("towers/monoliths/")
+air_defences = create_image_group("towers/air_defence/")
+single_infernoes = create_image_group("towers/inferno_single/")
+multi_infernoes = create_image_group("towers/inferno_multi/")
+cross_bowes = create_image_group("towers/cross_bowes")
+scattershots = create_image_group("towers/scattershots")
+queen_towers = create_image_group("towers/queen_towers")
 
 town_halls_b = create_image_group("attack_b/th_b", add_levels=False)
 
@@ -718,6 +767,9 @@ def merge_regions():
             count +=1
     return count
 
+def app():
+    i_app.click()
+
 def shrink_images(directory):
     files = os.listdir(directory)
     for file in files:
@@ -731,6 +783,8 @@ def shrink_images(directory):
 
 for i in images:
     i.merge_regions()
+
+
 
 # for i in war_castles:
 #     print(i, i.no_of_regions, len(i.regions))

@@ -37,8 +37,6 @@ troops1 = ["edrag"] * 8 + ["dragon"] * 2 + ["lightening"] * 11
 troops2 = ["dragon"] * 12 + ["balloon"] + ["lightening"] * 11
 data = [(1, troops1), (2, troops2)]
 
-
-
 def remove_clan_troops():
     goto(army_tab)
     i_army_edit.click()
@@ -116,7 +114,7 @@ def war_get_status_image():
     time.sleep(2)
     get_screenshot(WAR_BANNER, filename=f"tracker/war_banner")
     get_screenshot(WAR_INFO, filename=f"tracker/war_info")
-    print("Saved war banner")
+    # print("Saved war banner")
 
 def set_admin_mode():
     # change_accounts_fast(account_1)
@@ -135,6 +133,9 @@ def set_admin_mode():
         # if i_cwl_last_day.find(): status = "battle_day"
     elif i_clan_wars.find(fast=False): status = "no war"
     # elif i_clan_wars_2.find(fast=False): status = "no war"
+    if status == "battle_day" and admin.mode != "battle_day":
+        for account in accounts:
+            db_update(account, "war_troops", datetime.now() + timedelta(minutes=1))
     admin.mode = status
     print("Set admin mode:", admin.mode)
     if status in ["preparation", "cwl"]:
@@ -203,18 +204,32 @@ def print_troop_count(troops):
 def count_remaining_donations(cwl=False):
     if admin.war_donations_remaining == 0: return 0
     result = goto_war_castle(cwl=cwl)
+    print("Count remaining donations. Result from goto war castle:", result)
     if not result: return
     remaining_total = 0
     still_moving, count = True, 0
     required_troops = []
+    time.sleep(0.3)
     while still_moving and count < 50:
         remaining, total = remaining_donations()
-        required_troops += get_required_troops(remaining, total)
+        # required_troops += get_required_troops(remaining, total)
         print(remaining, total)
         remaining_total += remaining
 
-        if i_war_right.colour() < 800: still_moving = False
-        i_war_right.click()
+        result_1 = i_war_right.find_detail()[0]
+        result_2 = i_war_right_2.find_detail()[0]
+        if result_1 > result_2:
+            image_to_use = i_war_right
+            # print("Using image 1")
+        else:
+            image_to_use = i_war_right_2
+            # print("Using image 2")
+
+        colour = image_to_use.colour(show_image=False)
+        if count > 2 and colour < 800:
+            print(colour)
+            still_moving = False
+        image_to_use.click(show_loc=True)
         # pag.moveTo(1400,800)
         time.sleep(0.1)
         count += 1
@@ -244,13 +259,15 @@ def war_donations(cwl=False):
         remaining, total = remaining_donations()
         # remaining_total += remaining
         donation_list = []
-        if remaining >= 45: donation_list = [lava_hound] + [super_barb] * 3
+        if remaining >= 50: donation_list = [edrag, dragon]
+        elif remaining >= 45: donation_list = [lava_hound] + [ice_golem] + [edrag] + [super_barb]
         elif remaining >= 40: donation_list = [lava_hound] + [super_barb] * 2
         elif remaining >= 35: donation_list = [lava_hound] + [super_barb]
         elif remaining >= 30: donation_list = [lava_hound]
         elif remaining >= 20: donation_list = [dragon]
-        elif remaining >= 10: donation_list = [bloon] * 2
-        elif remaining >= 5: donation_list = [bloon]
+        elif remaining >= 15: donation_list = [ice_golem]
+        elif remaining >= 10: donation_list = [bloon] + [super_barb]
+        elif remaining >= 5: donation_list = [bloon] + [super_barb]
         elif remaining > 1: donation_list = [archer]
         donate_war_troops(donation_list)
         # print("Pre:", remaining, total)
@@ -258,8 +275,19 @@ def war_donations(cwl=False):
         print(remaining, total)
         remaining_total += remaining
 
-        if i_war_right.colour() < 800: still_moving = False
-        i_war_right.click()
+        result_1 = i_war_right.find_detail()[0]
+        result_2 = i_war_right_2.find_detail()[0]
+        if result_1 > result_2:
+            image_to_use = i_war_right
+            # print("Using image 1")
+        else:
+            image_to_use = i_war_right_2
+            # print("Using image 2")
+
+        colour = image_to_use.colour(show_image=False)
+
+        if colour < 800: still_moving = False
+        image_to_use.click()
         time.sleep(0.1)
         count += 1
 
@@ -272,15 +300,15 @@ def war_donations(cwl=False):
 def goto_war_screen():
     if i_return_home_3.find():
         return
-    print("Goto war screen")
+    # print("Goto war screen")
     goto(main)
     # print(current_location, main)
     # if current_location != main: return
-    print("Got to main")
+    # print("Got to main")
     found, count = False, 0
 
     while not found and count < 50:
-        print("Goto war screen:", count, found)
+        # print("Goto war screen:", count, found)
         for image in [i_war, i_war_cwl]:
             if image.find():
                 image.click()
@@ -366,6 +394,7 @@ def click_war_castle():
     for castle in war_castles:
         if castle.find(fast=True, show_image=False):
             castle.click()
+            print("Click war castle - fast loop")
             return True
         else:
             print(castle, castle.find_detail())
@@ -373,6 +402,7 @@ def click_war_castle():
     for castle in war_castles:
         if castle.find(fast=False, show_image=False):
             castle.click()
+            print("Click war castle - slow loop")
             return True
         else:
             print(castle, castle.find_detail())
@@ -400,8 +430,8 @@ def donate_war_troop(troop):
 
 def donate_war_troops(troops):
     # print("Donate war troops")
-    for x in troops:
-        print(x)
+    # for x in troops:
+    #     print(x)
 
     if i_war_request.find(): return
 

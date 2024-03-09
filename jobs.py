@@ -30,12 +30,14 @@ class Job:
         if account != admin:
             change_accounts_fast(account)
             if not account.initial_mode_set: account.set_mode(attacks_left_update=True)
+        print("Run job", self.name, account.mode, admin.mode, admin.war_donations_remaining, account in war_participants)
         if self.name == "donate":
             donate(account)
             if account.mode == "donate" and admin.mode == "preparation" and admin.war_donations_remaining and admin.war_donations_remaining > 0 and account in war_participants:
                 war_donations()
                 queue_up_troops(account)
-            if account.mode == "donate" and admin.mode == "cwl" and admin.war_donations_remaining and admin.war_donations_remaining > 0 and account in war_participants:
+            print("Check cwl donation:", account.mode, admin.mode, admin.war_donations_remaining, admin.war_donations_remaining, account in war_participants)
+            if admin.mode == "cwl" and admin.war_donations_remaining and admin.war_donations_remaining > 0 and account in war_participants:
                 war_donations(cwl=True)
                 queue_up_troops(account)
         if self.name == "coin": coin()
@@ -54,13 +56,13 @@ class Job:
         if self == j_sweep: sweep()
         if self == j_lose_trophies: lose_trophies(account)
         if account != admin:
-            print("Admin:", account, account.admin_hour, datetime.now().hour, account.admin_hour != datetime.now().hour)
             if account.admin_hour != datetime.now().hour:
                 build(account)
                 update_images(account)
                 account.update_resources()
-                get_coin(account)
-                remove_trees_main()
+                get_coin()
+                if datetime.now().hour % 8 == 0:
+                    get_gems()
                 account.admin_hour = datetime.now().hour
                 db_account_update(account.number, "admin_hour", datetime.now().hour)
             else:
@@ -133,14 +135,14 @@ def get_job(job):
 
 def sweep():
     change_accounts_fast(bad_daz)
-    if admin.inviting:
-        invite()
+    # if admin.inviting:
+    #     invite()
     current_mode = admin.mode
     set_admin_mode()
     if current_mode != admin.mode:
         for account in accounts:
             account.set_mode(attacks_left_update=True)
-        if admin.mode == "battle_day" and admin.has_prepped_for_war == False:
+        if admin.mode == "battle_day" and not admin.has_prepped_for_war:
             admin.has_prepped_for_war = True
         if admin.mode == "preparation":
             admin.has_prepped_for_war = False
@@ -157,8 +159,8 @@ def challenge():
 
 
 attack_data = {'name': "attack", 'time_active': timedelta(minutes=2), 'time_inactive': timedelta(hours=2), 'update_time': True}
-attack_b_data = {'name': "attack_b", 'time_active': timedelta(hours=3), 'time_inactive': timedelta(days=1), 'update_time': True}
-donate_data = {'name': "donate", 'time_active': timedelta(minutes=10), 'time_inactive': timedelta(minutes=30), 'update_time': True}
+attack_b_data = {'name': "attack_b", 'time_active': timedelta(hours=6), 'time_inactive': timedelta(days=1), 'update_time': True}
+donate_data = {'name': "donate", 'time_active': timedelta(minutes=10), 'time_inactive': timedelta(minutes=60), 'update_time': True}
 donate_war_data = {'name': "donate_war",'time_active': timedelta(minutes=10),'time_inactive': timedelta(hours=2),'update_time': True}
 research_data = {'name': "research",'time_active': None,'time_inactive': None,'update_time': False}
 build_data = {'name': "build",'time_active': None,'time_inactive': None,'update_time': False}
@@ -180,10 +182,10 @@ j_cwl_troops = Job({'name': "cwl_troops",'time_active': timedelta(hours=8),'time
 j_message = Job(data=message_data)
 j_completion_date = Job(data=completion_date_data)
 j_sweep = Job({'name': "sweep","time_active": timedelta(hours=3),"time_inactive": timedelta(hours=3),'update_time': True})
-j_lose_trophies = Job({'name': "lose_trophies", "time_active": timedelta(minutes=5), "time_inactive": timedelta(hours=2), 'update_time': True})
+j_lose_trophies = Job({'name': "lose_trophies", "time_active": timedelta(minutes=5), "time_inactive": timedelta(hours=4), 'update_time': True})
 
 # active_jobs = [j_build, j_donate, j_attack, j_coin, j_challenge, j_war_troops, j_donate_war, j_message]
-active_jobs = [j_attack, j_donate, j_attack_b, j_sweep, j_lose_trophies, j_completion_date, j_war_troops, j_cwl_troops]
+active_jobs = [j_attack, j_donate, j_attack_b, j_sweep, j_lose_trophies, j_war_troops, j_cwl_troops]
 # active_jobs = [j_attack, j_donate, j_completion_date, j_attack_b, j_war_troops, j_cwl_troops, j_lose_trophies, j_challenge]
 # active_jobs.append(j_sweep)
 
@@ -198,7 +200,7 @@ def print_info():
         account.set_mode(resource_update=False)
         account.print_info()
     print()
-    print("Mode:", admin.mode, admin.war_donations_remaining)
+    print("Mode:", admin.mode, admin.war_donations_remaining, f"{admin.no_of_members}/50")
     db_view(no=5)
     # db_view_builds(no=5)
 

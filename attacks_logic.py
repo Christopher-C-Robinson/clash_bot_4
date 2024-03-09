@@ -169,7 +169,9 @@ def attack(account, data, siege_required=True, attack_regardless=False, print_ti
 
     # Launch attack
     image = assessment[1]
-    launch_attack(account, data, image)
+    launch_attack_new(account, data)
+
+    # launch_attack(account, data, image)
 
     # Finish attack
     finish_attack(account, data)
@@ -218,7 +220,20 @@ def attack_prep(account, siege_required=True):
     if not sufficient_troops: return sufficient_troops
 
     if siege_required and actual_troops and account.th > 8:
-        if log_thrower not in actual_troops.keys() or actual_troops[log_thrower] == 0:
+        if blimp in account.clan_troops_army:
+            pass
+            # if blimp not in actual_troops.keys() or actual_troops[blimp] == 0:
+            #     print("No blimps")
+            #     if blimp not in actual_troops.keys(): print("Not in key")
+            #     if actual_troops[blimp] == 0: print("Count is zero")
+            #     sufficient_troops = False
+            #     # Donations
+            #     if account.request_type is None:
+            #         castle_troops_change(account.clan_troops_army)
+            #         account.request_type = "Army troops"
+            #     else:
+            #         request(account)
+        elif log_thrower not in actual_troops.keys() or actual_troops[log_thrower] == 0:
             print("No log throwers")
             sufficient_troops = False
             # Donations
@@ -258,7 +273,7 @@ def assess_village(account, data, war_goals, print_time=False):
     # zoom_out()
 
     if print_time: print("A", datetime.now() - start_time)
-    if not i_end_battle.wait():
+    if not i_end_battle.wait(dur=3):
         print("Not on attack screen")
         return "Not on attack screen"
 
@@ -290,8 +305,9 @@ def assess_village(account, data, war_goals, print_time=False):
         time_string = str(datetime.now().hour) + " " + str(datetime.now().minute) + " " + str(datetime.now().second)
         cv2.imwrite(f'images/attack_screens/attack {time_string}.png', img)
 
-        # return "Town hall not identified"
-    elif th > data['max_th'] and account.th > 5 and resources[0] < 900000:
+        if account == bad_daz:
+            return "Town hall not identified"
+    elif account.th > 5 and th > account.th and resources[0] < 900000:
         print("TH too high:", th)
         return "Town hall too high"
 
@@ -302,22 +318,9 @@ def assess_village(account, data, war_goals, print_time=False):
     # if check_towers(data['towers_to_avoid'], img) and resources[0] < 900000: return "Aggressive defence"
 
     # Barb drop spot
-    if data['name'] == "barbs":
-        DP = ram_drop_point(img)
-        if DP is None:
-            DP = STANDARD_DP2
-
-    # Goblin mines
-    if data['name'] == "goblins":
-        image_bw = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        target_locs = find_many_img(MINES, image_bw, confidence=0.7)
-        center = (img.shape[1] // 2, img.shape[0] // 2)
-        drop_points = get_drop_points(account, img, center, target_locs)
-        print("Assessment drop points:", drop_points)
-        if len(drop_points) == 0:
-            return "No identified mines"
-        else:
-            return "Good to go", img, drop_points
+    DP = ram_drop_point(img)
+    if DP is None:
+        DP = STANDARD_DP2
 
     # show(img, scale=0.5)
     return "Good to go", img
@@ -352,76 +355,76 @@ def drop_point(r, image):
     # show(image)
     return dp
 
-def launch_attack(account, data, image):
-    print("Attack - initial troops 4:", objects_to_str(data['initial_troops']))
-    pag.scroll(300)
-    pag.scroll(300)
-
-    standard_pace = True
-
-    if data['name'] == 'barbs':
-        if DP is None: return
-        dp = DP
-        if DP[1] > 700:
-            for _ in range(3): pag.scroll(-300)
-            pag.scroll(-300)
-            pag.scroll(-300)
-            dp[1] -= 350
-    else:
-        dp = STANDARD_DP
-
-    if data['name'] == "golems":
-        dp = top
-        dp2 = left
-    else:
-        dp2 = None
-
-    print("Launch attack: bombing")
-    earth_quake()
-
-    # if data['bomb']: bomb(data['bomb_target'], image)
-    # if data['bomb_target2'] is not None: bomb(data['bomb_target2'], image)
-    troop_pause = data['troop_pause']
-
-    # if account.th < 9:
-    #     place_clan()
-    print("Launch attack: initial troops")
-    print("Attack - initial troops 6:", objects_to_str(data['initial_troops']))
-
-    for x in data['initial_troops']:
-        place(x, 1, dp)
-
-    print("Launch attack: main troops")
-    for x in range(data['troop_groups']):
-        for troop, n in data['troop_group']:
-            if not dp2:
-                place(troop, n, dp, troop_pause=troop_pause)
-            else:
-                place_line(troop, n, dp, dp2)
-        # try:
-        #     damage = read_text(DAMAGE, WHITE,True)
-        # except:
-        #     damage = 0
-        # try:
-        #     if int(damage) > 60:
-        #         standard_pace = False
-        # except:
-        #     pass
-        # print("launch_attack Damage:", damage)
-        if standard_pace: time.sleep(3)
-    if standard_pace: time.sleep(10)
-
-    print("Launch attack: final troops")
-    for x in data['final_troops']:
-        place(x, 1, dp)
-    i_return_home.wait(30)
-    i_return_home.click()
-    # wait_cv2("return_home")
+# def launch_attack(account, data, image):
+#     print("Attack - initial troops:", objects_to_str(data['initial_troops']))
+#     pag.scroll(300)
+#     pag.scroll(300)
+#
+#     standard_pace = True
+#
+#     if data['name'] == 'barbs':
+#         if DP is None: return
+#         dp = DP
+#         if DP[1] > 700:
+#             for _ in range(3): pag.scroll(-300)
+#             pag.scroll(-300)
+#             pag.scroll(-300)
+#             dp[1] -= 350
+#     else:
+#         dp = STANDARD_DP
+#
+#     if data['name'] == "golems":
+#         dp = top
+#         dp2 = left
+#     else:
+#         dp2 = None
+#
+#     print("Launch attack: bombing")
+#     earth_quake()
+#
+#     # if data['bomb']: bomb(data['bomb_target'], image)
+#     # if data['bomb_target2'] is not None: bomb(data['bomb_target2'], image)
+#     troop_pause = data['troop_pause']
+#
+#     # if account.th < 9:
+#     #     place_clan()
+#     print("Launch attack: initial troops")
+#     print("Attack - initial troops 6:", objects_to_str(data['initial_troops']))
+#
+#     for x in data['initial_troops']:
+#         place(x, 1, dp)
+#
+#     print("Launch attack: main troops")
+#     for x in range(data['troop_groups']):
+#         for troop, n in data['troop_group']:
+#             if not dp2:
+#                 place(troop, n, dp, troop_pause=troop_pause)
+#             else:
+#                 place_line(troop, n, dp, dp2)
+#         # try:
+#         #     damage = read_text(DAMAGE, WHITE,True)
+#         # except:
+#         #     damage = 0
+#         # try:
+#         #     if int(damage) > 60:
+#         #         standard_pace = False
+#         # except:
+#         #     pass
+#         # print("launch_attack Damage:", damage)
+#         if standard_pace: time.sleep(3)
+#     if standard_pace: time.sleep(10)
+#
+#     print("Launch attack: final troops")
+#     for x in data['final_troops']:
+#         place(x, 1, dp)
+#     i_return_home.wait(30)
+#     i_return_home.click()
+#     # wait_cv2("return_home")
 
 def earth_quake():
     step_x, step_y = 80, 160
     base_x, base_y = 900, 100
-    hit_codes = [(0,0), (-1, 1), (1, 1), (-2, 2), (0, 2), (2, 2), (-3, 3), (-1, 3), (1, 3), (3, 3), (-2, 4), (0, 4), (2, 4)]
+    hit_codes = [(0,0), (-1, 1), (1, 1), (-2, 2), (0, 2), (2, 2), (-3, 3), (-1, 3), (1, 3), (3, 3), (-2, 4), (0, 4), (2, 4), (0, 5)]
     hits = []
     for x, y in hit_codes:
         hit_loc = (base_x + step_x * x, base_y + step_y * y)
@@ -430,10 +433,6 @@ def earth_quake():
     for x, y in hits:
         pag.click(x, y)
         time.sleep(0.1)
-
-    # pag.click(admin.th_loc)
-
-# earth_quake()
 
 def place(troop, count_total, dp=[400,400], troop_pause=0):
     out_of_bounds = True
@@ -457,6 +456,42 @@ def place(troop, count_total, dp=[400,400], troop_pause=0):
             time.sleep(0.1)
             print("Activate warden")
             i_warden_activate.click()
+
+
+def launch_attack_new(account, data):
+    dp = DP
+    if DP[1] > 700:
+        for _ in range(3): pag.scroll(-300)
+        dp[1] -= 350
+
+    print("Attack - new")
+    pag.scroll(300)
+    pag.scroll(300)
+
+    for d in data:
+        print("Attack - new", d)
+        if d[0] == "place":
+            place(d[1], d[2], dp, troop_pause=d[3])
+            time.sleep(d[3])
+        if d[0] == "ability":
+            d[1].activate_image.click()
+        if d[0] == "earthquake":
+            earth_quake()
+        if d[0] == "pause":
+            time.sleep(d[1])
+        if d[0] == 'rage_th':
+            for town_hall in town_halls:
+                if town_hall.level >= 12:
+                    val, loc, rect = town_hall.find_detail()
+                    print("Rage TH", town_hall, val)
+                    if val > town_hall.threshold:
+                        click(rage.i_attack.image, TROOP_ZONE)
+                        pag.click(loc)
+                        click(invisibility.i_attack.image, TROOP_ZONE)
+                        pag.click(loc)
+                        break
+
+
 
 def place_line(troop, count_total, dp1, dp2, troop_pause=0):
     if troop in TROOP_ATTACK_EXT: troop = troop + "_attack"
@@ -674,6 +709,7 @@ def available_resources():
 
     screen = get_screenshot(AVAILABLE_GOLD)
     gold = available_resource_set.read_screen(screen, return_number=True, show_image=False)
+    if gold > 2000000: gold = gold // 10
     print("Available resources (gold):", gold)
 
     return [gold, 0, 0]

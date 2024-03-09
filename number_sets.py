@@ -63,7 +63,7 @@ class Number():
 
             if show_image:
                 min_val, val, min_loc, loc = cv2.minMaxLoc(result)
-                show(image)
+                # show(image)
                 show(screen, label=str(round(val,2)))
             yloc, xloc = np.where(result >= self.confidence)
             z = zip(xloc, yloc)
@@ -112,7 +112,7 @@ class Number():
 
 
 resource_numbers = Number(name="resource_numbers", directory="numbers/resources", confidence=0.89)
-available_resource_set = Number(name="available_resource", directory="numbers/available_resources", confidence=0.85)
+available_resource_set = Number(name="available_resource", directory="numbers/available_resources", confidence=0.88 )
 cost_numbers = Number(name="cost_numbers", directory="numbers/cost", confidence=0.85)
 tower_count = Number(name="tower_count", directory="numbers/tower_count", confidence=0.85)
 build_time = Number(name="build_time", directory="numbers/time", confidence=0.89)
@@ -129,6 +129,7 @@ chat_new = Number(name="chat_new", directory="numbers/surveillance", confidence=
 members = Number(name="Members", directory="numbers/members", confidence=0.90)
 stars = Number(name="Stars", directory="numbers/stars", confidence=0.90)
 war_time = Number(name="war_time", directory="numbers/war_time", confidence=0.86)
+war_stars = Number(name="war_stars", directory="numbers/war_stars", confidence=0.86)
 
 build_towers = Number(name="build_towers", directory="numbers/build_towers", confidence=0.84)
 build_towers_mult = Number(name="build_towers_mult", directory="numbers/build_towers_mult", confidence=0.79)

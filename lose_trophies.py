@@ -6,7 +6,7 @@ from people import *
 # === 7. LOSE TROPHIES ===
 # ========================
 
-def place(troop):
+def place_trophies(troop):
     if troop.i_attack.find():
         troop.i_attack.click()
         time.sleep(0.2)
@@ -35,7 +35,7 @@ def lose_trophies(account):
             val, loc, rect = find(troop.i_attack.image, get_screenshot(TROOP_ZONE))
             print("Lose trophies:", troop.name, val)
             if val > 0.65:
-                if place(troop):
+                if place_trophies(troop):
                     print("Unleashed", troop)
                     break
 

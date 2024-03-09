@@ -1,6 +1,7 @@
 from nav import *
+import openpyxl as xl
 
-war_directory = "images/members/war/"
+war_directory = "images/members/names/"
 member_files = os.listdir(war_directory)
 members = []
 
@@ -9,96 +10,39 @@ CHAT_NAME = (158, 132, 160, 770)
 class Member():
     def __init__(self, name):
         self.name = name
-        self.i_war = Image("member_war", war_directory + name + ".png", threshold=0.9)
+        file = war_directory + name + ".png"
+        # print(file)
+        self.image = Image(file, name=self.name, threshold=0.95, no_of_regions=1, region_limit=[400, 240, 300, 700])
+        # print("Image name:", self.image.name)
+        # self.image.show()
+        self.stars = None
         members.append(self)
 
     def __str__(self):
         return self.name
 
-    def promote(self, position):
-        goto(l_clan)
-        found, count = False, 0
-        while not found and count < 5:
-            count += 1
-            move_war_screen("up", 400)
-            if self.i_war.find(fast=False):
-                self.i_war.click()
-                found = True
-                if i_promote_coleader.find() and position == "coleader":
-                    i_promote_coleader.click()
-                    return
-                if i_promote_elder.find():
-                    i_promote_elder.click()
-                    if position == "coleader":
-                        self.promote()
-
-
+    def get_stars(self):
+        if self.stars: return
+        result, loc, rect = self.image.find_detail(show_image=False)
+        # print(self, result)
+        if result > self.image.threshold:
+            y = rect[1] + 10
+            star_rect = [1540, y, 140, 40]
+            screen = get_screenshot(region=star_rect, colour=0)
+            # show(screen)
+            self.stars = war_stars.read_one_screen(screen)
+        # print(self, self.stars)
 
 
 for file in member_files:
     name = file[0:-4]
-    Member(name)
+    new = Member(name)
+    # print(new.name)
 
-m_rigg = next((x for x in members if x.name == 'rigg_kyo'), None)
-
-
-def save_war_results():
-    success = False
-    results = []
-    for x in range(5):
-        get_to_war_results_screen()
-        time.sleep(.5)
-        print(i_war_log.find_detail()[0])
-        if i_war_log.find():
-            success = True
-            break
-    if not success:
-        print("Couldn't find war log")
-        return
-    move_war_screen("up", 450)
-    finished, count = False, 0
-    while not finished and count < 20:
-        print("Start of loop")
-        print(count)
-        region = (554, 312, 1200, 114)
-        row = get_screenshot(region)
-        # show(row)
-        member = member_in_row(row)
-        if member:
-            print("Found")
-            result = scores.read_screen(row)
-            results.append((member.name, result))
-            print(member.name, result)
-            move_war_screen("up", 114)
-            count += 1
-        else:
-            print("Not found")
-            move_war_screen("up", 30)
-            count += 1
-        print("Finished, count", finished, count)
-
-    print(results)
-
-def member_in_row(row):
-    best, found_member = 0, None
-    for member in members:
-        bool, result, loc = member.i_war.find_screen(row, show_image=False, return_result=True, return_location=True)
-        print("Result:", member.name, bool, result, loc)
-        if bool and loc[1] < 40:
-            if result > best:
-                best = result
-                found_member = member
-            print("Found:", member.name, result, loc)
-    return found_member
-
-def get_to_war_results_screen():
-    goto(l_castle)
-    result = False
-    for image in [i_clan, i_war_log, i_details, i_view_map, i_war_details, i_war_my_team,]:
-        if image.click():
-            result = True
-            time.sleep(0.5)
-    return result
+ma = next((x for x in members if x.name == 'max'), None)
+ka = next((x for x in members if x.name == 'ka'), None)
+abood = next((x for x in members if x.name == 'abood'), None)
+# print(abood)
 
 def move_war_screen(dir, distance):
     time = 0.1
@@ -109,4 +53,89 @@ def move_war_screen(dir, distance):
     if dir == "up":
         pag.moveTo(1726, 900, 0.3)
         pag.dragTo(1726, 900 - distance, time, button="left")
+
+def war_save_name_image(rect):
+    y = rect[1] - 10
+    image_rect = [447, y, 140, 40]
+    image_rect_large = [437, y-10, 160, 60]
+    file_number = get_next_member_number()
+    filename = f"images/members/names/{file_number}.png"
+    screen = get_screenshot(region=image_rect_large, colour=0)
+    already_exists = False
+    for member in members:
+        if not already_exists:
+            bool, val = member.image.find_screen(screen, show_image=False, return_result=True)
+            if bool:
+                print("Member already exists:", member, val)
+                already_exists = True
+    if not already_exists:
+        result = get_screenshot(region=image_rect, colour=1)
+        cv2.imwrite(filename, result)
+    # show(result)
+
+def war_team_find_stars():
+    rects = i_war_star.find_many()
+    return rects
+
+def war_team_scroll_up():
+    star_x, star_y = 1600, 900
+    pag.moveTo(star_x, star_y, 0.3)
+    pag.dragTo(star_x, star_y - 550, 1.5, button="left")
+
+def get_next_member_number():
+    dir = "images/members/names"
+    existing_names = os.listdir(dir)
+    max_no = 1
+    for name in existing_names:
+        name_ex = name[:-4]
+        if name_ex.isnumeric():
+            max_no = max(int(name_ex), max_no)
+    return max_no + 1
+
+def get_stars():
+    goto(l_war_team)
+    for x in range(10):
+        war_team_scroll_up()
+        for member in members:
+            member.get_stars()
+
+def save_member_images():
+    goto(l_war_team)
+    for x in range(10):
+        war_team_scroll_up()
+        time.sleep(2)
+        rects = war_team_find_stars()
+        for rect in rects:
+            war_save_name_image(rect)
+
+def save_stars():
+    file = "excel/war_stars.xlsx"
+    workbook = xl.load_workbook(file)
+    today_date = datetime.now().strftime("%Y-%m-%d")
+
+    # Check if a sheet with today's date exists
+    if today_date in workbook.sheetnames:
+        sheet_to_delete = workbook[today_date]
+        workbook.remove(sheet_to_delete)
+
+    sheet = workbook.create_sheet("MyNewSheet")
+    sheet.title = datetime.now().strftime("%Y-%m-%d")
+
+    count = 1
+    for member in members:
+        if member.stars is not None:
+            sheet.cell(count, 1).value = member.name
+            sheet.cell(count, 2).value = member.stars
+            count += 1
+    workbook.save(file)
+
+if __name__ == "__main__":
+    # Add new members
+    # save_member_images()
+
+    # Save stars
+    get_stars()
+    save_stars()
+    goto(pycharm)
+
 

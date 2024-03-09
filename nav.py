@@ -39,8 +39,11 @@ def hold_key(key, dur):
     pag.keyUp(key)
 
 class Loc():
-    def __init__(self, name, identifier=None, optional=False, accessible=True, regions=[], height=0, pause=False):
-        self.name = name
+    def __init__(self, name=None, identifier=None, optional=False, accessible=True, regions=[], height=0, pause=False):
+        if name:
+            self.name = name
+        elif identifier:
+            self.name = identifier.name
         self.pause = pause
         self.accessible = accessible
         self.identifiers = [identifier, ]
@@ -110,17 +113,6 @@ class Loc():
                 pass
                 # print(f"Creating location: could not find {path}")
 
-
-    # def add_regions(self, regions):
-    #     self.regions += regions
-    #
-    # def show_regions(self, dur=5000):
-    #     goto(self)
-    #     screen = get_screenshot(colour=1)
-    #     for x, y, w, h in self.regions:
-    #         cv2.rectangle(screen, (x, y), (x + w, y + h), 255, 5)
-    #     show(screen, scale=0.7, dur=dur)
-    #
     def print_loc(self):
         print("Location:", self.name)
         for x in self.paths:
@@ -131,6 +123,10 @@ class Loc():
 
     def add_path(self, destination, action, parameter, expected_loc, region=None):
         self.Path(loc=self, destination=destination, action=action, parameter=parameter, expected_loc=expected_loc, region=region)
+
+    def add_paths(self, destinations, action, parameter, expected_loc, region=None):
+        for destination in destinations:
+            self.Path(loc=self, destination=destination, action=action, parameter=parameter, expected_loc=expected_loc, region=region)
 
     def add_default_path(self, action, parameter, expected_loc, region=None):
         new_path = self.Path(loc=self, destination=unknown, action=action, parameter=parameter,
@@ -165,7 +161,7 @@ class Loc():
                 if path.parameter.find():
                     path.parameter.click()
                 else:
-                    print("Perform action (image to click not found):", path.parameter, path.parameter.find_detail())
+                    print("Perform action (image to click not found):", current_location, path.parameter, path.parameter.find_detail())
         elif action == "click_p":
             found, count = False, 0
             while not found and count < 10:
@@ -453,14 +449,10 @@ no_app.id_absence = True
 no_app.id_val_max = 0.8
 no_app.height = -0.4
 l_ldplayer = Loc(name="LD PLayer", identifier=i_clash_icon, accessible=False)
-# no_bluestacks = Loc(name="no_bluestacks", identifier=i_bluestacks, accessible=False)
-# no_bluestacks.id_absence = True
-# no_bluestacks.id_val_max = 0.75
-# no_bluestacks.height = -0.5
-# maintenance = Loc(name="maintenance", identifier=i_maintenance, accessible=False)
 maintenance2 = Loc(name="maintenance2", identifier=i_maintenance2, accessible=False)
 
 main = Loc(name="main", identifier=i_builder, accessible=True, regions=main_regions)
+main.add_identifier(i_builder_goblin)
 unknown = Loc(name="unknown", identifier=i_x, accessible=False)
 unknown.height = -0.5
 chat = Loc(name="chat", identifier=i_challenge, accessible=True)
@@ -469,9 +461,7 @@ l_donate = Loc(name="donate", identifier=i_donate_troops)
 settings = Loc(name="settings", identifier=i_settings, accessible=True)
 change_account = Loc(name="change_account", identifier=i_switch_account, accessible=True, pause=True)
 change_account.height = settings.height + 1
-# forge = Loc(name="forge", identifier=i_forge, accessible=True)
 builder = Loc(name="builder", identifier=i_master_builder, accessible=True)
-# builder.add_identifier(i_otto)
 
 overlays = []
 for overlay in [i_another_device, i_reload, i_reload_game, i_try_again, i_return_home, i_okay,
@@ -489,12 +479,6 @@ for overlay in [i_another_device, i_reload, i_reload_game, i_try_again, i_return
         new_overlay.add_height(4)
     overlays.append(new_overlay)
 
-# log_in2 = Loc(name="log_in", identifier=i_bad_daz, accessible=False)
-# log_in2.add_default_path(action="click_identifier", parameter=None, expected_loc=main)
-
-# log_in = Loc(name="log_in", identifier=i_log_in, accessible=False)
-# log_in.add_default_path(action="click_identifier", parameter=None, expected_loc=log_in2)
-
 army_tab = Loc(name="army_tab", identifier=i_army_tab, accessible=True, regions=army_regions, height=1)
 troops_tab = Loc(name="troops_tab", identifier=i_troops_tab, accessible=True, height=1)
 spells_tab = Loc(name="spells_tab", identifier=i_spells_tab, accessible=True, height=1)
@@ -503,13 +487,17 @@ siege_tab = Loc(name="siege_tab", identifier=i_siege_tab, accessible=True, heigh
 l_request_reinforcements = Loc(name="request_reinforcments", identifier=i_request_reinforcements, accessible=True, height=1)
 l_donation_request_selector = Loc(name="donation_request_selector", identifier=i_highest_level, accessible=True, height=1)
 
-
 l_lab = Loc(name="lab", identifier=i_research_upgrading, accessible=True)
 l_lab.add_identifier(i_lab_girl)
 
 l_games = Loc(name="games", identifier=i_games, accessible=False)
-# l_castle = Loc(name="castle", identifier=i_treasury, accessible=True)
 l_clan = Loc(name="clan", identifier=i_my_clan, accessible=True)
+l_warlog_league = Loc(name="warlog_league", identifier=i_war_league_on, accessible=True)
+l_warlog_classic = Loc(name="warlog_classic", identifier=i_war_classic_on, accessible=True)
+l_war_details = Loc(identifier=i_view_map)
+l_war_map = Loc(identifier=i_war_results)
+l_war_stats = Loc(identifier=i_war_stats_on)
+l_war_team = Loc(identifier=i_war_team_on)
 
 n_attack = Loc(name="attack", identifier=i_find_a_match, accessible=True)
 n_attack.height = 2
@@ -559,8 +547,13 @@ main.add_path(destination=attack_b2, action="goto_builder", parameter="", expect
 main.add_path(destination=attacking_b, action="goto_builder", parameter="", expected_loc=builder)
 main.add_path(destination=l_lab, action="goto_lab", parameter="", expected_loc=l_lab)
 main.add_path(destination=l_games, action="goto_games", parameter="", expected_loc=l_games)
-# main.add_path(destination=l_castle, action="goto_castle", parameter="", expected_loc=l_castle)
 main.add_path(destination=l_clan, action="goto_clan", parameter="", expected_loc=l_clan)
+main.add_path(destination=l_warlog_league, action="goto_clan", parameter="", expected_loc=l_clan)
+main.add_path(destination=l_warlog_classic, action="goto_clan", parameter="", expected_loc=l_clan)
+main.add_path(destination=l_war_details, action="goto_clan", parameter="", expected_loc=l_clan)
+main.add_path(destination=l_war_map, action="goto_clan", parameter="", expected_loc=l_clan)
+main.add_path(destination=l_war_stats, action="goto_clan", parameter="", expected_loc=l_clan)
+main.add_path(destination=l_war_team, action="goto_clan", parameter="", expected_loc=l_clan)
 
 # Builder
 builder.add_path(destination=pycharm, action="click", parameter=i_pycharm_icon, expected_loc=pycharm)
@@ -583,6 +576,27 @@ l_games.add_default_path(action="click", parameter=i_red_cross_games, expected_l
 
 # Clan
 l_clan.add_default_path(action="click", parameter="bottom_left", expected_loc=main)
+l_clan.add_paths(destinations=[l_warlog_league, l_warlog_classic, l_war_details, l_war_map, l_war_stats, l_war_team], action="click", parameter=i_warlog, expected_loc=l_warlog_league)
+
+l_warlog_league.add_default_path(action="click", parameter="bottom_left", expected_loc=main)
+l_warlog_league.add_paths(destinations=[l_warlog_classic, l_war_details, l_war_map, l_war_stats, l_war_team], action="click", parameter=i_war_classic_off, expected_loc=l_warlog_classic)
+l_warlog_league.height = l_clan.height + 1
+
+l_warlog_classic.add_default_path(action="click", parameter="bottom_left", expected_loc=main)
+l_warlog_classic.add_paths(destinations=[l_war_details, l_war_map, l_war_stats, l_war_team], action="click", parameter=i_war_details, expected_loc=l_war_details)
+l_warlog_classic.height = l_clan.height + 1
+
+l_war_details.add_default_path(action="click", parameter=i_return_home_3, expected_loc=main)
+l_war_details.add_paths(destinations=[l_war_map, l_war_stats, l_war_team], action="click", parameter=i_view_map, expected_loc=l_war_map)
+
+l_war_map.add_default_path(action="click", parameter=i_return_home_3, expected_loc=main)
+l_war_map.add_paths(destinations=[l_war_stats, l_war_team], action="click", parameter=i_war_details_map, expected_loc=l_war_stats)
+
+l_war_stats.add_default_path(action="click", parameter=i_return_home_3, expected_loc=l_war_map)
+l_war_stats.add_paths(destinations=[l_war_team, ], action="click", parameter=i_war_team_off, expected_loc=l_war_team)
+
+l_war_team.add_default_path(action="click", parameter=i_return_home_3, expected_loc=l_war_map)
+
 
 # Chat
 chat.add_height(1)
@@ -665,7 +679,7 @@ def goto(destination, depth=0):
         #     print(path)
         # print(current_location, destination, path_found, loop_count)
         print(f"Path not found (loc): {current_location} -> {destination}")
-    if loop_count >= 7:
+    if loop_count >= 15:
         print("Loop count:", loop_count)
         loop_count = 0
         reload(1)
@@ -852,7 +866,6 @@ def current_resources(show_image=False):
     time.sleep(.1)
     result_array = []
     for region in [RESOURCES_G]:
-    # for region in [RESOURCES_G, RESOURCES_E, RESOURCES_D]:
         result_array.append(resource_numbers.read(region, show_image=show_image, return_number=True))
     if result_array[0] > 50000000: result_array[0] = result_array[0]/10
     # print("Current Resources:", result_array)
@@ -936,6 +949,7 @@ def tour(start=0, end=13):
 def spare_builders():
     goto(main)
     screen = get_screenshot(BUILDER_ZERO_REGION)
+    # show(screen)
     if i_builder_zero.find_screen(screen, show_image=False): return 0
     if i_builder_one.find_screen(screen): return 1
     return 2

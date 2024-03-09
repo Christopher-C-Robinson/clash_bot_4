@@ -62,6 +62,7 @@ class Troop():
         self.donate_bool = donate_bool
         self.donate_preference = donate_preference
         self.currently_training = False
+        self.activate_image = None
         if type not in ["hero", "clan"]:
             train_directory = "images/troops/train/"
             train_files = os.listdir(train_directory)
@@ -109,26 +110,27 @@ class Troop():
     def start_train(self, count, account, move_to_start=False):
         if count == 0: return
         print("Start train:", self, count)
-        global slide_position
         if self.type == "troop":
             goto(troops_tab)
-            slide(slide_position, self.slide)
+            if barb.i_army.find(): admin.army_slide = 1
+            slide(self.slide)
         if self.type == "spell":
             goto(spells_tab)
         if self.type == "siege":
             # print("Account has siege", account.has_siege, self.type)
             if not account.has_siege: return
+            # print("Train - going to siege tab")
             goto(siege_tab)
-            slide(slide_position, self.slide)
+            slide(self.slide)
         if self.i_train is None:
             print("Can't train - no image")
             return
 
-        val, loc, rect = find(self.i_train.image, get_screenshot(TRAIN_RANGE))
-        # screen = get_screenshot(TRAIN_RANGE)
+        screen = get_screenshot(TRAIN_RANGE)
+        val, loc, rect = find(self.i_train.image, screen)
         # show(screen)
         # show(self.i_train.image)
-        # print("Troop train", val)
+        print("Troop train", val)
         if val < 0.8 and self.super_troop and account.th >= 11:
             get_super_troop(self)
             goto(troops_tab)
@@ -159,6 +161,8 @@ class Troop():
 
 levels_filename = 'C:/Users/darre/OneDrive/Darren/clash_bot/levels.xlsx'
 
+
+
 def load_troops():
     wb = xl.load_workbook(levels_filename)
     sheet = wb['Troops']
@@ -172,11 +176,11 @@ def load_troops():
         donate_preference = sheet.cell(row, 7).value
         donations = sheet.cell(row, 8).value
         donation_count = sheet.cell(row, 9).value
-        if name == "goblin":
-            donate_bool = True
-            donate_preference = 10
-            donation_count = 10
-            donations = 1
+        # if name == "goblin":
+        #     donate_bool = True
+        #     donate_preference = 10
+        #     donation_count = 10
+        #     donations = 1
 
         # print("Creating troop:", name)
         Troop(name=name, type=type, slide=slide, castle_slide=castle_slide, training_time=training_time, donate_bool=donate_bool,
@@ -201,6 +205,7 @@ bloon = next((x for x in troops if x.name == 'bloon'), None)
 dragon = next((x for x in troops if x.name == 'dragon'), None)
 baby_drag = next((x for x in troops if x.name == 'baby_dragon'), None)
 edrag = next((x for x in troops if x.name == 'edrag'), None)
+root = next((x for x in troops if x.name == 'root'), None)
 minion = next((x for x in troops if x.name == 'minion'), None)
 hog = next((x for x in troops if x.name == 'hog'), None)
 golem = next((x for x in troops if x.name == 'golem'), None)
@@ -212,12 +217,15 @@ titan = next((x for x in troops if x.name == 'titan'), None)
 
 super_barb = next((x for x in troops if x.name == 'super_barb'), None)
 super_minion = next((x for x in troops if x.name == 'super_minion'), None)
+super_dragon = next((x for x in troops if x.name == 'super_dragon'), None)
+
 # super_minion.slide = 2
 
 lightening = next((x for x in troops if x.name == 'lightening'), None)
 heal = next((x for x in troops if x.name == 'heal'), None)
 rage = next((x for x in troops if x.name == 'rage'), None)
 freeze = next((x for x in troops if x.name == 'freeze'), None)
+invisibility = next((x for x in troops if x.name == 'invisibility'), None)
 poison = next((x for x in troops if x.name == 'poison'), None)
 skeleton = next((x for x in troops if x.name == 'skeleton'), None)
 clone = next((x for x in troops if x.name == 'clone'), None)
@@ -228,11 +236,17 @@ king = next((x for x in troops if x.name == 'king'), None)
 warden = next((x for x in troops if x.name == 'warden'), None)
 champ = next((x for x in troops if x.name == 'champ'), None)
 
+king.activate_image = i_king_activate
+queen.activate_image = i_queen_activate
+warden.activate_image = i_warden_activate
+champ.activate_image = i_champ_activate
+
 ram = next((x for x in troops if x.name == 'ram'), None)
 blimp = next((x for x in troops if x.name == 'blimp'), None)
 slammer = next((x for x in troops if x.name == 'slammer'), None)
 log_thrower = next((x for x in troops if x.name == 'log_thrower'), None)
 flinger = next((x for x in troops if x.name == 'flinger'), None)
+drill = next((x for x in troops if x.name == 'drill'), None)
 
 troops.sort(key=lambda x: x.donate_preference, reverse=False)
 
@@ -285,13 +299,13 @@ def drag(a, b):
     pag.dragTo(x1, y1, 1, button="left")
     time.sleep(1)
 
-def slide(slide_pos, slide_pos_target):
+def slide(slide_pos_target):
     # print("Sliding:", slide_pos, slide_pos_target)
     time.sleep(0.2)
-    if slide_pos == slide_pos_target:
-        return slide_pos
+    if admin.army_slide == slide_pos_target:
+        return admin.army_slide
 
-    if slide_pos < slide_pos_target:
+    if admin.army_slide < slide_pos_target:
         start_x = 1500
         end_x = 500
         # slide_pos = min(slide_pos + 1, 2)
@@ -304,13 +318,13 @@ def slide(slide_pos, slide_pos_target):
     # print(slide_pos, slide_pos_target)
     # print((slide_pos - slide_pos_target))
     # print(abs(slide_pos - slide_pos_target))
-    for x in range(abs(slide_pos - slide_pos_target)):
-        print("Slide loop:", x)
+    for x in range(abs(admin.army_slide - slide_pos_target)):
+        # print("Slide loop:", x)
         pag.moveTo(start_x, 660, dur)
         pag.dragTo(end_x, 660, dur)
         time.sleep(1)
-    slide_pos = slide_pos_target
-    return slide_pos
+    admin.army_slide = slide_pos_target
+    return admin.army_slide
 
 def merge_troop_regions():
     for image_type in ["donate1", "donate2"]:

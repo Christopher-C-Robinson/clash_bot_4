@@ -25,7 +25,8 @@ def invite():
     time.sleep(0.1)
     members = get_member_numbers()
     print("No of members:", members)
-    if members >= 49:
+    admin.no_of_members = members
+    if members >= 50:
         i_red_cross_clan.click()
         pag.click(BOTTOM_LEFT)
         admin.inviting = False
@@ -43,7 +44,7 @@ def invite():
             try:
                 member_stars = int(member_stars)
                 print("Member stars:", member_stars)
-                if member_stars > 150:
+                if member_stars > 500:
                     multi_click([i_invite, i_clan_back])
                 else:
                     i_clan_back.click()
@@ -66,8 +67,6 @@ def get_member_numbers():
     if result == 50: print("Full")
     return result
 
-def app():
-    i_app.click()
 
 def invite_many(count):
     invited = []
