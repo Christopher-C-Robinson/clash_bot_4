@@ -2,8 +2,9 @@ import sqlite3
 from utilities import *
 from admin import *
 
+
 def db(db_str):
-    con = sqlite3.connect('data.db')
+    con = sqlite3.connect("data.db")
     c = con.cursor()
     # print(db_str)
     c.execute(db_str)
@@ -12,19 +13,23 @@ def db(db_str):
     con.close()
     return output
 
+
 def db_create_table():
     db_str = "CREATE TABLE jobs(account INTEGER, job TEXT, time datetime)"
     db(db_str)
 
+
 def db_delete_table(table):
     db_str = f"DROP TABLE {table}"
     db(db_str)
+
 
 def db_add(account, job, time):
     if not isinstance(account, int):
         account = account.number
     db_str = f"INSERT INTO jobs VALUES ({account}, '{job}', '{time}')"
     db(db_str)
+
 
 def db_update(account, job, time, use_account_number=False):
     if type(account) == int:
@@ -44,6 +49,7 @@ def db_update(account, job, time, use_account_number=False):
         pass
         # print("Records not updated", account, job)
 
+
 def db_delete(rowid):
     if rowid == "all":
         db_str = f"DELETE from jobs"
@@ -51,11 +57,13 @@ def db_delete(rowid):
         db_str = f"DELETE from jobs WHERE rowid = {rowid}"
     db(db_str)
 
+
 def db_delete_job(job):
     db_str = f"DELETE from jobs WHERE job = {job}"
     db(db_str)
 
-def db_view(job='all', no=5):
+
+def db_view(job="all", no=5):
     output = db_get(job=job, no=no)
     count = 0
     for x in output:
@@ -63,14 +71,18 @@ def db_view(job='all', no=5):
             time = string_to_time(x[2])
             time = time_to_string(time)
             tabs = "\t"
-            if len(x[1]) <= 5: tabs += "\t"
-            if len(x[1]) <= 9: tabs += "\t"
-            if len(x[1]) <= 13: tabs += "\t"
+            if len(x[1]) <= 5:
+                tabs += "\t"
+            if len(x[1]) <= 9:
+                tabs += "\t"
+            if len(x[1]) <= 13:
+                tabs += "\t"
             print("Account:", x[0], " Job:", x[1], tabs + "Time:", time)
         count += 1
 
-def db_view_builds(job='all', no=5):
-    output = db_get(job='all', no=no)
+
+def db_view_builds(job="all", no=5):
+    output = db_get(job="all", no=no)
     count = 0
     for account, job, time in output:
         if count < no:
@@ -78,18 +90,22 @@ def db_view_builds(job='all', no=5):
                 time = string_to_time(time)
                 time = time_to_string(time)
                 tabs = "\t"
-                if len(job) <= 5: tabs += "\t"
-                if len(job) <= 9: tabs += "\t"
+                if len(job) <= 5:
+                    tabs += "\t"
+                if len(job) <= 9:
+                    tabs += "\t"
                 print("Account:", account, " Job:", job, tabs + "Time:", time)
                 count += 1
 
-def db_get(job='all', no=5):
-    if job == 'all':
+
+def db_get(job="all", no=5):
+    if job == "all":
         db_str = "SELECT * FROM jobs ORDER BY time"
     else:
         db_str = f"SELECT * FROM jobs WHERE job='{job}' ORDER BY time"
     output = db(db_str)
     return output
+
 
 def db_read(account, job):
     try:
@@ -106,37 +122,68 @@ def db_read(account, job):
     # print(time.astimezone().isoformat())
     return time
 
+
 def initial_entries(accounts):
-    db_delete('all')
+    db_delete("all")
     time = datetime.now() + timedelta(days=0)
     for x in accounts:
-        for y in ["completion_date", "lose_trophies", "attack", "attack_b", "donate", "war_troops", "cwl_troops", "challenge"]:
+        for y in [
+            "completion_date",
+            "lose_trophies",
+            "attack",
+            "attack_b",
+            "donate",
+            "war_troops",
+            "cwl_troops",
+            "challenge",
+        ]:
             db_add(x, y, time)
             print("SQL Adding:", x, y, time)
 
     db_add(admin, "sweep", time)
 
+
 def add_entries():
     time = datetime.now() + timedelta(minutes=-20)
-    for x in [1, ]:
+    for x in [
+        1,
+    ]:
         for y in ["message"]:
             db_add(x, y, time)
+
 
 def add_entries_all():
     # print("add_entries all")
     time = datetime.now() + timedelta(minutes=-20)
     db_add(0, "games", time)
 
+
 # add_entries_all()
+
 
 def update_entries():
     time = datetime.now() + timedelta(minutes=0)
     for x in range(1, 5):
-        for y in ["build", "attack", "build_b", "attack_b", "clock", "coin", "research", "research_b", "donate", "coin", "war_troops"]:
+        for y in [
+            "build",
+            "attack",
+            "build_b",
+            "attack_b",
+            "clock",
+            "coin",
+            "research",
+            "research_b",
+            "donate",
+            "coin",
+            "war_troops",
+        ]:
             db_update(x, y, time, use_account_number=True)
     for x in range(1):
-        for y in ["message", ]:
+        for y in [
+            "message",
+        ]:
             db_update(x, y, time, use_account_number=True)
+
 
 def db_next_job():
     db_str = "SELECT * FROM jobs ORDER BY time"
@@ -153,6 +200,7 @@ def db_next_job():
     else:
         return result[0]
 
+
 def job_pause(account_number, job, minutes):
     current_job_time = db_read(account_number, job)
     requested_time = datetime.now() + timedelta(minutes=minutes)
@@ -161,9 +209,17 @@ def job_pause(account_number, job, minutes):
     # print(requested_time)
     # print(selected_time)
     db_update(account_number, job, selected_time)
-    print("Pausing. Account:", account_number, "Job:", job, "Minutes", minutes, "New time", selected_time)
+    print(
+        "Pausing. Account:",
+        account_number,
+        "Job:",
+        job,
+        "Minutes",
+        minutes,
+        "New time",
+        selected_time,
+    )
     # print(db_read(account_number, job))
-
 
 
 # job_pause(1, "donate", 10)

@@ -1,32 +1,44 @@
 import openpyxl as xl
 from tower import *
 
-levels_filename = 'C:/Users/darre/OneDrive/Darren/clash_bot/levels.xlsx'
+levels_filename = "levels.xlsx"
+
 
 def load_towers():
     wb = xl.load_workbook(levels_filename)
-    sheet = wb['Towers']
+    sheet = wb["Towers"]
     for row in range(2, sheet.max_row + 1):
         # print(sheet.cell(row, 1).value)
-        if sheet.cell(row, 1).value == None: break
+        if sheet.cell(row, 1).value == None:
+            break
         name = sheet.cell(row, 1).value.replace(" ", "_").lower()
         village = sheet.cell(row, 2).value.lower()
         # village = "main"
         category = sheet.cell(row, 3).value.lower()
         resource = sheet.cell(row, 4).value.lower()
         priority = sheet.cell(row, 5).value
-        if priority is None: priority = 0
+        if priority is None:
+            priority = 0
         yolo_code = -1
-        if name == "air_defence": yolo_code = 0
+        if name == "air_defence":
+            yolo_code = 0
 
         # print("Creating tower:", name)
-        Tower(name=name, village=village, category=category, resource=resource, priority=priority, yolo_code=yolo_code)
+        Tower(
+            name=name,
+            village=village,
+            category=category,
+            resource=resource,
+            priority=priority,
+            yolo_code=yolo_code,
+        )
 
     # print()
 
+
 def load_levels():
     wb = xl.load_workbook(levels_filename)
-    sheet = wb['Levels']
+    sheet = wb["Levels"]
     for row in range(2, sheet.max_row + 1):
         name = sheet.cell(row, 1).value
         number = sheet.cell(row, 2).value
@@ -39,17 +51,22 @@ def load_levels():
         name = name.replace(" ", "_").lower()
         # print(name, number, th, gold, elixir, dark, days)
 
-        if gold is None: gold = 0
-        if elixir is None: elixir = 0
-        if dark is None: dark = 0
+        if gold is None:
+            gold = 0
+        if elixir is None:
+            elixir = 0
+        if dark is None:
+            dark = 0
 
         tower = next((x for x in towers if x.name == name.lower()), None)
         if tower:
-            if type(days) == str: days = int(days)
+            if type(days) == str:
+                days = int(days)
             # print("Loading level:", tower, number, th, gold, elixir, dark, days)
             tower.add_level(tower, number, th, gold, elixir, dark, days)
         # else:
         #     print(f"No {name.lower()} found")
+
 
 def return_tower(tower_name):
     return next((x for x in towers if x.name == tower_name), None)
